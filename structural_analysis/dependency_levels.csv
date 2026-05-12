@@ -1,0 +1,17 @@
+r_file,function,level,parents,children
+all.R,.onAttach,0 (leaf),,
+all.R,.onUnload,0 (leaf),,
+all.R,bkde,0,,linbin
+all.R,bkde2D,0,,linbin2D
+all.R,dpih,0,,bkfe; linbin
+all.R,dpik,0,,bkfe; linbin
+all.R,dpill,0,,blkest; cpblock; locpoly; rlbin; sdiag; sstdiag
+all.R,bkfe,1,dpih; dpik,linbin
+all.R,blkest,1 (leaf),dpill,
+all.R,cpblock,1 (leaf),dpill,
+all.R,linbin2D,1 (leaf),bkde2D,
+all.R,locpoly,1,dpill,linbin; rlbin
+all.R,sdiag,1,dpill,linbin
+all.R,sstdiag,1,dpill,linbin
+all.R,linbin,2 (leaf),bkde; bkfe; dpih; dpik; locpoly; sdiag; sstdiag,
+all.R,rlbin,2 (leaf),dpill; locpoly,
