@@ -19,19 +19,23 @@ The report must adhere strictly to the following parameters:
 Please structure the report using the following markdown format:
 
 ### 1. Abstract
+
 Provide a 2-3 sentence high-level overview of the session's primary objective and the final outcome or state of the project.
 
 ### 2. Methodology & Actions Taken
+
 Detail the concrete steps taken during the session. Include:
 - Which files were created, modified, or analyzed.
 - What tools or commands were executed.
 - Any bugs investigated and the approach taken to resolve them.
 
 ### 3. Key Findings & Results
+
 Highlight the core results of the session:
 - Output metrics, successful compilations, or structural changes.
 - Key technical insights or discoveries made during the work.
 - Resolutions to any problems encountered.
 
 ### 4. Conclusion & Next Steps
+
 Briefly conclude the report by stating the final status of the session's goal.

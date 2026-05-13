@@ -20,7 +20,6 @@ incdir_numpy = run_command(py, ['-c', 'import numpy; print(numpy.get_include())'
 incdir_f2py = run_command(py, ['-c', 'import numpy.f2py; print(numpy.f2py.get_include())'], check: true).stdout().strip()
 fortranobject_c = incdir_f2py / 'fortranobject.c'
 numpy_include = include_directories(incdir_numpy, incdir_f2py)
-
 py.install_sources(
   'KernSmooth/__init__.py',
   subdir: 'KernSmooth'
