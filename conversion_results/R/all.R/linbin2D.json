@@ -1,0 +1,20 @@
+{
+  "imports": [
+    "import numpy as np",
+    "from KernSmooth import _KernSmooth"
+  ],
+  "function_prototype": "def linbin2D(X: np.ndarray[np.float64], gpoints1: np.ndarray[np.float64], gpoints2: np.ndarray[np.float64]) -> np.ndarray[np.float64]:",
+  "function_body": [
+    "    n = X.shape[0]",
+    "    X_flat = np.concatenate([X[:, 0], X[:, 1]])",
+    "    M1 = len(gpoints1)",
+    "    M2 = len(gpoints2)",
+    "    a1 = np.float64(gpoints1[0])",
+    "    a2 = np.float64(gpoints2[0])",
+    "    b1 = np.float64(gpoints1[-1])",
+    "    b2 = np.float64(gpoints2[-1])",
+    "    gcnts = np.zeros(M1 * M2, dtype=np.float64)",
+    "    out = _KernSmooth.lbtwod(np.asarray(X_flat, dtype=np.float64), np.int32(n), a1, a2, b1, b2, np.int32(M1), np.int32(M2), gcnts)",
+    "    return out[8].reshape((M1, M2), order='F')"
+  ]
+}

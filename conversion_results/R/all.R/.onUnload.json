@@ -1,0 +1,17 @@
+{
+  "imports": [
+    "import atexit"
+  ],
+  "function_prototype": "def _on_unload(libpath: str = \"\") -> None:",
+  "function_body": [
+    "    # R's .onUnload hook called library.dynam.unload(\"KernSmooth\", libpath) to",
+    "    # unload the compiled shared library when the package was detached.",
+    "    # CPython does not support safe unloading of native extension modules;",
+    "    # the import system manages the shared library lifetime automatically.",
+    "    # Therefore this body is intentionally empty — no action is required.",
+    "    pass",
+    "",
+    "",
+    "atexit.register(_on_unload)"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "imports": [
+    "import numpy as np",
+    "from KernSmooth import _KernSmooth"
+  ],
+  "function_prototype": "def linbin(X: np.ndarray[np.float64], gpoints: np.ndarray[np.float64], truncate: bool = True) -> np.ndarray[np.float64]:",
+  "function_body": [
+    "    n = len(X)",
+    "    M = len(gpoints)",
+    "    trun = np.int32(1) if truncate else np.int32(0)",
+    "    a = np.float64(gpoints[0])",
+    "    b = np.float64(gpoints[-1])",
+    "    gcnts = np.zeros(M, dtype=np.float64)",
+    "    gcnts = _KernSmooth.linbin(np.asarray(X, dtype=np.float64), np.int32(n), a, b, np.int32(M), trun, gcnts)[6]",
+    "    return gcnts"
+  ]
+}
