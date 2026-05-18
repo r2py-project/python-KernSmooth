@@ -1,0 +1,1033 @@
+% =============================================================================
+% python-KernSmooth Technical Report
+% Main source file: docs/report/main.tex
+%
+% Compilation (from the project root):
+%   pdflatex docs/report/main.tex
+%   pdflatex docs/report/main.tex   (second pass for cross-references)
+%
+% All \lstinputlisting paths are relative to this file's directory (docs/report/).
+% Relative paths of the form ../../.claude/ therefore resolve to .claude/ under
+% the project root, which is the correct location of the agent/command specs.
+% =============================================================================
+
+\documentclass[12pt,a4paper]{article}
+
+% --- Encoding and fonts ---
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% --- Page layout ---
+\usepackage[top=1.2in,bottom=1.2in,left=1.1in,right=1.1in]{geometry}
+
+% --- Math ---
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+% --- Tables ---
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+
+% --- Color ---
+\usepackage{xcolor}
+\definecolor{bgcode}{RGB}{248,248,248}
+\definecolor{fgborder}{RGB}{200,200,200}
+\definecolor{appbg}{RGB}{241,246,255}
+\definecolor{appborder}{RGB}{110,145,210}
+\definecolor{kwblue}{RGB}{0,40,170}
+\definecolor{strred}{RGB}{160,0,0}
+\definecolor{comgray}{RGB}{110,110,110}
+\definecolor{linkblue}{RGB}{10,80,160}
+
+% --- Code listings ---
+\usepackage{listings}
+
+%% Generic monospace style (shell commands, build scripts, etc.)
+\lstdefinestyle{shell}{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{bgcode},
+  frame=single,
+  rulecolor=\color{fgborder},
+  breaklines=true,
+  breakatwhitespace=true,
+  columns=flexible,
+  keepspaces=true,
+  showstringspaces=false,
+  xleftmargin=6pt,
+  xrightmargin=6pt,
+  framexleftmargin=4pt,
+}
+
+%% Python syntax-highlighted style
+\lstdefinestyle{python}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{bgcode},
+  frame=single,
+  rulecolor=\color{fgborder},
+  breaklines=true,
+  columns=flexible,
+  keepspaces=true,
+  showstringspaces=false,
+  xleftmargin=6pt,
+  xrightmargin=6pt,
+  framexleftmargin=4pt,
+  keywordstyle=\color{kwblue}\bfseries,
+  stringstyle=\color{strred},
+  commentstyle=\color{comgray}\itshape,
+}
+
+%% Language definition for Markdown files (used in the appendix)
+%  No keyword highlighting — we want verbatim reproduction with a framed box.
+\lstdefinelanguage{Markdown}{
+  basicstyle=\ttfamily\scriptsize,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=fullflexible,
+  keepspaces=true,
+  tabsize=2,
+  showstringspaces=false,
+}
+
+%% Appendix-file listing style
+\lstdefinestyle{mdfile}{
+  language=Markdown,
+  backgroundcolor=\color{appbg},
+  frame=single,
+  rulecolor=\color{appborder},
+  framesep=5pt,
+  xleftmargin=4pt,
+  xrightmargin=4pt,
+  aboveskip=6pt,
+  belowskip=6pt,
+}
+
+% --- Headers and footers ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\itshape python-KernSmooth --- Technical Report}
+\fancyhead[R]{\small\itshape \nouppercase{\leftmark}}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+% --- Appendix package ---
+\usepackage[toc,page]{appendix}
+
+% --- Paragraph spacing ---
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+
+% --- List formatting ---
+\usepackage{enumitem}
+\setlist[itemize]{noitemsep,topsep=4pt}
+\setlist[enumerate]{noitemsep,topsep=4pt}
+\setlist[description]{noitemsep,topsep=4pt}
+
+% --- Hyperref (load last) ---
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks  = true,
+  linkcolor   = linkblue,
+  urlcolor    = linkblue,
+  citecolor   = {green!45!black},
+  pdftitle    = {python-KernSmooth: A Technical Report},
+  pdfauthor   = {Yufei Cai},
+  pdfsubject  = {Porting KernSmooth from R to Python},
+  pdfkeywords = {KernSmooth, R, Python, kernel smoothing, f2py, Fortran},
+}
+
+% =============================================================================
+% Custom commands
+% =============================================================================
+
+%% \appendixentry{Display Title}{relative/path/to/file.md}
+%%
+%% Inserts a labelled subsubsection in the appendix, adds it to the TOC,
+%% and typesets the file contents verbatim using the mdfile listing style.
+%% The label is app:<Display Title> (with spaces and special chars as given;
+%% callers should pass simple hyphenated names for safety).
+\newcommand{\appendixentry}[2]{%
+  \phantomsection%
+  \subsubsection*{\texttt{#1}}%
+  \addcontentsline{toc}{subsubsection}{\texttt{#1}}%
+  \label{appentry:#1}%
+  \lstinputlisting[style=mdfile]{#2}%
+  \vspace{0.5em}%
+}
+
+% =============================================================================
+\begin{document}
+% =============================================================================
+
+% --- Title page ---
+\begin{titlepage}
+  \centering
+  \vspace*{3.5cm}
+  {\Huge\bfseries python-KernSmooth\par}
+  \vspace{0.8cm}
+  {\LARGE A Technical Report on Porting the\\[0.4em]
+   \texttt{KernSmooth} R Package to Python\par}
+  \vspace{1.4cm}
+  {\Large Yufei Cai\par}
+  \vspace{0.5cm}
+  {\normalsize\ttfamily /groups/jli9/Yufei/python-KernSmooth\par}
+  \vfill
+  {\normalsize\textit{Status:~Work in Progress}\par}
+  \vspace{0.3cm}
+  {\normalsize Last updated:~2026-05-18\par}
+\end{titlepage}
+
+\tableofcontents
+\clearpage
+
+% =============================================================================
+\section*{Abstract}
+\addcontentsline{toc}{section}{Abstract}
+% =============================================================================
+
+This report documents the ongoing work to port the R package \texttt{KernSmooth} (version~2.23-26, released 2024-12-10) into an installable Python package of the same name. \texttt{KernSmooth} is a \emph{recommended} package shipped with every standard R installation; it implements kernel smoothing methods from Wand \& Jones~\cite{wandjones1995} and has no runtime dependencies on any external CRAN package.
+
+The conversion strategy retains the original Fortran~77 computational core verbatim, compiles it into a Python C-extension via \texttt{numpy.f2py}, and replaces the R wrapper layer with semantically equivalent Python functions. The project proceeds in five phases: (1)~static architectural analysis of the R package, (2)~Python build-system establishment, (3)~language-dependency cataloguing and per-dependency conversion guide generation, (4)~automated R-to-Python function conversion and package assembly, and (5)~code-quality audit and namespace refinement. All five phases have been executed. The resulting package installs under Python~3.14 (CPython) in a \texttt{conda} environment on a Red Hat Enterprise Linux~9 HPC node and produces numerically correct output.
+
+% =============================================================================
+\section{Introduction}
+% =============================================================================
+
+\subsection{Background and Motivation}
+
+The R package \texttt{KernSmooth} implements the statistical methods described in
+\begin{quote}
+  M.~P.~Wand and M.~C.~Jones (1995).\ \textit{Kernel Smoothing}.
+  Chapman and Hall, London.
+\end{quote}
+It is a \emph{recommended} package --- one of the roughly fifteen packages that ship as part of the base R distribution and are maintained by the R Core Team. The package was authored by M.~P.~Wand, contributed LINPACK Fortran routines are attributed to Cleve Moler, and the current R-language port and maintenance is by Brian Ripley. It is released under an ``Unlimited'' license.
+
+The package provides seven public functions covering kernel density estimation, plug-in bandwidth and bin-width selection, and local polynomial regression. Because it delegates all numerically intensive loops to compiled Fortran~77 code, it is both correct and performant.
+
+The motivation for a Python port is to make these well-tested implementations available to Python-based scientific workflows without requiring an R runtime. A port that re-uses the \emph{original Fortran routines} offers a stronger correctness guarantee than a ground-up Python reimplementation: numerical differences between the Python and R packages can then originate only in the R-to-Python wrapper translation, which is far easier to audit systematically.
+
+The broader scientific motivation, experimental design, and validation plan for this project are described in two planning documents that are not reproduced in this report:
+\begin{itemize}
+  \item \texttt{docs/methodology\_and\_plan\_Jun.pdf} --- the primary methodology and project plan.
+  \item \texttt{docs/methodology\_addendum\_20260511.pdf} --- an addendum dated 2026-05-11.
+\end{itemize}
+The original R package reference manual is archived at \texttt{docs/KernSmooth.pdf}. The contents of these PDF files were not available during the writing of this report and are therefore not summarised here.
+
+\subsection{Repository Structure}
+
+The working directory \texttt{python-KernSmooth/} is organized as follows.
+
+\begin{center}
+\begin{tabular}{p{0.42\textwidth}p{0.50\textwidth}}
+\toprule
+Path & Contents \\
+\midrule
+\texttt{KernSmooth/} &
+  Unmodified R package source (v2.23-26). \\
+\texttt{py-KernSmooth/} &
+  Python package under development; contains \texttt{KernSmooth/\_\_init\_\_.py}, \texttt{meson.build}, \texttt{pyproject.toml}, Fortran sources in \texttt{src/}, and \texttt{tests/test.py}. \\
+\texttt{structural\_analysis/} &
+  Dependency-graph visualisation artefacts (\texttt{dependency\_graph.\{py,html,pdf,png\}}), the function-level CSV (\texttt{dependency\_levels.csv}), and the JSON analysis outputs per R file. \\
+\texttt{language\_dependency\_analysis/} &
+  Per-file CSV dependency tables, the CSV merge script, the combined table, and the 46 per-dependency conversion guides in \texttt{conversion\_guides/}. \\
+\texttt{conversion\_results/} &
+  Per-function JSON translation artefacts produced by the conversion pipeline. \\
+\texttt{docs/} &
+  Architecture document, planning PDFs, per-phase summaries in \texttt{daily\_summaries/}, and this report in \texttt{report/}. \\
+\texttt{.claude/agents/} &
+  Sub-agent specification Markdown files. \\
+\texttt{.claude/commands/} &
+  Skill (slash command) specification Markdown files. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Automated Workflow Infrastructure}
+
+This project employs \textbf{Claude Code} (Anthropic) as an AI-assisted development environment. Recurring multi-step tasks are encoded as \emph{skills} --- top-level slash commands whose specifications are stored as Markdown files under \texttt{.claude/commands/}. Skills orchestrate one or more \emph{sub-agents} whose specifications are stored under \texttt{.claude/agents/}. Both types of specification files use YAML front matter to declare a name and description, followed by a structured natural-language body describing execution steps and output schemas. Sub-agents are dispatched via the \texttt{@agent-name} notation from within a skill.
+
+The full specifications for all agents and commands referenced in this report appear in Appendices~\ref{app:agents} and~\ref{app:commands}.
+
+At the end of each phase, the \texttt{/summarize-research-report} skill was invoked:
+\begin{lstlisting}[style=shell]
+/summarize-research-report
+\end{lstlisting}
+This produced a structured Markdown summary of the phase's activities, which was saved to \texttt{docs/daily\_summaries/}. Those summaries are the primary source material for this report.
+
+% =============================================================================
+\section{Phase 1: Static Analysis of the KernSmooth R Package}
+% =============================================================================
+
+\subsection{Motivation}
+
+Before any translation work could begin, a precise, machine-readable map of the R package's internal structure was required. The goals of this phase were:
+
+\begin{enumerate}
+  \item Classify every R function by dependency type: calls to R standard-library functions, calls to other functions defined within the same (or other self-written related) R source file, and calls through the Fortran foreign-function interface.
+  \item Establish the public API surface and the complete internal call graph.
+  \item Understand the Fortran integration layer and the symbol-registration convention it uses.
+  \item Produce a comprehensive architecture document to serve as a reference throughout all subsequent phases.
+\end{enumerate}
+
+Without this foundation, later phases would need to infer architectural facts on a per-function basis, risking inconsistency and missed dependencies. The structural analysis JSON produced here also serves as a direct input to the language-dependency extraction skill in Phase~3 and to the conversion ordering logic in Phase~4.
+
+\subsection{R Dependency Analysis}
+
+The \texttt{/analyze-r-folder-dependencies} skill (Appendix~\ref{app:commands}, \S\ref{appentry:analyze-r-folder-dependencies}) was invoked against the R source directory:
+
+\begin{lstlisting}[style=shell]
+/analyze-r-folder-dependencies KernSmooth/R/
+\end{lstlisting}
+
+The skill performs a recursive scan of the target folder for \texttt{.R} and \texttt{.r} files, then dispatches the \texttt{@analyze-r-file-dependencies} sub-agent (Appendix~\ref{app:agents}, \S\ref{appentry:analyze-r-file-dependencies}) on each file. Because \texttt{KernSmooth} packages all R code into a single source file (\texttt{KernSmooth/R/all.R}), exactly one agent invocation was required.
+
+The sub-agent parses the R file, identifies every user-defined function, and classifies each function call in its body into one of three mutually exclusive categories:
+
+\begin{description}
+  \item[\texttt{language\_dependencies}] Calls to R built-in functions or functions from installed packages, identified by namespace prefix or by not being locally defined (e.g.\ \texttt{fft}, \texttt{var}, \texttt{dnorm}, \texttt{stats::quantile}).
+  \item[\texttt{internal\_dependencies}] Calls to other functions defined within the same R file.
+  \item[\texttt{external\_dependencies}] Calls via \texttt{.Fortran()}, \texttt{.C()}, \texttt{.Call()}, or \texttt{.External()} to compiled native-code entry points.
+\end{description}
+
+The result is a JSON object keyed by function name, each value containing the three dependency arrays. The output was written to \texttt{structural\_analysis/R/all.json}.
+
+\subsection{Architecture Synthesis}
+
+To produce a comprehensive architecture document, the following files were read in parallel and synthesised into \texttt{docs/architecture-analysis.md}:
+
+\begin{center}
+\begin{tabular}{p{0.46\textwidth}p{0.44\textwidth}}
+\toprule
+File & Purpose \\
+\midrule
+\texttt{KernSmooth/DESCRIPTION} &
+  Package metadata, authorship, license, declared dependencies. \\
+\texttt{KernSmooth/NAMESPACE} &
+  Exported symbols; \texttt{useDynLib} registration directive. \\
+\texttt{structural\_analysis/R/all.json} &
+  Per-function dependency classification (produced above). \\
+\texttt{structural\_analysis/dependency\_levels.csv} &
+  Function call-depth hierarchy (pre-existing artefact). \\
+\texttt{KernSmooth/man/bkde.Rd} &
+  Density estimation API and algorithm description. \\
+\texttt{KernSmooth/man/bkde2D.Rd} &
+  Two-dimensional density estimation API. \\
+\texttt{KernSmooth/man/bkfe.Rd} &
+  Kernel functional estimator API. \\
+\texttt{KernSmooth/man/dpih.Rd} &
+  Histogram bin-width selector API. \\
+\texttt{KernSmooth/man/dpik.Rd} &
+  Kernel density bandwidth selector API. \\
+\texttt{KernSmooth/man/dpill.Rd} &
+  Local linear regression bandwidth selector API. \\
+\texttt{KernSmooth/man/locpoly.Rd} &
+  Local polynomial estimator API. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A check for \texttt{KernSmooth/vignettes/} confirmed that the directory does not exist; the package has no vignette sources.
+
+\subsection{Key Findings}
+
+\subsubsection{Package Scope and External Dependencies}
+
+\texttt{KernSmooth} has \emph{zero} runtime dependencies on contributed CRAN packages. It imports exactly five functions from the base \texttt{stats} package: \texttt{dbeta}, \texttt{dnorm}, \texttt{fft}, \texttt{quantile}, and \texttt{var}. \texttt{MASS} and \texttt{carData} appear in the \texttt{Suggests} field of \texttt{DESCRIPTION} but are referenced only in \texttt{man/} examples and play no role in the package's computational logic. This minimal dependency footprint simplifies the Python port considerably.
+
+\subsubsection{Function Inventory}
+
+\texttt{R/all.R} defines exactly 16 functions in a single file. Seven are exported via \texttt{NAMESPACE}; nine are internal (unexported).
+
+\begin{center}
+\begin{tabular}{llll}
+\toprule
+Function & Exported & Level & Fortran entry point \\
+\midrule
+\texttt{bkde}      & Yes & 0 & \texttt{F\_linbin} (via \texttt{linbin}) \\
+\texttt{bkde2D}    & Yes & 0 & \texttt{F\_lbtwod} (via \texttt{linbin2D}) \\
+\texttt{dpih}      & Yes & 0 & \texttt{F\_linbin} (via \texttt{linbin}) \\
+\texttt{dpik}      & Yes & 0 & \texttt{F\_linbin} (via \texttt{linbin}) \\
+\texttt{dpill}     & Yes & 0 & multiple (via six helpers) \\
+\texttt{locpoly}   & Yes & 0 & \texttt{F\_locpol} and \texttt{F\_rlbin} \\
+\texttt{bkfe}      & Yes & 1 & \texttt{F\_linbin} (via \texttt{linbin}) \\
+\texttt{linbin}    & No  & 2 & \texttt{F\_linbin} \\
+\texttt{rlbin}     & No  & 2 & \texttt{F\_rlbin} \\
+\texttt{blkest}    & No  & 1 & \texttt{F\_blkest} \\
+\texttt{cpblock}   & No  & 1 & \texttt{F\_cp} \\
+\texttt{linbin2D}  & No  & 1 & \texttt{F\_lbtwod} \\
+\texttt{sdiag}     & No  & 1 & \texttt{F\_sdiag} \\
+\texttt{sstdiag}   & No  & 1 & \texttt{F\_sstdg} \\
+\texttt{.onAttach} & No  & 0 & --- \\
+\texttt{.onUnload} & No  & 0 & --- \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\texttt{bkfe} is notable for being both an \emph{exported} function and an \emph{internal dependency}: \texttt{dpih} and \texttt{dpik} both call it to evaluate the density functionals $\int f(x)\,f^{(r)}(x)\,\mathrm{d}x$ required for plug-in bandwidth selection.
+
+\subsubsection{Three-Level Dependency Hierarchy}
+
+The internal call graph has three levels, stored in \texttt{structural\_analysis/dependency\_levels.csv}:
+
+\begin{description}
+  \item[Level~0 (entry points):] Functions callable directly by the user: \texttt{bkde}, \texttt{bkde2D}, \texttt{dpih}, \texttt{dpik}, \texttt{dpill}, \texttt{.onAttach}, \texttt{.onUnload}.
+  \item[Level~1 (mid-tier helpers):] Functions called by one or more level-0 functions: \texttt{bkfe}, \texttt{blkest}, \texttt{cpblock}, \texttt{linbin2D}, \texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}.
+  \item[Level~2 (binning primitives):] \texttt{linbin} and \texttt{rlbin}.
+\end{description}
+
+\texttt{linbin} (one-dimensional linear binning, backed by Fortran \texttt{F\_linbin}) is the single most central function: it is called by seven distinct callers (\texttt{bkde}, \texttt{bkfe}, \texttt{dpih}, \texttt{dpik}, \texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}), meaning that every density estimation and functional estimation path passes through it.
+
+\texttt{dpill} is the most internally complex exported function, orchestrating six internal helpers (\texttt{rlbin}, \texttt{cpblock}, \texttt{blkest}, \texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}) to produce a single bandwidth estimate.
+
+\subsubsection{Fortran Integration Convention}
+
+The \texttt{NAMESPACE} file contains:
+
+\begin{lstlisting}[style=shell]
+useDynLib(KernSmooth, .registration = TRUE, .fixes = "F_")
+\end{lstlisting}
+
+This registers all Fortran entry points at package load time and applies the \texttt{F\_} prefix to their R-level names, preventing symbol conflicts. All eight Fortran-delegating R wrappers use this naming scheme. LINPACK-derived linear-algebra routines (attributed to Cleve Moler in \texttt{DESCRIPTION}) reside in \texttt{KernSmooth/src/d*} and underpin the local polynomial computations in \texttt{locpoly}, \texttt{sdiag}, and \texttt{sstdiag}.
+
+\subsubsection{Architectural Design: Binned Approximation}
+
+Every computationally non-trivial function in \texttt{KernSmooth} adopts the same two-phase strategy: (1)~\textbf{bin} the raw data onto an equally-spaced grid using \emph{linear binning}, which preserves the first moment of each data point within its bin interval (unlike simple histogram binning), and (2)~\textbf{convolve} the bin counts with a kernel weight vector, either via FFT (\texttt{bkde}, \texttt{bkde2D}, \texttt{bkfe}) or via the Fortran local-polynomial routines. This trades a small, controllable bias for a reduction in computational complexity from $O(n \cdot g)$ to $O(n + g \log g)$, where $n$ is the sample size and $g$ is the grid size.
+
+\subsubsection{Note on Fortran Source Analysis}
+
+A complete cross-language dependency map would also require analysing the compiled Fortran sources in \texttt{KernSmooth/src/}. The \texttt{/analyze-c-folder-dependencies} skill (Appendix~\ref{app:commands}) was identified as a candidate tool for this task (it handles both C and Fortran), but this analysis has not yet been executed.
+
+% =============================================================================
+\section{Phase 2: Establishing the Python Build Infrastructure}
+% =============================================================================
+
+\subsection{Motivation}
+
+The conversion strategy requires the original Fortran~77 sources to be compiled into a Python C-extension so that Python wrapper functions can call them directly. This approach avoids re-implementing numerically sensitive routines and provides a strong guarantee of numerical equivalence with the R package.
+
+The R package's Fortran integration uses R's internal \texttt{.Fortran()} mechanism. Replicating this in Python requires \texttt{f2py} (part of NumPy), which parses Fortran source files and automatically generates C wrapper code and Python callable interfaces. The resulting extension must be integrated into a proper Python package with an installable structure.
+
+Phase~2 addresses all build-system and packaging concerns before any wrapper code is written.
+
+\subsection{Build System Design}
+
+The build system uses \texttt{meson-python} as the build backend, declared in \texttt{py-KernSmooth/pyproject.toml}:
+
+\begin{lstlisting}[style=shell]
+[build-system]
+build-backend = "mesonpy"
+requires = ["meson-python", "numpy"]
+
+[project]
+name = "KernSmooth"
+version = "0.1.0"
+dependencies = ["numpy"]
+\end{lstlisting}
+
+The complete build definition resides in \texttt{py-KernSmooth/meson.build}.
+
+\subsubsection{Fortran Sources}
+
+Thirteen Fortran~77 fixed-form source files in \texttt{py-KernSmooth/src/} are compiled into the extension:
+
+\begin{center}
+\begin{tabular}{p{0.36\textwidth}p{0.55\textwidth}}
+\toprule
+File & Origin \\
+\midrule
+\texttt{src/blkest.f}   & Original \texttt{KernSmooth} source \\
+\texttt{src/cp.f}       & Original \texttt{KernSmooth} source \\
+\texttt{src/dgedi.f}    & Original \texttt{KernSmooth} source (LINPACK LU) \\
+\texttt{src/dgefa.f}    & Original \texttt{KernSmooth} source (LINPACK LU) \\
+\texttt{src/dgesl.f}    & Original \texttt{KernSmooth} source (LINPACK LU) \\
+\texttt{src/linbin.f}   & Original \texttt{KernSmooth} source \\
+\texttt{src/linbin2D.f} & Original \texttt{KernSmooth} source \\
+\texttt{src/locpoly.f}  & Original \texttt{KernSmooth} source \\
+\texttt{src/rlbin.f}    & Original \texttt{KernSmooth} source \\
+\texttt{src/sdiag.f}    & Original \texttt{KernSmooth} source \\
+\texttt{src/sstdiag.f}  & Original \texttt{KernSmooth} source \\
+\texttt{src/dqrdc.f}    & Added from Netlib (LINPACK QR decomposition, G.~W.~Stewart 1978) \\
+\texttt{src/dqrsl.f}    & Added from Netlib (LINPACK QR solve, G.~W.~Stewart 1978) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The two Netlib additions are necessary because \texttt{blkest.f} and \texttt{cp.f} call \texttt{dqrdc\_} and \texttt{dqrsl\_}, respectively. The original R package satisfies these symbols from R's own internal LINPACK copy (built into the R binary). OpenBLAS provides only BLAS levels~1--3 and does not include LINPACK QR routines. Sourcing them from Netlib is the standard remedy for this gap when porting R packages that depend on LINPACK.
+
+The presence of LINPACK routines (both the original \texttt{dgedi/dgefa/dgesl} trio and the newly added \texttt{dqrdc/dqrsl}) was discovered iteratively during Phase~2: each link failure at \texttt{pip install} time revealed one missing symbol, which was then resolved by adding the corresponding Netlib file.
+
+\subsubsection{f2py Wrapper Generation}
+
+\texttt{f2py} (NumPy~2.4.3) is invoked as a Meson \texttt{custom\_target}:
+
+\begin{lstlisting}[style=shell]
+python -m numpy.f2py @INPUT@ -m _KernSmooth --lower
+\end{lstlisting}
+
+Because all sources are Fortran~77 fixed-form (\texttt{.f}), \texttt{f2py} generates \texttt{\_KernSmoothmodule.c} and \texttt{\_KernSmooth-f2pywrappers.f} (the fixed-form wrapper variant). An initial build template incorrectly named the wrapper file \texttt{\_KernSmooth-f2pywrappers2.f90} (the free-form Fortran~90 variant), which caused a build failure; the distinction was identified by inspecting the \texttt{f2py} output and corrected in the \texttt{meson.build} \texttt{outputs} list.
+
+The \texttt{--lower} flag lowercases all Fortran symbol names in the generated C wrapper, which is required for standard GFortran symbol conventions.
+
+\subsubsection{NumPy Include Directories}
+
+The Meson configure step must locate NumPy's C header files at configure time (not at install time), since they are required to compile \texttt{fortranobject.c}, the f2py runtime support file. Two \texttt{run\_command} calls retrieve these directories:
+
+\begin{lstlisting}[style=shell]
+incdir_numpy = run_command(py,
+  ['-c', 'import numpy; print(numpy.get_include())'],
+  check: true).stdout().strip()
+incdir_f2py = run_command(py,
+  ['-c', 'import numpy.f2py; print(numpy.f2py.get_include())'],
+  check: true).stdout().strip()
+\end{lstlisting}
+
+\texttt{fortranobject.c} (located in \texttt{incdir\_f2py}) is included directly in the extension module's source list.
+
+\subsubsection{BLAS Discovery and Fallback Chain}
+
+The HPC node (Red~Hat Enterprise Linux~9, GFortran~15.2.0, \texttt{ld.bfd~2.35.2-67}) provides OpenBLAS at \texttt{/usr/lib64/libopenblaso.so.0}, but the unversioned symlink (\texttt{libopenblaso.so}) normally installed by the \texttt{openblas-openmp-devel} package is absent. Meson's standard \texttt{find\_library} and \texttt{dependency('blas')} mechanisms cannot resolve a bare \texttt{.so.0} file. The following four-stage fallback chain in \texttt{meson.build} addresses this:
+
+\begin{lstlisting}[style=shell]
+blas_dep = dependency('blas', required: false)
+if not blas_dep.found()
+  blas_dep = fc.find_library('openblaso', required: false)
+endif
+if not blas_dep.found()
+  blas_dep = fc.find_library('openblas', required: false)
+endif
+if not blas_dep.found()
+  blas_dep = fc.find_library('blas', required: false)
+endif
+if not blas_dep.found()
+  blas_dep = declare_dependency(link_args:
+    ['/usr/lib64/libopenblaso.so.0'])
+endif
+\end{lstlisting}
+
+The final \texttt{declare\_dependency} hard-codes the absolute path as a last resort. The presence of each fallback stage allows the build to succeed on other systems that may have BLAS installed in the standard way.
+
+\subsubsection{Package Structure}
+
+The Python package exposes two components:
+
+\begin{description}
+  \item[\texttt{KernSmooth/\_KernSmooth}] The compiled Fortran C-extension (private backend). All 11 original subroutines are accessible via \texttt{KernSmooth.\_KernSmooth.\textit{name}}.
+  \item[\texttt{KernSmooth/\_\_init\_\_.py}] The Python wrapper layer that defines the public API.
+\end{description}
+
+An early design exposed the raw Fortran subroutines directly in the \texttt{KernSmooth} namespace. This was identified as architecturally incorrect: the Fortran subroutines have a low-level calling convention (all arguments passed by reference, no input validation, no Python-idiomatic defaults) and should not be part of the public API. \texttt{\_\_init\_\_.py} was revised to contain only \texttt{from . import \_KernSmooth} and \texttt{\_\_all\_\_ = []}, deferring all public-API decisions to the wrapper functions to be written in Phase~4.
+
+\subsection{Installation}
+
+The package is installed into the \texttt{r-to-python} conda environment via:
+
+\begin{lstlisting}[style=shell]
+pip install --no-build-isolation .
+\end{lstlisting}
+
+The \texttt{--no-build-isolation} flag is required because the conda environment provides \texttt{numpy} and \texttt{meson-python} directly, and the Meson configure step calls \texttt{numpy.get\_include()} and \texttt{numpy.f2py.get\_include()} at configure time. With build isolation, pip would install \texttt{numpy} into an isolated build environment, producing a different path that may conflict with the runtime environment.
+
+The full invocation, including the cluster's \texttt{module load gcc} and \texttt{conda activate r-to-python} steps, is captured in \texttt{py-KernSmooth/pip\_install.sh}. This script is also suitable for submission as a cluster batch job (\texttt{\#\$ -pe smp 1}, \texttt{\#\$ -q long} directives are included).
+
+After successful installation, \texttt{import KernSmooth} and \texttt{import KernSmooth.\_KernSmooth} both succeed without error.
+
+% =============================================================================
+\section{Phase 3: Language Dependency Catalogue and Conversion Guides}
+% =============================================================================
+
+\subsection{Motivation}
+
+The automated function conversion in Phase~4 maps each R construct to its Python equivalent. For most R standard-library functions, a na\"{i}ve translation to the apparent NumPy or SciPy analogue introduces silent numerical errors. Documented examples include: R's \texttt{fft(inverse=TRUE)} is unnormalised while NumPy's \texttt{ifft} normalises by $1/N$; R's \texttt{var()} uses Bessel's correction while \texttt{np.var} does not; R's \texttt{as.integer()} targets 32-bit integers while NumPy defaults to 64-bit.
+
+Phase~3 systematically catalogs every R standard-library function used in \texttt{all.R}, records its precise call sites, and generates a dedicated translation guide for each. By encoding these nuances in machine-readable Markdown files that are later fed to the conversion sub-agent, the translation quality is improved without depending on the agent's training-data knowledge of R semantics.
+
+\subsection{Language Dependency Extraction}
+
+The \texttt{/extract-r-folder-language-dependencies} skill (Appendix~\ref{app:commands}, \S\ref{appentry:extract-r-folder-language-dependencies}) was invoked:
+
+\begin{lstlisting}[style=shell]
+/extract-r-folder-language-dependencies KernSmooth/R/
+\end{lstlisting}
+
+The skill dispatches the \texttt{@extract-r-file-language-dependencies} sub-agent (Appendix~\ref{app:agents}, \S\ref{appentry:extract-r-file-language-dependencies}) on each R file together with its pre-computed structural-analysis JSON. The sub-agent reads the structural JSON to identify the language dependencies of each function, then scans the R source line by line to record, for every individual call site: the dependency name, the enclosing function name, the line number, and the complete call expression (including multi-line calls).
+
+The result was written to \texttt{language\_dependency\_analysis/R/all.csv}: a 370-row, 4-column CSV (\texttt{language\_dependency}, \texttt{function\_name}, \texttt{line\_number}, \texttt{call\_body}) covering all 16 functions in \texttt{all.R}.
+
+A utility script \texttt{language\_dependency\_analysis/combine\_csvs.py} was also written (but not yet executed) to:
+\begin{itemize}
+  \item Recursively glob all \texttt{.csv} files under \texttt{language\_dependency\_analysis/R/}.
+  \item Insert a \texttt{file\_path} column (the relative path of the source R file within the \texttt{R/} folder, \texttt{.csv} extension replaced with \texttt{.R}).
+  \item Concatenate, sort by \texttt{[language\_dependency, file\_path, function\_name, line\_number]}, and save the combined result to \texttt{language\_dependency\_analysis/combined\_table.csv}.
+\end{itemize}
+
+This script is designed to support future analysis of additional R files beyond \texttt{all.R}.
+
+\subsection{Conversion Guide Generation}
+
+The \texttt{/generate-language-dependency-conversion-guides} skill (Appendix~\ref{app:commands}, \S\ref{appentry:generate-language-dependency-conversion-guides}) was invoked:
+
+\begin{lstlisting}[style=shell]
+/generate-language-dependency-conversion-guides \
+    KernSmooth/R/ \
+    language_dependency_analysis/combined_table.csv
+\end{lstlisting}
+
+The skill identified 46 unique \texttt{language\_dependency} values in the combined CSV and launched 46 instances of the \texttt{@generate-language-dependency-conversion-guide} sub-agent (Appendix~\ref{app:agents}, \S\ref{appentry:generate-language-dependency-conversion-guide}) in a single parallel batch. Each agent:
+\begin{enumerate}
+  \item Received the CSV subset for its assigned dependency.
+  \item Read the corresponding source lines in \texttt{all.R} for contextual understanding of argument types and surrounding logic.
+  \item Consulted R online documentation (\url{https://www.rdocumentation.org}) where the function's behavior was complex or non-obvious.
+  \item Produced a structured Markdown guide specifying the correct Python translation strategy, with concrete code examples.
+\end{enumerate}
+
+The 46 resulting guides were saved to \texttt{language\_dependency\_analysis/conversion\_guides/} with filenames matching the dependency name (e.g.\ \texttt{fft.md}, \texttt{var.md}, \texttt{match.arg.md}).
+
+\subsection{Selected Translation Nuances}
+
+The following are the most consequential findings from the conversion guides, as they directly informed specific decisions in Phase~4. Together, they constitute the principal risk of silent numerical error in any R-to-Python translation of this package.
+
+\subsubsection{FFT Normalisation (\texttt{fft.md})}
+
+R's \texttt{fft(\ldots,\,inverse=TRUE)} returns the \emph{raw, unnormalised} inverse DFT: for an $N$-point transform it returns $\sum_{k=0}^{N-1} X_k e^{2\pi i k n /N}$ without dividing by $N$. NumPy's \texttt{np.fft.ifft} normalises by $1/N$ by default, as per the conventional definition. The R source explicitly divides the inverse-FFT result by the grid size $P$ (or $P_1 \times P_2$ for two-dimensional transforms) after computing \texttt{Re()}. When porting to NumPy, those division operations must be \emph{removed}.
+
+\subsubsection{Fortran FFI Type Coercions (\texttt{as.double.md}, \texttt{as.integer.md})}
+
+R's pre-allocation idiom \texttt{as.double(rep(0, n))} maps to \texttt{np.zeros(n, dtype=np.float64)}. \texttt{as.integer(Lvec)} on a vector maps to \texttt{Lvec.astype(np.int32)}. The 32-bit integer constraint is non-obvious but critical: standard Fortran \texttt{INTEGER} is 32~bits; passing \texttt{np.int64} arrays would silently corrupt the values seen by the Fortran subroutine on a 64-bit system.
+
+\subsubsection{Sample Variance Denominator (\texttt{var.md})}
+
+R's \texttt{var(x)} uses Bessel's correction ($n-1$ denominator), i.e.\ it computes the \emph{sample} variance. NumPy's \texttt{np.var} defaults to the \emph{population} variance ($n$ denominator, \texttt{ddof=0}). All occurrences of \texttt{sqrt(var(x))} in the R source must be translated as \texttt{np.std(x, ddof=1)}.
+
+\subsubsection{Optional Argument Detection (\texttt{missing.md})}
+
+R's \texttt{missing(param)} returns \texttt{TRUE} if the caller did not supply the argument. Python has no built-in equivalent. The idiomatic replacement is the \texttt{None} sentinel default: \texttt{def f(x, param=None)} with \texttt{if param is None:} guards inside the function body.
+
+\subsubsection{Negative-Base Fractional Exponentiation (\texttt{sqrt.md})}
+
+Several bandwidth formulas involve odd roots of quantities that may be negative, e.g.\ $(-3\sqrt{2/\pi}\,/\,\hat{\psi}_6)^{1/7}$. R silently computes real-valued odd roots of negative numbers via its internal rule for fractional exponents. Python's \texttt{**} operator raises \texttt{ValueError} for negative bases with non-integer exponents. The correct idiom is
+\begin{lstlisting}[style=python]
+math.copysign(abs(x) ** (1.0 / n), x)
+\end{lstlisting}
+
+\subsubsection{Array Memory Order (\texttt{matrix.md})}
+
+R's \texttt{matrix()} and Fortran both use \emph{column-major} (Fortran-order) storage. NumPy defaults to \emph{row-major} (C-order). When reshaping arrays produced by Fortran subroutines, \texttt{np.reshape(\ldots,\,order=`F')} is required.
+
+\subsubsection{Package Lifecycle Hooks (\texttt{library.dynam.unload.md})}
+
+R provides package attach/detach lifecycle hooks via \texttt{.onAttach} and \texttt{.onUnload}. \texttt{library.dynam.unload} has no Python equivalent: CPython does not safely support unloading native extension modules. The guide documents that the \texttt{.onUnload} body should either be omitted or replaced with an \texttt{atexit} callback for non-library cleanup tasks.
+
+\subsubsection{Partial String Matching (\texttt{match.arg.md})}
+
+R's \texttt{match.arg(arg, choices)} validates \texttt{arg} against a vector of allowed strings and supports \emph{unambiguous prefix matching} (e.g.\ \texttt{"ep"} matches \texttt{"epanechnikov"}). No standard Python equivalent exists. The guide specifies a reusable helper function that performs exact match, then unique-prefix match, then raises a descriptive error.
+
+\subsubsection{R \texttt{switch} on Strings (\texttt{switch.md})}
+
+R's \texttt{switch(key, case1=expr1, case2=expr2, \ldots)} on string keys translates cleanly to a Python dictionary lookup. For cheap scalar computations (as in \texttt{KernSmooth}), a plain \texttt{dict} of values is sufficient; a \texttt{dict} of \texttt{lambda} functions is available for cases requiring lazy evaluation.
+
+% =============================================================================
+\section{Phase 4: Automated Function Conversion and Package Assembly}
+% =============================================================================
+
+\subsection{Motivation}
+
+With the dependency map (Phase~1), build infrastructure (Phase~2), and translation guides (Phase~3) in place, Phase~4 executes the actual conversion. Two challenges make this non-trivial even with the preparation work done:
+
+\begin{enumerate}
+  \item Functions must be converted in dependency order: when the conversion agent for a function reads the JSON files of its callees to understand their Python calling conventions, those files must already exist.
+  \item The Fortran FFI calling convention in Python (via \texttt{f2py}) differs fundamentally from R's \texttt{.Fortran()} in how it handles output arguments. This difference is invisible from the R source and therefore not naturally handled by pattern matching; it requires targeted post-conversion patching.
+\end{enumerate}
+
+\subsection{Function Conversion}
+
+The \texttt{/convert-r-file-to-python} skill (Appendix~\ref{app:commands}, \S\ref{appentry:convert-r-file-to-python}) was invoked:
+
+\begin{lstlisting}[style=shell]
+/convert-r-file-to-python \
+    KernSmooth/R/all.R \
+    structural_analysis/R/all.json \
+    structural_analysis/dependency_levels.csv \
+    language_dependency_analysis/conversion_guides/ \
+    conversion_results/R/
+\end{lstlisting}
+
+The skill parses \texttt{dependency\_levels.csv}, filters for \texttt{r\_file == all.R}, and derives a topological ordering from leaves to roots. It then invokes the \texttt{@convert-r-function-to-python} sub-agent (Appendix~\ref{app:agents}, \S\ref{appentry:convert-r-function-to-python}) once per function, \emph{sequentially} in topological order, providing each agent with:
+\begin{itemize}
+  \item The R source fragment for the function.
+  \item The function's JSON dependency map (from \texttt{all.json}).
+  \item The folder of 46 language-dependency conversion guides.
+  \item The output folder \texttt{conversion\_results/R/all.R/} for the resulting JSON artefact.
+\end{itemize}
+
+The conversion order was:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Level & Functions (in conversion order) \\
+\midrule
+2 (deepest leaves) & \texttt{linbin}, \texttt{rlbin} \\
+1 (intermediate) &
+  \texttt{bkfe}, \texttt{blkest}, \texttt{cpblock},
+  \texttt{linbin2D}, \texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag} \\
+0 (roots) &
+  \texttt{.onAttach}, \texttt{.onUnload}, \texttt{bkde},
+  \texttt{bkde2D}, \texttt{dpih}, \texttt{dpik}, \texttt{dpill} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The 16 resulting JSON artefacts were written to \texttt{conversion\_results/R/all.R/}. (Two artefacts --- \texttt{.onAttach.json} and \texttt{.onUnload.json} --- use leading-dot filenames and are not visible to standard \texttt{ls}; they require \texttt{ls -a} to discover.)
+
+\subsubsection{Notable Per-Function Translation Decisions}
+
+\begin{description}
+  \item[\texttt{linbin}/\texttt{rlbin}/\texttt{linbin2D}/\texttt{blkest}/\texttt{cpblock}]
+    \texttt{.Fortran(F\_xxx,~\ldots)[[k]]} mapped to \texttt{\_KernSmooth.xxx(\ldots)} with pre-allocated NumPy output buffers.
+  \item[\texttt{bkfe}]
+    Hermite polynomial recurrence loop translated directly; the manual \texttt{/P} division present in the R source was removed per the \texttt{fft.md} guide, since NumPy's \texttt{np.fft.ifft} already normalises.
+  \item[\texttt{locpoly}]
+    Dual density/regression branch (controlled by whether the \texttt{y} argument is \texttt{None}); a variable-length bandwidth discretization loop; a 19-argument Fortran subroutine call; and a \texttt{math.gamma(drv+1)} post-multiplier for the derivative-order correction.
+  \item[\texttt{sdiag}/\texttt{sstdiag}]
+    The \texttt{ss}, \texttt{Smat}, \texttt{uu}, \texttt{Umat} matrices are flattened column-major (\texttt{order=`F'}) before being passed to the Fortran subroutine, consistent with the \texttt{matrix.md} guide.
+  \item[\texttt{dpih}/\texttt{dpik}]
+    Negative-base fractional exponents (e.g.\ $(-3\sqrt{2/\pi}/\hat\psi_6)^{1/7}$) replaced with \texttt{math.copysign(abs(val)**(1/k), val)} per the \texttt{sqrt.md} guide.
+  \item[\texttt{bkde2D}]
+    Two-dimensional FFT convolution via \texttt{np.fft.fft2}/\texttt{np.fft.ifft2}; wrap-around kernel construction using Python slice notation to replicate R's decreasing-index sequences.
+  \item[\texttt{.onAttach}]
+    \texttt{packageStartupMessage} translated to \texttt{print(\ldots,\,file=sys.stderr)}.
+  \item[\texttt{.onUnload}]
+    \texttt{library.dynam.unload} body omitted per \texttt{library.dynam.unload.md}; function registered as an \texttt{atexit} callback at module level.
+\end{description}
+
+\subsection{Package Assembly}
+
+The \texttt{/combine-python-functions-into-file} skill (Appendix~\ref{app:commands}, \S\ref{appentry:combine-python-functions-into-file}) was invoked:
+
+\begin{lstlisting}[style=shell]
+/combine-python-functions-into-file \
+    conversion_results/R/all.R/ \
+    py-KernSmooth/KernSmooth/__init__.py
+\end{lstlisting}
+
+Before writing, the skill performed a structural scan of \texttt{meson.build} and the existing \texttt{\_\_init\_\_.py} to verify the correct import path for the Fortran extension (\texttt{from~.~import~\_KernSmooth}), then corrected discrepancies found in the per-function JSON artefacts:
+
+\begin{center}
+\begin{tabular}{p{0.44\textwidth}p{0.44\textwidth}}
+\toprule
+Original (in JSON artefacts) & Corrected \\
+\midrule
+\texttt{from KernSmooth import \_KernSmooth} &
+  \texttt{from . import \_KernSmooth} \\
+\texttt{from KernSmooth.linbin import linbin} &
+  removed (functions are co-located) \\
+\texttt{from scipy.stats import norm} (duplicate) &
+  merged: \texttt{from scipy.stats import beta as beta\_dist, norm} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The final import block, sorted standard library $\to$ third-party $\to$ local, was:
+
+\begin{lstlisting}[style=python]
+import atexit
+import math
+import sys
+import warnings
+
+import numpy as np
+from scipy.stats import beta as beta_dist, norm
+
+from . import _KernSmooth
+\end{lstlisting}
+
+The \texttt{\_\_all\_\_} list was populated with all 14 public function names (excluding \texttt{\_on\_attach} and \texttt{\_on\_unload}). Functions were written to the file in leaf-to-root order, ensuring all callees are defined before callers. Syntax was confirmed immediately by \texttt{ast.parse()}.
+
+\subsection{The f2py Return-Value Bug}
+
+\subsubsection{Observed Symptom}
+
+After assembly, running the test script raised:
+
+\begin{lstlisting}[style=shell]
+TypeError: 'NoneType' object is not subscriptable
+  File "__init__.py", line 36, in linbin
+    gcnts = _KernSmooth.linbin(...)[6]
+\end{lstlisting}
+
+\subsubsection{Root Cause: R \texttt{.Fortran()} vs.\ f2py Semantics}
+
+R's \texttt{.Fortran()} always returns a \emph{named list of all arguments}, including modified output arrays. The R idiom \texttt{.Fortran(F\_linbin, \ldots)\$gcnts} (or equivalently \texttt{[[6]]}) extracts the modified output array from that list.
+
+f2py-wrapped Fortran \emph{subroutines} return \texttt{None} unconditionally. Output array arguments are modified in-place via C pointer; the Python caller reads results by examining the pre-allocated arrays that were passed in. Scalar output arguments require special treatment: passing a Python \texttt{np.float64(0.0)} (immutable) does not allow Fortran to write back. The fix is to use a length-1 NumPy array (\texttt{np.zeros(1, dtype=np.float64)}), which is mutable and passes a writable pointer.
+
+The \texttt{@convert-r-function-to-python} agent for \texttt{linbin} had generated \texttt{[\,6\,]} subscripting on the \texttt{None} return. The agent for \texttt{rlbin} (converted first) had correctly identified the in-place semantics and avoided this. The inconsistency arose because each agent operated independently.
+
+\subsubsection{Fortran Output Argument Audit}
+
+All Fortran source files were read to identify output arguments:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Subroutine & Output argument(s) & Type \\
+\midrule
+\texttt{linbin} & \texttt{gcnts(*)} & \texttt{double precision} array \\
+\texttt{lbtwod} & \texttt{gcnts(*)} & \texttt{double precision} array \\
+\texttt{blkest} & \texttt{sigsqe}, \texttt{th22e}, \texttt{th24e} &
+  \texttt{double precision} \emph{scalars} \\
+\texttt{cp}     & \texttt{Cpvals(Nmax)} & \texttt{double precision} array \\
+\texttt{locpol} & \texttt{cvest(*)} & \texttt{double precision} array \\
+\texttt{sdiag}  & \texttt{Sdg(*)} & \texttt{double precision} array \\
+\texttt{sstdg}  & \texttt{SSTd(*)} & \texttt{double precision} array \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsubsection{Patches Applied}
+
+Seven targeted edits were made to \texttt{py-KernSmooth/KernSmooth/\_\_init\_\_.py}:
+
+\begin{enumerate}
+  \item \textbf{\texttt{linbin}} --- Removed \texttt{[6]} subscript; read \texttt{gcnts} (pre-allocated \texttt{np.zeros(M)}) directly after the call.
+  \item \textbf{\texttt{linbin2D}} --- Removed \texttt{out = \ldots} and \texttt{out[8]}; read \texttt{gcnts} then reshaped with \texttt{order=`F'}.
+  \item \textbf{\texttt{blkest}} --- Changed \texttt{sigsqe/th22e/th24e} from \texttt{np.float64(0.0)} to \texttt{np.zeros(1, dtype=np.float64)}; return values read as \texttt{sigsqe[0]}, \texttt{th22e[0]}, \texttt{th24e[0]}.
+  \item \textbf{\texttt{cpblock}} --- Removed \texttt{out = \ldots} and \texttt{out[12]}; used \texttt{Cpvals} (modified in-place) directly in \texttt{np.argmin}.
+  \item \textbf{\texttt{locpoly}} --- Removed \texttt{out = \ldots} and \texttt{out[18]}; applied \texttt{math.gamma(drv+1)} multiplier to \texttt{curvest} directly.
+  \item \textbf{\texttt{sdiag}} --- Removed \texttt{out = \ldots} and \texttt{out[16]}; returned \texttt{Sdg} directly.
+  \item \textbf{\texttt{sstdiag}} --- Removed \texttt{out = \ldots} and \texttt{out[18]}; returned \texttt{SSTd} directly.
+\end{enumerate}
+
+A post-patch \texttt{grep} confirmed zero remaining stale \texttt{out[integer]} subscripts on Fortran call returns. \texttt{ast.parse()} re-confirmed syntax validity.
+
+\subsection{Output Validation}
+
+The test script \texttt{py-KernSmooth/tests/test.py} invoked \texttt{KernSmooth.bkde(np.array([1,2,3,4,5]))} with default parameters and printed the result. The output was verified analytically:
+
+\begin{itemize}
+  \item \textbf{Grid range:} $[-4.244,\,10.244]$. Expected $[\min(x)-\tau h,\,\max(x)+\tau h]$ where $\tau=4$ and $h \approx \delta_0 \cdot (243/175)^{1/5} \cdot \sigma \approx 0.776 \times 1.069 \times 1.581 \approx 1.312$, giving $[-4.248,\,10.248]$. \checkmark
+  \item \textbf{Grid size:} 401 points (default \texttt{gridsize=401}).~\checkmark
+  \item \textbf{Peak location:} Maximum density $\approx 0.18989$ at $x=3.0$, matching the mean and median of the symmetric input $\{1,2,3,4,5\}$.~\checkmark
+  \item \textbf{Symmetry:} The density array is a palindrome.~\checkmark
+  \item \textbf{Non-negativity:} All values $>0$.~\checkmark
+  \item \textbf{Normalisation:} Trapezoidal integral $\approx 1.0$.~\checkmark
+\end{itemize}
+
+After Phase~4, the package was in a runnable state with all 16 functions converted. \texttt{\_\_init\_\_.py} was approximately 990 lines.
+
+% =============================================================================
+\section{Phase 5: Code Quality Audit and Namespace Refinement}
+% =============================================================================
+
+\subsection{Motivation}
+
+The automated conversion pipeline prioritises functional correctness. Phase~5 is a manual audit and refactoring pass that addresses three categories of follow-on concerns:
+
+\begin{enumerate}
+  \item \textbf{Type annotations:} The conversion agent was instructed to produce complete annotations, but the initial assembly contained bare container types (\texttt{np.ndarray}, \texttt{dict}) without subtype parameters.
+  \item \textbf{Namespace hygiene:} Module-level imports (\texttt{import numpy as np}, etc.) are visible as package attributes; best-practice conventions for managing this were investigated and applied.
+  \item \textbf{Code quality:} A systematic audit identified dead code left over from the R porting process, a latent crash bug, structural duplication, and PEP~8 violations, all of which were resolved.
+\end{enumerate}
+
+\subsection{Type Annotation Completion}
+
+All 14 public function signatures and both private function signatures were reviewed. The following annotation deficiencies were found and corrected:
+
+\begin{itemize}
+  \item Bare \texttt{np.ndarray} parameters and return types, which lack dtype information.
+  \item Bare \texttt{dict}, \texttt{tuple}, and \texttt{list} without element type parameters.
+  \item Optional parameters with default \texttt{None} missing the \texttt{| None} union form (e.g.\ \texttt{bandwidth}, \texttt{range\_x}, \texttt{y}, \texttt{degree}).
+\end{itemize}
+
+\texttt{from typing import Any} was added to the import block. Every array annotation was expanded to \texttt{np.ndarray[Any, np.dtype[np.float64]]}, reflecting the exclusive use of 64-bit floating-point arrays throughout the module. Return types of functions returning dictionaries were updated:
+
+\begin{itemize}
+  \item \texttt{rlbin}, \texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}, \texttt{bkde}, \texttt{bkde2D} $\to$ \texttt{dict[str, np.ndarray[Any, np.dtype[np.float64]]]}
+  \item \texttt{blkest} $\to$ \texttt{dict[str, np.float64]} (scalar values extracted from length-1 arrays)
+\end{itemize}
+
+The \texttt{NDArray[np.float64]} alias from \texttt{numpy.typing} was evaluated and rejected in favour of the explicit \texttt{np.ndarray} base type.
+
+\subsection{Namespace Privacy Investigation}
+
+Importing \texttt{numpy as np} at module level exposes \texttt{KernSmooth.np} as a public package attribute, which is undesirable but difficult to prevent. Two strategies were evaluated:
+
+\begin{description}
+  \item[Underscore aliasing] All imports renamed to \texttt{\_np}, \texttt{\_math}, etc., with global replacement of all references throughout the file. Implemented and tested (confirmed \texttt{hasattr(KernSmooth, `np')} returned \texttt{False}), then \textbf{reverted}. A survey of major scientific Python packages (NumPy, SciPy, pandas) confirmed that underscore-aliasing of dependency imports is not standard practice; all use conventional import names at module level.
+  \item[\texttt{del} cleanup] Applicable only to imports used \emph{exclusively at module initialisation time}. Only \texttt{atexit} qualified: it appeared solely in the \texttt{atexit.register(\_on\_unload)} call. \texttt{del atexit} was added immediately after that registration. No other import could be safely deleted because all others (\texttt{math}, \texttt{np}, etc.) are referenced inside function bodies, where deletion would cause \texttt{NameError} at call time.
+\end{description}
+
+PEP~562 (\texttt{module.\_\_getattr\_\_}) was also evaluated but found inapplicable: it is invoked only for \emph{missing} attributes and cannot hide names already present in \texttt{\_\_dict\_\_}. The \texttt{\_\_all\_\_} list was confirmed as the authoritative and conventional public-API contract.
+
+\subsection{Full Code Audit and Systematic Refactoring}
+
+A line-by-line review of the 981-line \texttt{\_\_init\_\_.py} identified seven defect categories. All were resolved in a single comprehensive rewrite.
+
+\subsubsection{Dead Code from R Porting}
+
+\texttt{\_on\_attach} and \texttt{\_on\_unload} were direct transliterations of R's \texttt{.onAttach} and \texttt{.onUnload} lifecycle hooks. Python's import machinery provides no equivalent of R's package attach/detach events; neither function was reachable from any Python code path. Their presence also rendered \texttt{import atexit}, \texttt{import sys}, and the subsequently added \texttt{del atexit} statement all useless. All were removed.
+
+An R-era source-control comment inside \texttt{cpblock} (\texttt{\# remove unused `q' 2007-07-10}) was also removed; it had no meaning in a Python file and referenced an event in the R package's version history.
+
+\subsubsection{Silent Crash Bug in Three Public Functions}
+
+\texttt{locpoly}, \texttt{sdiag}, and \texttt{sstdiag} all declared \texttt{bandwidth:~np.ndarray[\ldots]\,|\,None~=~None} (a \texttt{None} default with a \texttt{| None} annotation added during type annotation completion) yet called \texttt{np.asarray(bandwidth, dtype=np.float64)} unconditionally. Passing \texttt{None} produced a 0-d array with value \texttt{nan}; a subsequent \texttt{len(bandwidth)} call on that 0-d array raised \texttt{TypeError:~len()~of~unsized~object}.
+
+The annotation advertised \texttt{None} as a semantically valid input while the implementation crashed silently. In the internal call graph, the bug was unreachable because all three functions are always called from \texttt{dpill} with a concrete bandwidth value --- but any external caller relying on the type annotation would have encountered it immediately. A guard was added at the top of each function body:
+
+\begin{lstlisting}[style=python]
+if bandwidth is None:
+    raise ValueError("'bandwidth' must be specified")
+\end{lstlisting}
+
+\subsubsection{Structural Code Duplication}
+
+Two logic blocks appeared identically across three functions each:
+
+\begin{description}
+  \item[Bandwidth discretization (27 lines)] In \texttt{locpoly}, \texttt{sdiag}, and \texttt{sstdiag}: handles the scalar-bandwidth path, the vector-of-length-$M$ path, and an error path. Extracted into:
+    \begin{lstlisting}[style=python]
+def _discretize_bandwidth(bandwidth, M, delta, Q, tau):
+    ...  # returns (hdisc, Lvec, indic, Q)
+    \end{lstlisting}
+    The extraction also corrected a robustness defect in the scalar-detection logic. The original code used \texttt{elif len(bandwidth) == 1}, which raises \texttt{TypeError} for 0-d NumPy arrays produced by \texttt{np.asarray} on a plain Python \texttt{float} or \texttt{np.float64} scalar. The corrected guard, consistent with the pattern already used in \texttt{bkde2D}, is:
+    \begin{lstlisting}[style=python]
+if bw.ndim == 0 or len(bw) == 1:
+    ...
+    \end{lstlisting}
+  \item[Prefix-match validation (8 lines)] In \texttt{bkde} (for \texttt{kernel}), \texttt{dpih} (for \texttt{scalest}), and \texttt{dpik} (for both \texttt{kernel} and \texttt{scalest}). Extracted into:
+    \begin{lstlisting}[style=python]
+def _resolve_choice(val, choices, param_name):
+    ...  # exact match -> unique prefix match -> error
+    \end{lstlisting}
+\end{description}
+
+Both helpers are private (underscore-prefixed) and absent from \texttt{\_\_all\_\_}, preserving the public API surface.
+
+\subsubsection{Type Alias for Line-Length Compliance}
+
+The annotation \texttt{np.ndarray[Any,~np.dtype[np.float64]]} (37~characters) appeared in every public function signature. A module-level alias was introduced:
+
+\begin{lstlisting}[style=python]
+_F64Array = np.ndarray[Any, np.dtype[np.float64]]
+\end{lstlisting}
+
+This reduces each occurrence to 9~characters, directly enabling PEP~8-compliant line lengths ($\leq 88$ characters) without any loss of annotation precision.
+
+\subsubsection{PEP~8 Signature Reformatting}
+
+All function signatures exceeding 88 characters were reformatted to multi-line style with one parameter per line. The most extreme cases (\texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}) had reached 210+ characters on a single line prior to reformatting.
+
+\subsection{State of the Package After Phase~5}
+
+The rewritten \texttt{py-KernSmooth/KernSmooth/\_\_init\_\_.py} is 1,006 lines and satisfies the following properties:
+
+\begin{itemize}
+  \item No dead code or unused imports.
+  \item No bare \texttt{np.ndarray}, \texttt{dict}, \texttt{tuple}, or \texttt{list} annotations in any public or private function prototype.
+  \item A clear \texttt{ValueError} (not an opaque \texttt{TypeError}) is raised when \texttt{bandwidth=None} is passed to \texttt{locpoly}, \texttt{sdiag}, or \texttt{sstdiag}.
+  \item No duplicated bandwidth-discretization or argument-validation logic.
+  \item Correct 0-d NumPy array handling in the scalar-bandwidth code path.
+  \item PEP~8 line-length compliance ($\leq 88$ characters) across all function signatures.
+  \item No R-era changelog comments or R-specific lifecycle hook documentation.
+\end{itemize}
+
+The runtime target is CPython~3.14 (confirmed by the presence of \texttt{\_\_pycache\_\_/\_\_init\_\_.cpython-314.pyc}). The package uses Python~3.10+ syntax (\texttt{dict[str,~\ldots]}, \texttt{float\,|\,None} union types, lowercase generics), which is consistent with the runtime version.
+
+% =============================================================================
+% Bibliography
+% =============================================================================
+
+\begin{thebibliography}{9}
+\bibitem{wandjones1995}
+  M.~P.~Wand and M.~C.~Jones (1995).
+  \textit{Kernel Smoothing}.
+  Chapman and Hall, London.
+
+\bibitem{sheatherjones1991}
+  S.~J.~Sheather and M.~C.~Jones (1991).
+  A reliable data-based bandwidth selection method for kernel density estimation.
+  \textit{Journal of the Royal Statistical Society, Series B}, \textbf{53}(3), 683--690.
+
+\bibitem{ruppertsheatherwand1995}
+  D.~Ruppert, S.~J.~Sheather, and M.~P.~Wand (1995).
+  An effective bandwidth selector for local least squares regression.
+  \textit{Journal of the American Statistical Association}, \textbf{90}(432), 1257--1270.
+
+\bibitem{wand1994}
+  M.~P.~Wand (1994).
+  Fast computation of multivariate kernel estimators.
+  \textit{Journal of Computational and Graphical Statistics}, \textbf{3}(4), 433--445.
+\end{thebibliography}
+
+% =============================================================================
+% Appendices
+% =============================================================================
+
+\clearpage
+\begin{appendices}
+
+% -----------------------------------------------------------
+\section{Agent Specifications}
+\label{app:agents}
+% -----------------------------------------------------------
+
+This appendix reproduces the complete specifications of the sub-agents deployed in this project. Each file is stored under \texttt{.claude/agents/} in the project repository. The YAML front matter names the agent and provides a one-line description; the body specifies the execution steps and output schema in structured natural language. These files are the normative definitions of agent behaviour: what the agent receives as input, how it processes it, and what it must output.
+
+\subsection{Agents Used in Phase~1}
+
+\appendixentry{analyze-r-file-dependencies}{../../.claude/agents/analyze-r-file-dependencies.md}
+
+\subsection{Agents Used in Phase~3}
+
+\appendixentry{extract-r-file-language-dependencies}{../../.claude/agents/extract-r-file-language-dependencies.md}
+
+\appendixentry{generate-language-dependency-conversion-guide}{../../.claude/agents/generate-language-dependency-conversion-guide.md}
+
+\subsection{Agents Used in Phase~4}
+
+\appendixentry{convert-r-function-to-python}{../../.claude/agents/convert-r-function-to-python.md}
+
+\subsection{Supplementary Agent}
+
+The following agent is defined in the repository but has not yet been invoked in this project. It is included for completeness and as a reference for the Fortran source analysis task identified as a potential next step in Phase~1.
+
+\appendixentry{analyze-c-file-dependencies}{../../.claude/agents/analyze-c-file-dependencies.md}
+
+% -----------------------------------------------------------
+\section{Skill (Command) Specifications}
+\label{app:commands}
+% -----------------------------------------------------------
+
+This appendix reproduces the complete specifications of the top-level skills (slash commands) deployed in this project. Each file is stored under \texttt{.claude/commands/}. Skills are the entry points invoked interactively; they orchestrate one or more sub-agents (Appendix~\ref{app:agents}) and handle batch dispatch, error recovery, and output persistence.
+
+\subsection{Skills Used in Phase~1}
+
+\appendixentry{analyze-r-folder-dependencies}{../../.claude/commands/analyze-r-folder-dependencies.md}
+
+\subsection{Skills Used in Phase~3}
+
+\appendixentry{extract-r-folder-language-dependencies}{../../.claude/commands/extract-r-folder-language-dependencies.md}
+
+\appendixentry{generate-language-dependency-conversion-guides}{../../.claude/commands/generate-language-dependency-conversion-guides.md}
+
+\subsection{Skills Used in Phase~4}
+
+\appendixentry{convert-r-file-to-python}{../../.claude/commands/convert-r-file-to-python.md}
+
+\appendixentry{combine-python-functions-into-file}{../../.claude/commands/combine-python-functions-into-file.md}
+
+\subsection{Workflow Utility}
+
+The following skill was used at the end of each phase to produce the structured phase summaries stored in \texttt{docs/daily\_summaries/}, which are the primary source material for this report.
+
+\appendixentry{summarize-research-report}{../../.claude/commands/summarize-research-report.md}
+
+\end{appendices}
+
+\end{document}

@@ -25,7 +25,7 @@ Your task is to orchestrate the batch processing of this CSV. You must extract r
 
 ### Step 1: Identify Unique Dependencies
 
-Parse the input CSV file to identify all unique values in the `language_dependency` column. 
+Parse the input CSV file to identify all unique values in the `language_dependency` column.
 
 *Note: The CSV is pre-sorted so identical dependencies are grouped together, allowing for efficient sequential processing.*
 
@@ -39,5 +39,5 @@ Iterate through the list of identified unique `language_dependency` values seque
 ### Step 3: Save Output as Markdown Files
 
 For every successfully generated conversion guide, save the agent's markdown output to the file system according to these strict rules:
-* **Naming Convention:** Name the output file exactly `{language_dependency}.md` (e.g., `Re.md`, `abs.md`). 
+* **Naming Convention:** Name the output file exactly `{language_dependency}.md` (e.g., `Re.md`, `abs.md`).
 * **Output Directory:** Save the files to the user-specified output directory. If the user did not explicitly provide one, create and use a default directory path named `language_dependency_analysis/conversion_guides/`.

@@ -13,8 +13,8 @@ Given a source folder containing JSON-formatted function data and a target Pytho
 
 ### Step 1: Discover and Map JSON Files
 
-* Scan the specified source folder for all files ending with `.json`. 
-* The filename (excluding the `.json` extension) represents the original R function name. 
+* Scan the specified source folder for all files ending with `.json`.
+* The filename (excluding the `.json` extension) represents the original R function name.
 
 ### Step 2: Extract and Format Function Definitions
 
@@ -42,7 +42,7 @@ For each JSON file, extract the `imports`, `function_prototype`, and `function_b
 
 * Aggregate all `imports` arrays from every JSON file.
 * Remove any duplicate import statements.
-* Sort the deduplicated imports logically: 
+* Sort the deduplicated imports logically:
   1. Standard library imports (e.g., `import math`).
   2. Third-party imports (e.g., `import numpy as np`).
   3. Local project imports (e.g., `from .linbin import linbin`).

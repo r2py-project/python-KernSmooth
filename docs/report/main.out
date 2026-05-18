@@ -1,0 +1,83 @@
+\BOOKMARK [1][-]{section*.2}{Abstract}{}% 1
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 2
+\BOOKMARK [2][-]{subsection.1.1}{Background and Motivation}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.2}{Repository Structure}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.3}{Automated Workflow Infrastructure}{section.1}% 5
+\BOOKMARK [1][-]{section.2}{Phase 1: Static Analysis of the KernSmooth R Package}{}% 6
+\BOOKMARK [2][-]{subsection.2.1}{Motivation}{section.2}% 7
+\BOOKMARK [2][-]{subsection.2.2}{R Dependency Analysis}{section.2}% 8
+\BOOKMARK [2][-]{subsection.2.3}{Architecture Synthesis}{section.2}% 9
+\BOOKMARK [2][-]{subsection.2.4}{Key Findings}{section.2}% 10
+\BOOKMARK [3][-]{subsubsection.2.4.1}{Package Scope and External Dependencies}{subsection.2.4}% 11
+\BOOKMARK [3][-]{subsubsection.2.4.2}{Function Inventory}{subsection.2.4}% 12
+\BOOKMARK [3][-]{subsubsection.2.4.3}{Three-Level Dependency Hierarchy}{subsection.2.4}% 13
+\BOOKMARK [3][-]{subsubsection.2.4.4}{Fortran Integration Convention}{subsection.2.4}% 14
+\BOOKMARK [3][-]{subsubsection.2.4.5}{Architectural Design: Binned Approximation}{subsection.2.4}% 15
+\BOOKMARK [3][-]{subsubsection.2.4.6}{Note on Fortran Source Analysis}{subsection.2.4}% 16
+\BOOKMARK [1][-]{section.3}{Phase 2: Establishing the Python Build Infrastructure}{}% 17
+\BOOKMARK [2][-]{subsection.3.1}{Motivation}{section.3}% 18
+\BOOKMARK [2][-]{subsection.3.2}{Build System Design}{section.3}% 19
+\BOOKMARK [3][-]{subsubsection.3.2.1}{Fortran Sources}{subsection.3.2}% 20
+\BOOKMARK [3][-]{subsubsection.3.2.2}{f2py Wrapper Generation}{subsection.3.2}% 21
+\BOOKMARK [3][-]{subsubsection.3.2.3}{NumPy Include Directories}{subsection.3.2}% 22
+\BOOKMARK [3][-]{subsubsection.3.2.4}{BLAS Discovery and Fallback Chain}{subsection.3.2}% 23
+\BOOKMARK [3][-]{subsubsection.3.2.5}{Package Structure}{subsection.3.2}% 24
+\BOOKMARK [2][-]{subsection.3.3}{Installation}{section.3}% 25
+\BOOKMARK [1][-]{section.4}{Phase 3: Language Dependency Catalogue and Conversion Guides}{}% 26
+\BOOKMARK [2][-]{subsection.4.1}{Motivation}{section.4}% 27
+\BOOKMARK [2][-]{subsection.4.2}{Language Dependency Extraction}{section.4}% 28
+\BOOKMARK [2][-]{subsection.4.3}{Conversion Guide Generation}{section.4}% 29
+\BOOKMARK [2][-]{subsection.4.4}{Selected Translation Nuances}{section.4}% 30
+\BOOKMARK [3][-]{subsubsection.4.4.1}{FFT Normalisation \(fft.md\)}{subsection.4.4}% 31
+\BOOKMARK [3][-]{subsubsection.4.4.2}{Fortran FFI Type Coercions \(as.double.md, as.integer.md\)}{subsection.4.4}% 32
+\BOOKMARK [3][-]{subsubsection.4.4.3}{Sample Variance Denominator \(var.md\)}{subsection.4.4}% 33
+\BOOKMARK [3][-]{subsubsection.4.4.4}{Optional Argument Detection \(missing.md\)}{subsection.4.4}% 34
+\BOOKMARK [3][-]{subsubsection.4.4.5}{Negative-Base Fractional Exponentiation \(sqrt.md\)}{subsection.4.4}% 35
+\BOOKMARK [3][-]{subsubsection.4.4.6}{Array Memory Order \(matrix.md\)}{subsection.4.4}% 36
+\BOOKMARK [3][-]{subsubsection.4.4.7}{Package Lifecycle Hooks \(library.dynam.unload.md\)}{subsection.4.4}% 37
+\BOOKMARK [3][-]{subsubsection.4.4.8}{Partial String Matching \(match.arg.md\)}{subsection.4.4}% 38
+\BOOKMARK [3][-]{subsubsection.4.4.9}{R switch on Strings \(switch.md\)}{subsection.4.4}% 39
+\BOOKMARK [1][-]{section.5}{Phase 4: Automated Function Conversion and Package Assembly}{}% 40
+\BOOKMARK [2][-]{subsection.5.1}{Motivation}{section.5}% 41
+\BOOKMARK [2][-]{subsection.5.2}{Function Conversion}{section.5}% 42
+\BOOKMARK [3][-]{subsubsection.5.2.1}{Notable Per-Function Translation Decisions}{subsection.5.2}% 43
+\BOOKMARK [2][-]{subsection.5.3}{Package Assembly}{section.5}% 44
+\BOOKMARK [2][-]{subsection.5.4}{The f2py Return-Value Bug}{section.5}% 45
+\BOOKMARK [3][-]{subsubsection.5.4.1}{Observed Symptom}{subsection.5.4}% 46
+\BOOKMARK [3][-]{subsubsection.5.4.2}{Root Cause: R .Fortran\(\) vs. f2py Semantics}{subsection.5.4}% 47
+\BOOKMARK [3][-]{subsubsection.5.4.3}{Fortran Output Argument Audit}{subsection.5.4}% 48
+\BOOKMARK [3][-]{subsubsection.5.4.4}{Patches Applied}{subsection.5.4}% 49
+\BOOKMARK [2][-]{subsection.5.5}{Output Validation}{section.5}% 50
+\BOOKMARK [1][-]{section.6}{Phase 5: Code Quality Audit and Namespace Refinement}{}% 51
+\BOOKMARK [2][-]{subsection.6.1}{Motivation}{section.6}% 52
+\BOOKMARK [2][-]{subsection.6.2}{Type Annotation Completion}{section.6}% 53
+\BOOKMARK [2][-]{subsection.6.3}{Namespace Privacy Investigation}{section.6}% 54
+\BOOKMARK [2][-]{subsection.6.4}{Full Code Audit and Systematic Refactoring}{section.6}% 55
+\BOOKMARK [3][-]{subsubsection.6.4.1}{Dead Code from R Porting}{subsection.6.4}% 56
+\BOOKMARK [3][-]{subsubsection.6.4.2}{Silent Crash Bug in Three Public Functions}{subsection.6.4}% 57
+\BOOKMARK [3][-]{subsubsection.6.4.3}{Structural Code Duplication}{subsection.6.4}% 58
+\BOOKMARK [3][-]{subsubsection.6.4.4}{Type Alias for Line-Length Compliance}{subsection.6.4}% 59
+\BOOKMARK [3][-]{subsubsection.6.4.5}{PEP 8 Signature Reformatting}{subsection.6.4}% 60
+\BOOKMARK [2][-]{subsection.6.5}{State of the Package After Phase 5}{section.6}% 61
+\BOOKMARK [1][-]{section*.4}{Appendices}{}% 62
+\BOOKMARK [1][-]{Appendix.a.A}{Agent Specifications}{}% 63
+\BOOKMARK [2][-]{subsection.a.A.1}{Agents Used in Phase 1}{Appendix.a.A}% 64
+\BOOKMARK [3][-]{section*.6}{analyze-r-file-dependencies}{subsection.a.A.1}% 65
+\BOOKMARK [2][-]{subsection.a.A.2}{Agents Used in Phase 3}{Appendix.a.A}% 66
+\BOOKMARK [3][-]{section*.8}{extract-r-file-language-dependencies}{subsection.a.A.2}% 67
+\BOOKMARK [3][-]{section*.10}{generate-language-dependency-conversion-guide}{subsection.a.A.2}% 68
+\BOOKMARK [2][-]{subsection.a.A.3}{Agents Used in Phase 4}{Appendix.a.A}% 69
+\BOOKMARK [3][-]{section*.12}{convert-r-function-to-python}{subsection.a.A.3}% 70
+\BOOKMARK [2][-]{subsection.a.A.4}{Supplementary Agent}{Appendix.a.A}% 71
+\BOOKMARK [3][-]{section*.14}{analyze-c-file-dependencies}{subsection.a.A.4}% 72
+\BOOKMARK [1][-]{Appendix.a.B}{Skill \(Command\) Specifications}{}% 73
+\BOOKMARK [2][-]{subsection.a.B.1}{Skills Used in Phase 1}{Appendix.a.B}% 74
+\BOOKMARK [3][-]{section*.16}{analyze-r-folder-dependencies}{subsection.a.B.1}% 75
+\BOOKMARK [2][-]{subsection.a.B.2}{Skills Used in Phase 3}{Appendix.a.B}% 76
+\BOOKMARK [3][-]{section*.18}{extract-r-folder-language-dependencies}{subsection.a.B.2}% 77
+\BOOKMARK [3][-]{section*.20}{generate-language-dependency-conversion-guides}{subsection.a.B.2}% 78
+\BOOKMARK [2][-]{subsection.a.B.3}{Skills Used in Phase 4}{Appendix.a.B}% 79
+\BOOKMARK [3][-]{section*.22}{convert-r-file-to-python}{subsection.a.B.3}% 80
+\BOOKMARK [3][-]{section*.24}{combine-python-functions-into-file}{subsection.a.B.3}% 81
+\BOOKMARK [2][-]{subsection.a.B.4}{Workflow Utility}{Appendix.a.B}% 82
+\BOOKMARK [3][-]{section*.26}{summarize-research-report}{subsection.a.B.4}% 83

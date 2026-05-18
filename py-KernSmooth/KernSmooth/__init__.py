@@ -1,12 +1,13 @@
-import atexit
 import math
-import sys
 import warnings
+from typing import Any
 
 import numpy as np
 from scipy.stats import beta as beta_dist, norm
 
 from . import _KernSmooth
+
+_F64Array = np.ndarray[Any, np.dtype[np.float64]]
 
 __all__ = [
     "bkde",
@@ -26,18 +27,82 @@ __all__ = [
 ]
 
 
-def linbin(X: np.ndarray, gpoints: np.ndarray, truncate: bool = True) -> np.ndarray:
+def _resolve_choice(val: str, choices: tuple[str, ...], param_name: str) -> str:
+    if val in choices:
+        return val
+    matches = [c for c in choices if c.startswith(val)]
+    if len(matches) == 1:
+        return matches[0]
+    if len(matches) > 1:
+        raise ValueError(
+            f"'{param_name}' = '{val}' matches multiple choices: {matches}; "
+            f"must be one of {choices}."
+        )
+    raise ValueError(
+        f"'{param_name}' = '{val}' is not a valid choice; must be one of {choices}."
+    )
+
+
+def _discretize_bandwidth(
+    bandwidth: float | _F64Array,
+    M: int,
+    delta: float,
+    Q: int,
+    tau: float,
+) -> tuple[_F64Array, np.ndarray, np.ndarray, int]:
+    bw = np.asarray(bandwidth, dtype=np.float64)
+    if bw.ndim == 0 or len(bw) == 1:
+        scalar = float(bw.ravel()[0])
+        Q = 1
+        hdisc = np.full(1, scalar, dtype=np.float64)
+        Lvec = np.full(1, int(np.floor(tau * scalar / delta)), dtype=np.int32)
+        indic = np.ones(M, dtype=np.int32)
+    elif len(bw) == M:
+        hlow = float(np.min(bw))
+        hupp = float(np.max(bw))
+        hdisc = np.exp(np.linspace(np.log(hlow), np.log(hupp), Q))
+        Lvec = np.floor(tau * hdisc / delta).astype(np.int32)
+        if Q > 1:
+            lhdisc = np.log(hdisc)
+            gap = (lhdisc[Q - 1] - lhdisc[0]) / (Q - 1)
+            if gap == 0:
+                indic = np.ones(M, dtype=np.int32)
+            else:
+                indic = np.round(
+                    ((np.log(bw) - np.log(hlow)) / gap) + 1
+                ).astype(np.int32)
+        else:
+            indic = np.ones(M, dtype=np.int32)
+    else:
+        raise ValueError(
+            "'bandwidth' must be a scalar or an array of length 'gridsize'"
+        )
+    return hdisc, Lvec, indic, Q
+
+
+def linbin(
+    X: _F64Array,
+    gpoints: _F64Array,
+    truncate: bool = True,
+) -> _F64Array:
     n = len(X)
     M = len(gpoints)
     trun = np.int32(1) if truncate else np.int32(0)
     a = np.float64(gpoints[0])
     b = np.float64(gpoints[-1])
     gcnts = np.zeros(M, dtype=np.float64)
-    _KernSmooth.linbin(np.asarray(X, dtype=np.float64), np.int32(n), a, b, np.int32(M), trun, gcnts)
+    _KernSmooth.linbin(
+        np.asarray(X, dtype=np.float64), np.int32(n), a, b, np.int32(M), trun, gcnts
+    )
     return gcnts
 
 
-def rlbin(X: np.ndarray, Y: np.ndarray, gpoints: np.ndarray, truncate: bool = True) -> dict:
+def rlbin(
+    X: _F64Array,
+    Y: _F64Array,
+    gpoints: _F64Array,
+    truncate: bool = True,
+) -> dict[str, _F64Array]:
     n = len(X)
     M = len(gpoints)
     trun = np.int32(1) if truncate else np.int32(0)
@@ -45,11 +110,23 @@ def rlbin(X: np.ndarray, Y: np.ndarray, gpoints: np.ndarray, truncate: bool = Tr
     b = np.float64(gpoints[-1])
     xcnts = np.zeros(M, dtype=np.float64)
     ycnts = np.zeros(M, dtype=np.float64)
-    _KernSmooth.rlbin(np.asarray(X, dtype=np.float64), np.asarray(Y, dtype=np.float64), np.int32(n), a, b, np.int32(M), trun, xcnts, ycnts)
+    _KernSmooth.rlbin(
+        np.asarray(X, dtype=np.float64),
+        np.asarray(Y, dtype=np.float64),
+        np.int32(n), a, b, np.int32(M), trun, xcnts, ycnts,
+    )
     return {"xcounts": xcnts, "ycounts": ycnts}
 
 
-def bkfe(x: np.ndarray, drv: int, bandwidth: float = None, gridsize: int = 401, range_x: tuple = None, binned: bool = False, truncate: bool = True) -> np.float64:
+def bkfe(
+    x: _F64Array,
+    drv: int,
+    bandwidth: float | None = None,
+    gridsize: int = 401,
+    range_x: tuple[float, float] | None = None,
+    binned: bool = False,
+    truncate: bool = True,
+) -> np.float64:
     # Install safeguard against non-positive bandwidths:
     if bandwidth is not None and bandwidth <= 0:
         raise ValueError("'bandwidth' must be strictly positive")
@@ -112,7 +189,12 @@ def bkfe(x: np.ndarray, drv: int, bandwidth: float = None, gridsize: int = 401, 
     return np.sum(gcounts * np.fft.ifft(kappam * Gcounts).real[:M]) / (n ** 2)
 
 
-def blkest(x: np.ndarray, y: np.ndarray, Nval: int, q: int) -> dict:
+def blkest(
+    x: _F64Array,
+    y: _F64Array,
+    Nval: int,
+    q: int,
+) -> dict[str, np.float64]:
     n = len(x)
 
     # Sort the (x, y) data with respect to the x's.
@@ -133,27 +215,21 @@ def blkest(x: np.ndarray, y: np.ndarray, Nval: int, q: int) -> dict:
     th24e = np.zeros(1, dtype=np.float64)
 
     _KernSmooth.blkest(
-        x,
-        y,
-        np.int32(n),
-        np.int32(q),
-        np.int32(qq),
-        np.int32(Nval),
-        xj,
-        yj,
-        coef,
-        Xmat.flatten(order='F'),
-        wk,
-        qraux,
-        sigsqe,
-        th22e,
-        th24e,
+        x, y,
+        np.int32(n), np.int32(q), np.int32(qq), np.int32(Nval),
+        xj, yj, coef, Xmat.flatten(order='F'), wk, qraux,
+        sigsqe, th22e, th24e,
     )
 
     return {"sigsqe": sigsqe[0], "th22e": th22e[0], "th24e": th24e[0]}
 
 
-def cpblock(X: np.ndarray, Y: np.ndarray, Nmax: int, q: int) -> int:
+def cpblock(
+    X: _F64Array,
+    Y: _F64Array,
+    Nmax: int,
+    q: int,
+) -> int:
     n = len(X)
 
     # Sort the (X, Y) data with respect to the X's.
@@ -172,27 +248,20 @@ def cpblock(X: np.ndarray, Y: np.ndarray, Nmax: int, q: int) -> int:
     wk = np.zeros(n, dtype=np.float64)
     qraux = np.zeros(qq, dtype=np.float64)
 
-    # remove unused 'q' 2007-07-10
     _KernSmooth.cp(
-        X,
-        Y,
-        np.int32(n),
-        np.int32(qq),
-        np.int32(Nmax),
-        RSS,
-        Xj,
-        Yj,
-        coef,
-        Xmat.flatten(order='F'),
-        wk,
-        qraux,
-        Cpvals,
+        X, Y,
+        np.int32(n), np.int32(qq), np.int32(Nmax),
+        RSS, Xj, Yj, coef, Xmat.flatten(order='F'), wk, qraux, Cpvals,
     )
 
     return int(np.argmin(Cpvals)) + 1
 
 
-def linbin2D(X: np.ndarray, gpoints1: np.ndarray, gpoints2: np.ndarray) -> np.ndarray:
+def linbin2D(
+    X: _F64Array,
+    gpoints1: _F64Array,
+    gpoints2: _F64Array,
+) -> _F64Array:
     n = X.shape[0]
     X_flat = np.concatenate([X[:, 0], X[:, 1]])
     M1 = len(gpoints1)
@@ -202,13 +271,31 @@ def linbin2D(X: np.ndarray, gpoints1: np.ndarray, gpoints2: np.ndarray) -> np.nd
     b1 = np.float64(gpoints1[-1])
     b2 = np.float64(gpoints2[-1])
     gcnts = np.zeros(M1 * M2, dtype=np.float64)
-    _KernSmooth.lbtwod(np.asarray(X_flat, dtype=np.float64), np.int32(n), a1, a2, b1, b2, np.int32(M1), np.int32(M2), gcnts)
+    _KernSmooth.lbtwod(
+        np.asarray(X_flat, dtype=np.float64),
+        np.int32(n), a1, a2, b1, b2, np.int32(M1), np.int32(M2), gcnts,
+    )
     return gcnts.reshape((M1, M2), order='F')
 
 
-def locpoly(x: np.ndarray, y: np.ndarray = None, drv: int = 0, degree: int = None, kernel: str = "normal", bandwidth: np.ndarray = None, gridsize: int = 401, bwdisc: int = 25, range_x: tuple = None, binned: bool = False, truncate: bool = True) -> dict:
+def locpoly(
+    x: _F64Array,
+    y: _F64Array | None = None,
+    drv: int = 0,
+    degree: int | None = None,
+    kernel: str = "normal",
+    bandwidth: float | _F64Array | None = None,
+    gridsize: int = 401,
+    bwdisc: int = 25,
+    range_x: tuple[float, float] | None = None,
+    binned: bool = False,
+    truncate: bool = True,
+) -> dict[str, _F64Array]:
+    if bandwidth is None:
+        raise ValueError("'bandwidth' must be specified")
+
     # Install safeguard against non-positive bandwidths:
-    if bandwidth is not None and np.any(bandwidth <= 0):
+    if np.any(np.asarray(bandwidth) <= 0):
         raise ValueError("'bandwidth' must be strictly positive")
 
     drv = int(drv)
@@ -257,36 +344,13 @@ def locpoly(x: np.ndarray, y: np.ndarray = None, drv: int = 0, degree: int = Non
     delta = (b - a) / (M - 1)
 
     # Discretise the bandwidths
-    bandwidth = np.asarray(bandwidth, dtype=np.float64)
-    if len(bandwidth) == M:
-        hlow = np.min(bandwidth)
-        hupp = np.max(bandwidth)
-        hdisc = np.exp(np.linspace(np.log(hlow), np.log(hupp), Q))
-
-        # Determine value of L for each member of 'hdisc'
-        Lvec = np.floor(tau * hdisc / delta).astype(np.int32)
-
-        # Determine index of closest entry of 'hdisc' to each member of 'bandwidth'
-        if Q > 1:
-            lhdisc = np.log(hdisc)
-            gap = (lhdisc[Q - 1] - lhdisc[0]) / (Q - 1)
-            if gap == 0:
-                indic = np.ones(M, dtype=np.int32)
-            else:
-                indic = np.round(((np.log(bandwidth) - np.log(np.min(bandwidth))) / gap) + 1).astype(np.int32)
-        else:
-            indic = np.ones(M, dtype=np.int32)
-    elif len(bandwidth) == 1:
-        scalar_bw = float(bandwidth[0]) if hasattr(bandwidth, '__len__') else float(bandwidth)
-        indic = np.ones(M, dtype=np.int32)
-        Q = 1
-        Lvec = np.full(Q, int(np.floor(tau * scalar_bw / delta)), dtype=np.int32)
-        hdisc = np.full(Q, scalar_bw, dtype=np.float64)
-    else:
-        raise ValueError("'bandwidth' must be a scalar or an array of length 'gridsize'")
+    hdisc, Lvec, indic, Q = _discretize_bandwidth(bandwidth, M, delta, Q, tau)
 
     if np.min(Lvec) == 0:
-        raise ValueError("Binning grid too coarse for current (small) bandwidth: consider increasing 'gridsize'")
+        raise ValueError(
+            "Binning grid too coarse for current (small) bandwidth: "
+            "consider increasing 'gridsize'"
+        )
 
     # Allocate space for the kernel vector and final estimate
     dimfkap = 2 * int(np.sum(Lvec)) + Q
@@ -327,7 +391,21 @@ def locpoly(x: np.ndarray, y: np.ndarray = None, drv: int = 0, degree: int = Non
     return {"x": gpoints, "y": curvest}
 
 
-def sdiag(x: np.ndarray, drv: int = 0, degree: int = 1, kernel: str = "normal", bandwidth: np.ndarray = None, gridsize: int = 401, bwdisc: int = 25, range_x: tuple = None, binned: bool = False, truncate: bool = True) -> dict:
+def sdiag(
+    x: _F64Array,
+    drv: int = 0,
+    degree: int = 1,
+    kernel: str = "normal",
+    bandwidth: float | _F64Array | None = None,
+    gridsize: int = 401,
+    bwdisc: int = 25,
+    range_x: tuple[float, float] | None = None,
+    binned: bool = False,
+    truncate: bool = True,
+) -> dict[str, _F64Array]:
+    if bandwidth is None:
+        raise ValueError("'bandwidth' must be specified")
+
     if range_x is None and not binned:
         range_x = (np.min(x), np.max(x))
 
@@ -353,33 +431,7 @@ def sdiag(x: np.ndarray, drv: int = 0, degree: int = 1, kernel: str = "normal", 
     delta = (b - a) / (M - 1)
 
     # Discretise the bandwidths
-    bandwidth = np.asarray(bandwidth, dtype=np.float64)
-    if len(bandwidth) == M:
-        hlow = np.min(bandwidth)
-        hupp = np.max(bandwidth)
-        hdisc = np.exp(np.linspace(np.log(hlow), np.log(hupp), Q))
-
-        # Determine value of L for each member of 'hdisc'
-        Lvec = np.floor(tau * hdisc / delta).astype(np.int32)
-
-        # Determine index of closest entry of 'hdisc' to each member of 'bandwidth'
-        if Q > 1:
-            lhdisc = np.log(hdisc)
-            gap = (lhdisc[Q - 1] - lhdisc[0]) / (Q - 1)
-            if gap == 0:
-                indic = np.ones(M, dtype=np.int32)
-            else:
-                indic = np.round(((np.log(bandwidth) - np.log(np.min(bandwidth))) / gap) + 1).astype(np.int32)
-        else:
-            indic = np.ones(M, dtype=np.int32)
-    elif len(bandwidth) == 1:
-        scalar_bw = float(bandwidth[0]) if hasattr(bandwidth, '__len__') else float(bandwidth)
-        indic = np.ones(M, dtype=np.int32)
-        Q = 1
-        Lvec = np.full(Q, int(np.floor(tau * scalar_bw / delta)), dtype=np.int32)
-        hdisc = np.full(Q, scalar_bw, dtype=np.float64)
-    else:
-        raise ValueError("'bandwidth' must be a scalar or an array of length 'gridsize'")
+    hdisc, Lvec, indic, Q = _discretize_bandwidth(bandwidth, M, delta, Q, tau)
 
     dimfkap = 2 * int(np.sum(Lvec)) + Q
     fkap = np.zeros(dimfkap, dtype=np.float64)
@@ -414,7 +466,21 @@ def sdiag(x: np.ndarray, drv: int = 0, degree: int = 1, kernel: str = "normal", 
     return {"x": gpoints, "y": Sdg}
 
 
-def sstdiag(x: np.ndarray, drv: int = 0, degree: int = 1, kernel: str = "normal", bandwidth: np.ndarray = None, gridsize: int = 401, bwdisc: int = 25, range_x: tuple = None, binned: bool = False, truncate: bool = True) -> dict:
+def sstdiag(
+    x: _F64Array,
+    drv: int = 0,
+    degree: int = 1,
+    kernel: str = "normal",
+    bandwidth: float | _F64Array | None = None,
+    gridsize: int = 401,
+    bwdisc: int = 25,
+    range_x: tuple[float, float] | None = None,
+    binned: bool = False,
+    truncate: bool = True,
+) -> dict[str, _F64Array]:
+    if bandwidth is None:
+        raise ValueError("'bandwidth' must be specified")
+
     if range_x is None and not binned:
         range_x = (np.min(x), np.max(x))
 
@@ -440,33 +506,7 @@ def sstdiag(x: np.ndarray, drv: int = 0, degree: int = 1, kernel: str = "normal"
     delta = (b - a) / (M - 1)
 
     # Discretise the bandwidths
-    bandwidth = np.asarray(bandwidth, dtype=np.float64)
-    if len(bandwidth) == M:
-        hlow = np.min(bandwidth)
-        hupp = np.max(bandwidth)
-        hdisc = np.exp(np.linspace(np.log(hlow), np.log(hupp), Q))
-
-        # Determine value of L for each member of 'hdisc'
-        Lvec = np.floor(tau * hdisc / delta).astype(np.int32)
-
-        # Determine index of closest entry of 'hdisc' to each member of 'bandwidth'
-        if Q > 1:
-            lhdisc = np.log(hdisc)
-            gap = (lhdisc[Q - 1] - lhdisc[0]) / (Q - 1)
-            if gap == 0:
-                indic = np.ones(M, dtype=np.int32)
-            else:
-                indic = np.round(((np.log(bandwidth) - np.log(np.min(bandwidth))) / gap) + 1).astype(np.int32)
-        else:
-            indic = np.ones(M, dtype=np.int32)
-    elif len(bandwidth) == 1:
-        scalar_bw = float(bandwidth[0]) if hasattr(bandwidth, '__len__') else float(bandwidth)
-        indic = np.ones(M, dtype=np.int32)
-        Q = 1
-        Lvec = np.full(Q, int(np.floor(tau * scalar_bw / delta)), dtype=np.int32)
-        hdisc = np.full(Q, scalar_bw, dtype=np.float64)
-    else:
-        raise ValueError("'bandwidth' must be a scalar or an array of length 'gridsize'")
+    hdisc, Lvec, indic, Q = _discretize_bandwidth(bandwidth, M, delta, Q, tau)
 
     dimfkap = 2 * int(np.sum(Lvec)) + Q
     fkap = np.zeros(dimfkap, dtype=np.float64)
@@ -505,36 +545,19 @@ def sstdiag(x: np.ndarray, drv: int = 0, degree: int = 1, kernel: str = "normal"
     return {"x": gpoints, "y": SSTd}
 
 
-def _on_attach(libname: str, pkgname: str) -> None:
-    print("KernSmooth 2.23 loaded\nCopyright M. P. Wand 1997-2009", file=sys.stderr)
-
-
-def _on_unload(libpath: str = "") -> None:
-    # R's .onUnload hook called library.dynam.unload("KernSmooth", libpath) to
-    # unload the compiled shared library when the package was detached.
-    # CPython does not support safe unloading of native extension modules;
-    # the import system manages the shared library lifetime automatically.
-    # Therefore this body is intentionally empty — no action is required.
-    pass
-
-
-atexit.register(_on_unload)
-
-
-def bkde(x: np.ndarray, kernel: str = 'normal', canonical: bool = False, bandwidth: float = None, gridsize: int = 401, range_x: np.ndarray = None, truncate: bool = True) -> dict:
+def bkde(
+    x: _F64Array,
+    kernel: str = 'normal',
+    canonical: bool = False,
+    bandwidth: float | None = None,
+    gridsize: int = 401,
+    range_x: _F64Array | None = None,
+    truncate: bool = True,
+) -> dict[str, _F64Array]:
     if bandwidth is not None and bandwidth <= 0:
         raise ValueError("'bandwidth' must be strictly positive")
     valid_kernels = ('normal', 'box', 'epanech', 'biweight', 'triweight')
-    if kernel in valid_kernels:
-        pass
-    else:
-        matches = [c for c in valid_kernels if c.startswith(kernel)]
-        if len(matches) == 1:
-            kernel = matches[0]
-        elif len(matches) > 1:
-            raise ValueError(f"'kernel' = '{kernel}' matches multiple choices: {matches}; must be one of {valid_kernels}.")
-        else:
-            raise ValueError(f"'kernel' = '{kernel}' is not a valid choice; must be one of {valid_kernels}.")
+    kernel = _resolve_choice(kernel, valid_kernels, 'kernel')
     n = len(x)
     M = gridsize
     del0_map = {
@@ -588,7 +611,13 @@ def bkde(x: np.ndarray, kernel: str = 'normal', canonical: bool = False, bandwid
     return {'x': gpoints, 'y': np.fft.ifft(kappa * gcounts).real[:M]}
 
 
-def bkde2D(x: np.ndarray, bandwidth: np.ndarray = None, gridsize: tuple = (51, 51), range_x: list = None, truncate: bool = True) -> dict:
+def bkde2D(
+    x: _F64Array,
+    bandwidth: _F64Array | None = None,
+    gridsize: tuple[int, int] = (51, 51),
+    range_x: list[tuple[float, float]] | None = None,
+    truncate: bool = True,
+) -> dict[str, _F64Array]:
     # Install safeguard against non-positive bandwidths
     if bandwidth is not None and np.min(bandwidth) <= 0:
         raise ValueError("'bandwidth' must be strictly positive")
@@ -670,7 +699,14 @@ def bkde2D(x: np.ndarray, bandwidth: np.ndarray = None, gridsize: tuple = (51, 5
     return {"x1": gpoints1, "x2": gpoints2, "fhat": rp}
 
 
-def dpih(x: np.ndarray, scalest: str = 'minim', level: int = 2, gridsize: int = 401, range_x: tuple = None, truncate: bool = True) -> np.float64:
+def dpih(
+    x: _F64Array,
+    scalest: str = 'minim',
+    level: int = 2,
+    gridsize: int = 401,
+    range_x: tuple[float, float] | None = None,
+    truncate: bool = True,
+) -> np.float64:
     if level > 5:
         raise ValueError('Level should be between 0 and 5')
 
@@ -688,16 +724,7 @@ def dpih(x: np.ndarray, scalest: str = 'minim', level: int = 2, gridsize: int = 
 
     # Compute scale estimate
     _SCALEST_CHOICES = ('minim', 'stdev', 'iqr')
-    if scalest in _SCALEST_CHOICES:
-        pass
-    else:
-        matches = [c for c in _SCALEST_CHOICES if c.startswith(scalest)]
-        if len(matches) == 1:
-            scalest = matches[0]
-        elif len(matches) > 1:
-            raise ValueError(f"'scalest' = '{scalest}' matches multiple choices: {matches}; must be one of {_SCALEST_CHOICES}.")
-        else:
-            raise ValueError(f"'scalest' = '{scalest}' is not a valid choice; must be one of {_SCALEST_CHOICES}.")
+    scalest = _resolve_choice(scalest, _SCALEST_CHOICES, 'scalest')
 
     std_val = np.std(x, ddof=1)
     iqr_val = (np.quantile(x, 0.75) - np.quantile(x, 0.25)) / 1.349
@@ -774,22 +801,22 @@ def dpih(x: np.ndarray, scalest: str = 'minim', level: int = 2, gridsize: int = 
     return np.float64(scalest_val * hpi)
 
 
-def dpik(x: np.ndarray, scalest: str = 'minim', level: int = 2, kernel: str = 'normal', canonical: bool = False, gridsize: int = 401, range_x: tuple = None, truncate: bool = True) -> np.float64:
+def dpik(
+    x: _F64Array,
+    scalest: str = 'minim',
+    level: int = 2,
+    kernel: str = 'normal',
+    canonical: bool = False,
+    gridsize: int = 401,
+    range_x: tuple[float, float] | None = None,
+    truncate: bool = True,
+) -> np.float64:
     if level > 5:
         raise ValueError('Level should be between 0 and 5')
 
     # Validate kernel argument
     _KERNEL_CHOICES = ('normal', 'box', 'epanech', 'biweight', 'triweight')
-    if kernel in _KERNEL_CHOICES:
-        pass
-    else:
-        matches = [c for c in _KERNEL_CHOICES if c.startswith(kernel)]
-        if len(matches) == 1:
-            kernel = matches[0]
-        elif len(matches) > 1:
-            raise ValueError(f"'kernel' = '{kernel}' matches multiple choices: {matches}; must be one of {_KERNEL_CHOICES}.")
-        else:
-            raise ValueError(f"'kernel' = '{kernel}' is not a valid choice; must be one of {_KERNEL_CHOICES}.")
+    kernel = _resolve_choice(kernel, _KERNEL_CHOICES, 'kernel')
 
     # Set kernel constants
     if canonical:
@@ -818,16 +845,7 @@ def dpik(x: np.ndarray, scalest: str = 'minim', level: int = 2, kernel: str = 'n
 
     # Compute scale estimate
     _SCALEST_CHOICES = ('minim', 'stdev', 'iqr')
-    if scalest in _SCALEST_CHOICES:
-        pass
-    else:
-        matches = [c for c in _SCALEST_CHOICES if c.startswith(scalest)]
-        if len(matches) == 1:
-            scalest = matches[0]
-        elif len(matches) > 1:
-            raise ValueError(f"'scalest' = '{scalest}' matches multiple choices: {matches}; must be one of {_SCALEST_CHOICES}.")
-        else:
-            raise ValueError(f"'scalest' = '{scalest}' is not a valid choice; must be one of {_SCALEST_CHOICES}.")
+    scalest = _resolve_choice(scalest, _SCALEST_CHOICES, 'scalest')
 
     std_val = np.std(x, ddof=1)
     iqr_val = (np.quantile(x, 0.75) - np.quantile(x, 0.25)) / 1.349
@@ -903,7 +921,17 @@ def dpik(x: np.ndarray, scalest: str = 'minim', level: int = 2, kernel: str = 'n
     return np.float64(scalest_val * del0 * (1.0 / (psi4hat * n)) ** (1.0 / 5.0))
 
 
-def dpill(x: np.ndarray, y: np.ndarray, blockmax: int = 5, divisor: int = 20, trim: float = 0.01, proptrun: float = 0.05, gridsize: int = 401, range_x: tuple = None, truncate: bool = True) -> np.float64:
+def dpill(
+    x: _F64Array,
+    y: _F64Array,
+    blockmax: int = 5,
+    divisor: int = 20,
+    trim: float = 0.01,
+    proptrun: float = 0.05,
+    gridsize: int = 401,
+    range_x: tuple[float, float] | None = None,
+    truncate: bool = True,
+) -> np.float64:
     # Trim the 100(trim)% of the data from each end (in the x-direction).
     x = np.asarray(x, dtype=np.float64)
     y = np.asarray(y, dtype=np.float64)
