@@ -7,8 +7,6 @@ from scipy.stats import beta as beta_dist, norm
 
 from . import _KernSmooth
 
-_F64Array = np.ndarray[Any, np.dtype[np.float64]]
-
 __all__ = [
     "bkde",
     "bkde2D",
@@ -44,12 +42,12 @@ def _resolve_choice(val: str, choices: tuple[str, ...], param_name: str) -> str:
 
 
 def _discretize_bandwidth(
-    bandwidth: float | _F64Array,
+    bandwidth: float | np.ndarray[Any, np.dtype[np.float64]],
     M: int,
     delta: float,
     Q: int,
     tau: float,
-) -> tuple[_F64Array, np.ndarray, np.ndarray, int]:
+) -> tuple[np.ndarray[Any, np.dtype[np.float64]], np.ndarray, np.ndarray, int]:
     bw = np.asarray(bandwidth, dtype=np.float64)
     if bw.ndim == 0 or len(bw) == 1:
         scalar = float(bw.ravel()[0])
@@ -68,9 +66,9 @@ def _discretize_bandwidth(
             if gap == 0:
                 indic = np.ones(M, dtype=np.int32)
             else:
-                indic = np.round(
-                    ((np.log(bw) - np.log(hlow)) / gap) + 1
-                ).astype(np.int32)
+                indic = np.round(((np.log(bw) - np.log(hlow)) / gap) + 1).astype(
+                    np.int32
+                )
         else:
             indic = np.ones(M, dtype=np.int32)
     else:
@@ -81,10 +79,10 @@ def _discretize_bandwidth(
 
 
 def linbin(
-    X: _F64Array,
-    gpoints: _F64Array,
+    X: np.ndarray[Any, np.dtype[np.float64]],
+    gpoints: np.ndarray[Any, np.dtype[np.float64]],
     truncate: bool = True,
-) -> _F64Array:
+) -> np.ndarray[Any, np.dtype[np.float64]]:
     n = len(X)
     M = len(gpoints)
     trun = np.int32(1) if truncate else np.int32(0)
@@ -98,11 +96,11 @@ def linbin(
 
 
 def rlbin(
-    X: _F64Array,
-    Y: _F64Array,
-    gpoints: _F64Array,
+    X: np.ndarray[Any, np.dtype[np.float64]],
+    Y: np.ndarray[Any, np.dtype[np.float64]],
+    gpoints: np.ndarray[Any, np.dtype[np.float64]],
     truncate: bool = True,
-) -> dict[str, _F64Array]:
+) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
     n = len(X)
     M = len(gpoints)
     trun = np.int32(1) if truncate else np.int32(0)
@@ -113,13 +111,19 @@ def rlbin(
     _KernSmooth.rlbin(
         np.asarray(X, dtype=np.float64),
         np.asarray(Y, dtype=np.float64),
-        np.int32(n), a, b, np.int32(M), trun, xcnts, ycnts,
+        np.int32(n),
+        a,
+        b,
+        np.int32(M),
+        trun,
+        xcnts,
+        ycnts,
     )
     return {"xcounts": xcnts, "ycounts": ycnts}
 
 
 def bkfe(
-    x: _F64Array,
+    x: np.ndarray[Any, np.dtype[np.float64]],
     drv: int,
     bandwidth: float | None = None,
     gridsize: int = 401,
@@ -174,8 +178,8 @@ def bkfe(
     if drv >= 2:
         for i in range(2, drv + 1):
             hmnew = arg * hmold1 - (i - 1) * hmold0
-            hmold0 = hmold1       # Compute mth degree Hermite polynomial
-            hmold1 = hmnew        # by recurrence.
+            hmold0 = hmold1  # Compute mth degree Hermite polynomial
+            hmold1 = hmnew  # by recurrence.
     kappam = hmnew * kappam
 
     # Now combine weights and counts to obtain estimate
@@ -186,12 +190,12 @@ def bkfe(
     kappam = np.fft.fft(kappam)
     Gcounts = np.fft.fft(Gcounts)
 
-    return np.sum(gcounts * np.fft.ifft(kappam * Gcounts).real[:M]) / (n ** 2)
+    return np.sum(gcounts * np.fft.ifft(kappam * Gcounts).real[:M]) / (n**2)
 
 
 def blkest(
-    x: _F64Array,
-    y: _F64Array,
+    x: np.ndarray[Any, np.dtype[np.float64]],
+    y: np.ndarray[Any, np.dtype[np.float64]],
     Nval: int,
     q: int,
 ) -> dict[str, np.float64]:
@@ -207,7 +211,7 @@ def blkest(
     xj = np.zeros(n, dtype=np.float64)
     yj = np.zeros(n, dtype=np.float64)
     coef = np.zeros(qq, dtype=np.float64)
-    Xmat = np.zeros((n, qq), dtype=np.float64)
+    Xmat = np.zeros((n, qq), dtype=np.float64, order="F")
     wk = np.zeros(n, dtype=np.float64)
     qraux = np.zeros(qq, dtype=np.float64)
     sigsqe = np.zeros(1, dtype=np.float64)
@@ -215,18 +219,27 @@ def blkest(
     th24e = np.zeros(1, dtype=np.float64)
 
     _KernSmooth.blkest(
-        x, y,
-        np.int32(n), np.int32(q), np.int32(qq), np.int32(Nval),
-        xj, yj, coef, Xmat.flatten(order='F'), wk, qraux,
-        sigsqe, th22e, th24e,
+        x,
+        y,
+        np.int32(q),
+        np.int32(Nval),
+        xj,
+        yj,
+        coef,
+        Xmat,
+        wk,
+        qraux,
+        sigsqe,
+        th22e,
+        th24e,
     )
 
     return {"sigsqe": sigsqe[0], "th22e": th22e[0], "th24e": th24e[0]}
 
 
 def cpblock(
-    X: _F64Array,
-    Y: _F64Array,
+    X: np.ndarray[Any, np.dtype[np.float64]],
+    Y: np.ndarray[Any, np.dtype[np.float64]],
     Nmax: int,
     q: int,
 ) -> int:
@@ -243,25 +256,32 @@ def cpblock(
     Xj = np.zeros(n, dtype=np.float64)
     Yj = np.zeros(n, dtype=np.float64)
     coef = np.zeros(qq, dtype=np.float64)
-    Xmat = np.zeros((n, qq), dtype=np.float64)
+    Xmat = np.zeros((n, qq), dtype=np.float64, order="F")
     Cpvals = np.zeros(Nmax, dtype=np.float64)
     wk = np.zeros(n, dtype=np.float64)
     qraux = np.zeros(qq, dtype=np.float64)
 
     _KernSmooth.cp(
-        X, Y,
-        np.int32(n), np.int32(qq), np.int32(Nmax),
-        RSS, Xj, Yj, coef, Xmat.flatten(order='F'), wk, qraux, Cpvals,
+        X,
+        Y,
+        RSS,
+        Xj,
+        Yj,
+        coef,
+        Xmat,
+        wk,
+        qraux,
+        Cpvals,
     )
 
     return int(np.argmin(Cpvals)) + 1
 
 
 def linbin2D(
-    X: _F64Array,
-    gpoints1: _F64Array,
-    gpoints2: _F64Array,
-) -> _F64Array:
+    X: np.ndarray[Any, np.dtype[np.float64]],
+    gpoints1: np.ndarray[Any, np.dtype[np.float64]],
+    gpoints2: np.ndarray[Any, np.dtype[np.float64]],
+) -> np.ndarray[Any, np.dtype[np.float64]]:
     n = X.shape[0]
     X_flat = np.concatenate([X[:, 0], X[:, 1]])
     M1 = len(gpoints1)
@@ -273,24 +293,31 @@ def linbin2D(
     gcnts = np.zeros(M1 * M2, dtype=np.float64)
     _KernSmooth.lbtwod(
         np.asarray(X_flat, dtype=np.float64),
-        np.int32(n), a1, a2, b1, b2, np.int32(M1), np.int32(M2), gcnts,
+        np.int32(n),
+        a1,
+        a2,
+        b1,
+        b2,
+        np.int32(M1),
+        np.int32(M2),
+        gcnts,
     )
-    return gcnts.reshape((M1, M2), order='F')
+    return gcnts.reshape((M1, M2), order="F")
 
 
 def locpoly(
-    x: _F64Array,
-    y: _F64Array | None = None,
+    x: np.ndarray[Any, np.dtype[np.float64]],
+    y: np.ndarray[Any, np.dtype[np.float64]] | None = None,
     drv: int = 0,
     degree: int | None = None,
     kernel: str = "normal",
-    bandwidth: float | _F64Array | None = None,
+    bandwidth: float | np.ndarray[Any, np.dtype[np.float64]] | None = None,
     gridsize: int = 401,
     bwdisc: int = 25,
     range_x: tuple[float, float] | None = None,
     binned: bool = False,
     truncate: bool = True,
-) -> dict[str, _F64Array]:
+) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
     if bandwidth is None:
         raise ValueError("'bandwidth' must be specified")
 
@@ -357,13 +384,14 @@ def locpoly(
     fkap = np.zeros(dimfkap, dtype=np.float64)
     curvest = np.zeros(M, dtype=np.float64)
     midpts = np.zeros(Q, dtype=np.int32)
-    ss = np.zeros((M, ppp), dtype=np.float64)
-    tt = np.zeros((M, pp), dtype=np.float64)
-    Smat = np.zeros((pp, pp), dtype=np.float64)
+    ss = np.zeros((M, ppp), dtype=np.float64, order="F")
+    tt = np.zeros((M, pp), dtype=np.float64, order="F")
+    Smat = np.zeros((pp, pp), dtype=np.float64, order="F")
     Tvec = np.zeros(pp, dtype=np.float64)
     ipvt = np.zeros(pp, dtype=np.int32)
 
     # Call Fortran routine 'locpol'
+    # f2py infers m/ipp/ippp from ss/tt shapes; iq=Q must immediately follow midpts
     _KernSmooth.locpol(
         np.asarray(xcounts, dtype=np.float64),
         np.asarray(ycounts, dtype=np.float64),
@@ -373,14 +401,11 @@ def locpoly(
         Lvec,
         indic,
         midpts,
-        np.int32(M),
         np.int32(Q),
         fkap,
-        np.int32(pp),
-        np.int32(ppp),
-        ss.flatten(order='F'),
-        tt.flatten(order='F'),
-        Smat.flatten(order='F'),
+        ss,
+        tt,
+        Smat,
         Tvec,
         ipvt,
         curvest,
@@ -392,17 +417,17 @@ def locpoly(
 
 
 def sdiag(
-    x: _F64Array,
+    x: np.ndarray[Any, np.dtype[np.float64]],
     drv: int = 0,
     degree: int = 1,
     kernel: str = "normal",
-    bandwidth: float | _F64Array | None = None,
+    bandwidth: float | np.ndarray[Any, np.dtype[np.float64]] | None = None,
     gridsize: int = 401,
     bwdisc: int = 25,
     range_x: tuple[float, float] | None = None,
     binned: bool = False,
     truncate: bool = True,
-) -> dict[str, _F64Array]:
+) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
     if bandwidth is None:
         raise ValueError("'bandwidth' must be specified")
 
@@ -436,8 +461,8 @@ def sdiag(
     dimfkap = 2 * int(np.sum(Lvec)) + Q
     fkap = np.zeros(dimfkap, dtype=np.float64)
     midpts = np.zeros(Q, dtype=np.int32)
-    ss = np.zeros((M, ppp), dtype=np.float64)
-    Smat = np.zeros((pp, pp), dtype=np.float64)
+    ss = np.zeros((M, ppp), dtype=np.float64, order="F")
+    Smat = np.zeros((pp, pp), dtype=np.float64, order="F")
     work = np.zeros(pp, dtype=np.float64)
     det = np.zeros(2, dtype=np.float64)
     ipvt = np.zeros(pp, dtype=np.int32)
@@ -450,13 +475,10 @@ def sdiag(
         Lvec,
         indic,
         midpts,
-        np.int32(M),
         np.int32(Q),
         fkap,
-        np.int32(pp),
-        np.int32(ppp),
-        ss.flatten(order='F'),
-        Smat.flatten(order='F'),
+        ss,
+        Smat,
         work,
         det,
         ipvt,
@@ -467,17 +489,17 @@ def sdiag(
 
 
 def sstdiag(
-    x: _F64Array,
+    x: np.ndarray[Any, np.dtype[np.float64]],
     drv: int = 0,
     degree: int = 1,
     kernel: str = "normal",
-    bandwidth: float | _F64Array | None = None,
+    bandwidth: float | np.ndarray[Any, np.dtype[np.float64]] | None = None,
     gridsize: int = 401,
     bwdisc: int = 25,
     range_x: tuple[float, float] | None = None,
     binned: bool = False,
     truncate: bool = True,
-) -> dict[str, _F64Array]:
+) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
     if bandwidth is None:
         raise ValueError("'bandwidth' must be specified")
 
@@ -511,10 +533,10 @@ def sstdiag(
     dimfkap = 2 * int(np.sum(Lvec)) + Q
     fkap = np.zeros(dimfkap, dtype=np.float64)
     midpts = np.zeros(Q, dtype=np.int32)
-    ss = np.zeros((M, ppp), dtype=np.float64)
-    uu = np.zeros((M, ppp), dtype=np.float64)
-    Smat = np.zeros((pp, pp), dtype=np.float64)
-    Umat = np.zeros((pp, pp), dtype=np.float64)
+    ss = np.zeros((M, ppp), dtype=np.float64, order="F")
+    uu = np.zeros((M, ppp), dtype=np.float64, order="F")
+    Smat = np.zeros((pp, pp), dtype=np.float64, order="F")
+    Umat = np.zeros((pp, pp), dtype=np.float64, order="F")
     work = np.zeros(pp, dtype=np.float64)
     det = np.zeros(2, dtype=np.float64)
     ipvt = np.zeros(pp, dtype=np.int32)
@@ -527,15 +549,12 @@ def sstdiag(
         Lvec,
         indic,
         midpts,
-        np.int32(M),
         np.int32(Q),
         fkap,
-        np.int32(pp),
-        np.int32(ppp),
-        ss.flatten(order='F'),
-        uu.flatten(order='F'),
-        Smat.flatten(order='F'),
-        Umat.flatten(order='F'),
+        ss,
+        uu,
+        Smat,
+        Umat,
         work,
         det,
         ipvt,
@@ -546,26 +565,26 @@ def sstdiag(
 
 
 def bkde(
-    x: _F64Array,
-    kernel: str = 'normal',
+    x: np.ndarray[Any, np.dtype[np.float64]],
+    kernel: str = "normal",
     canonical: bool = False,
     bandwidth: float | None = None,
     gridsize: int = 401,
-    range_x: _F64Array | None = None,
+    range_x: np.ndarray[Any, np.dtype[np.float64]] | None = None,
     truncate: bool = True,
-) -> dict[str, _F64Array]:
+) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
     if bandwidth is not None and bandwidth <= 0:
         raise ValueError("'bandwidth' must be strictly positive")
-    valid_kernels = ('normal', 'box', 'epanech', 'biweight', 'triweight')
-    kernel = _resolve_choice(kernel, valid_kernels, 'kernel')
+    valid_kernels = ("normal", "box", "epanech", "biweight", "triweight")
+    kernel = _resolve_choice(kernel, valid_kernels, "kernel")
     n = len(x)
     M = gridsize
     del0_map = {
-        'normal':    (1.0 / (4.0 * np.pi)) ** (1.0 / 10.0),
-        'box':       (9.0 / 2.0) ** (1.0 / 5.0),
-        'epanech':   15.0 ** (1.0 / 5.0),
-        'biweight':  35.0 ** (1.0 / 5.0),
-        'triweight': (9450.0 / 143.0) ** (1.0 / 5.0),
+        "normal": (1.0 / (4.0 * np.pi)) ** (1.0 / 10.0),
+        "box": (9.0 / 2.0) ** (1.0 / 5.0),
+        "epanech": 15.0 ** (1.0 / 5.0),
+        "biweight": 35.0 ** (1.0 / 5.0),
+        "triweight": (9450.0 / 143.0) ** (1.0 / 5.0),
     }
     del0 = del0_map[kernel]
     if not isinstance(canonical, (bool, np.bool_)):
@@ -576,7 +595,7 @@ def bkde(
         h = del0 * bandwidth
     else:
         h = bandwidth
-    tau = 4.0 if kernel == 'normal' else 1.0
+    tau = 4.0 if kernel == "normal" else 1.0
     if range_x is None:
         range_x = np.array([np.min(x) - tau * h, np.max(x) + tau * h])
     a = range_x[0]
@@ -592,13 +611,13 @@ def bkde(
             stacklevel=2,
         )
     lvec = np.arange(0, L + 1)
-    if kernel == 'normal':
+    if kernel == "normal":
         kappa = norm.pdf(lvec * delta) / (n * h)
-    elif kernel == 'box':
+    elif kernel == "box":
         kappa = 0.5 * beta_dist.pdf(0.5 * (lvec * delta + 1.0), 1, 1) / (n * h)
-    elif kernel == 'epanech':
+    elif kernel == "epanech":
         kappa = 0.5 * beta_dist.pdf(0.5 * (lvec * delta + 1.0), 2, 2) / (n * h)
-    elif kernel == 'biweight':
+    elif kernel == "biweight":
         kappa = 0.5 * beta_dist.pdf(0.5 * (lvec * delta + 1.0), 3, 3) / (n * h)
     else:
         kappa = 0.5 * beta_dist.pdf(0.5 * (lvec * delta + 1.0), 4, 4) / (n * h)
@@ -608,16 +627,16 @@ def bkde(
     gcounts = np.concatenate([gcounts, np.zeros(P - M)])
     kappa = np.fft.fft(kappa / tot)
     gcounts = np.fft.fft(gcounts)
-    return {'x': gpoints, 'y': np.fft.ifft(kappa * gcounts).real[:M]}
+    return {"x": gpoints, "y": np.fft.ifft(kappa * gcounts).real[:M]}
 
 
 def bkde2D(
-    x: _F64Array,
-    bandwidth: _F64Array | None = None,
+    x: np.ndarray[Any, np.dtype[np.float64]],
+    bandwidth: np.ndarray[Any, np.dtype[np.float64]] | None = None,
     gridsize: tuple[int, int] = (51, 51),
     range_x: list[tuple[float, float]] | None = None,
     truncate: bool = True,
-) -> dict[str, _F64Array]:
+) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
     # Install safeguard against non-positive bandwidths
     if bandwidth is not None and np.min(bandwidth) <= 0:
         raise ValueError("'bandwidth' must be strictly positive")
@@ -636,7 +655,10 @@ def bkde2D(
     if range_x is None:
         range_x = [None, None]
         for id in range(2):
-            range_x[id] = (np.min(x[:, id]) - 1.5 * h[id], np.max(x[:, id]) + 1.5 * h[id])
+            range_x[id] = (
+                np.min(x[:, id]) - 1.5 * h[id],
+                np.max(x[:, id]) + 1.5 * h[id],
+            )
 
     a = np.array([range_x[0][0], range_x[1][0]], dtype=np.float64)
     b = np.array([range_x[0][1], range_x[1][1]], dtype=np.float64)
@@ -677,11 +699,11 @@ def bkde2D(
     P2 = int(P[1])
 
     rp = np.zeros((P1, P2), dtype=np.float64)
-    rp[:L1 + 1, :L2 + 1] = kapp
+    rp[: L1 + 1, : L2 + 1] = kapp
     if L1:
-        rp[P1 - L1:P1, :L2 + 1] = kapp[L1:0:-1, :L2 + 1]
+        rp[P1 - L1 : P1, : L2 + 1] = kapp[L1:0:-1, : L2 + 1]
     if L2:
-        rp[:, P2 - L2:P2] = rp[:, L2:0:-1]
+        rp[:, P2 - L2 : P2] = rp[:, L2:0:-1]
     # wrap-around version of kapp
 
     sp = np.zeros((P1, P2), dtype=np.float64)
@@ -700,15 +722,15 @@ def bkde2D(
 
 
 def dpih(
-    x: _F64Array,
-    scalest: str = 'minim',
+    x: np.ndarray[Any, np.dtype[np.float64]],
+    scalest: str = "minim",
     level: int = 2,
     gridsize: int = 401,
     range_x: tuple[float, float] | None = None,
     truncate: bool = True,
 ) -> np.float64:
     if level > 5:
-        raise ValueError('Level should be between 0 and 5')
+        raise ValueError("Level should be between 0 and 5")
 
     # Rename variables
     n = len(x)
@@ -723,20 +745,20 @@ def dpih(
     gcounts = linbin(x, gpoints, truncate)
 
     # Compute scale estimate
-    _SCALEST_CHOICES = ('minim', 'stdev', 'iqr')
-    scalest = _resolve_choice(scalest, _SCALEST_CHOICES, 'scalest')
+    _SCALEST_CHOICES = ("minim", "stdev", "iqr")
+    scalest = _resolve_choice(scalest, _SCALEST_CHOICES, "scalest")
 
     std_val = np.std(x, ddof=1)
     iqr_val = (np.quantile(x, 0.75) - np.quantile(x, 0.25)) / 1.349
     scale_map = {
-        'stdev': std_val,
-        'iqr': iqr_val,
-        'minim': min(iqr_val, std_val),
+        "stdev": std_val,
+        "iqr": iqr_val,
+        "minim": min(iqr_val, std_val),
     }
     scalest_val = scale_map[scalest]
 
     if scalest_val == 0:
-        raise ValueError('scale estimate is zero for input data')
+        raise ValueError("scale estimate is zero for input data")
 
     # Replace input data by standardised data for numerical stability:
     x_mean = np.mean(x)
@@ -802,32 +824,32 @@ def dpih(
 
 
 def dpik(
-    x: _F64Array,
-    scalest: str = 'minim',
+    x: np.ndarray[Any, np.dtype[np.float64]],
+    scalest: str = "minim",
     level: int = 2,
-    kernel: str = 'normal',
+    kernel: str = "normal",
     canonical: bool = False,
     gridsize: int = 401,
     range_x: tuple[float, float] | None = None,
     truncate: bool = True,
 ) -> np.float64:
     if level > 5:
-        raise ValueError('Level should be between 0 and 5')
+        raise ValueError("Level should be between 0 and 5")
 
     # Validate kernel argument
-    _KERNEL_CHOICES = ('normal', 'box', 'epanech', 'biweight', 'triweight')
-    kernel = _resolve_choice(kernel, _KERNEL_CHOICES, 'kernel')
+    _KERNEL_CHOICES = ("normal", "box", "epanech", "biweight", "triweight")
+    kernel = _resolve_choice(kernel, _KERNEL_CHOICES, "kernel")
 
     # Set kernel constants
     if canonical:
         del0 = 1.0
     else:
         _KERNEL_DEL0 = {
-            'normal':    1.0 / ((4.0 * math.pi) ** (1.0 / 10.0)),
-            'box':       (9.0 / 2.0) ** (1.0 / 5.0),
-            'epanech':   15.0 ** (1.0 / 5.0),
-            'biweight':  35.0 ** (1.0 / 5.0),
-            'triweight': (9450.0 / 143.0) ** (1.0 / 5.0),
+            "normal": 1.0 / ((4.0 * math.pi) ** (1.0 / 10.0)),
+            "box": (9.0 / 2.0) ** (1.0 / 5.0),
+            "epanech": 15.0 ** (1.0 / 5.0),
+            "biweight": 35.0 ** (1.0 / 5.0),
+            "triweight": (9450.0 / 143.0) ** (1.0 / 5.0),
         }
         del0 = _KERNEL_DEL0[kernel]
 
@@ -844,20 +866,20 @@ def dpik(
     gcounts = linbin(x, gpoints, truncate)
 
     # Compute scale estimate
-    _SCALEST_CHOICES = ('minim', 'stdev', 'iqr')
-    scalest = _resolve_choice(scalest, _SCALEST_CHOICES, 'scalest')
+    _SCALEST_CHOICES = ("minim", "stdev", "iqr")
+    scalest = _resolve_choice(scalest, _SCALEST_CHOICES, "scalest")
 
     std_val = np.std(x, ddof=1)
     iqr_val = (np.quantile(x, 0.75) - np.quantile(x, 0.25)) / 1.349
     scale_map = {
-        'stdev': float(std_val),
-        'iqr':   float(iqr_val),
-        'minim': float(min(iqr_val, std_val)),
+        "stdev": float(std_val),
+        "iqr": float(iqr_val),
+        "minim": float(min(iqr_val, std_val)),
     }
     scalest_val = scale_map[scalest]
 
     if scalest_val == 0:
-        raise ValueError('scale estimate is zero for input data')
+        raise ValueError("scale estimate is zero for input data")
 
     # Replace input data by standardised data for numerical stability:
     x_mean = np.mean(x)
@@ -873,16 +895,22 @@ def dpik(
     if level == 0:
         psi4hat = 3.0 / (8.0 * math.sqrt(math.pi))
     elif level == 1:
-        alpha = (2.0 * (math.sqrt(2.0)) ** 7 / (5.0 * n)) ** (1.0 / 7.0)  # bandwidth for psi_4
+        alpha = (2.0 * (math.sqrt(2.0)) ** 7 / (5.0 * n)) ** (
+            1.0 / 7.0
+        )  # bandwidth for psi_4
         psi4hat = bkfe(gcounts, 4, alpha, range_x=(sa, sb), binned=True)
     elif level == 2:
-        alpha = (2.0 * (math.sqrt(2.0)) ** 9 / (7.0 * n)) ** (1.0 / 9.0)  # bandwidth for psi_6
+        alpha = (2.0 * (math.sqrt(2.0)) ** 9 / (7.0 * n)) ** (
+            1.0 / 9.0
+        )  # bandwidth for psi_6
         psi6hat = bkfe(gcounts, 6, alpha, range_x=(sa, sb), binned=True)
         _val = -3.0 * math.sqrt(2.0 / math.pi) / (psi6hat * n)
         alpha = math.copysign(abs(_val) ** (1.0 / 7.0), _val)  # bandwidth for psi_4
         psi4hat = bkfe(gcounts, 4, alpha, range_x=(sa, sb), binned=True)
     elif level == 3:
-        alpha = (2.0 * (math.sqrt(2.0)) ** 11 / (9.0 * n)) ** (1.0 / 11.0)  # bandwidth for psi_8
+        alpha = (2.0 * (math.sqrt(2.0)) ** 11 / (9.0 * n)) ** (
+            1.0 / 11.0
+        )  # bandwidth for psi_8
         psi8hat = bkfe(gcounts, 8, alpha, range_x=(sa, sb), binned=True)
         _val = 15.0 * math.sqrt(2.0 / math.pi) / (psi8hat * n)
         alpha = math.copysign(abs(_val) ** (1.0 / 9.0), _val)  # bandwidth for psi_6
@@ -891,7 +919,9 @@ def dpik(
         alpha = math.copysign(abs(_val) ** (1.0 / 7.0), _val)  # bandwidth for psi_4
         psi4hat = bkfe(gcounts, 4, alpha, range_x=(sa, sb), binned=True)
     elif level == 4:
-        alpha = (2.0 * (math.sqrt(2.0)) ** 13 / (11.0 * n)) ** (1.0 / 13.0)  # bandwidth for psi_10
+        alpha = (2.0 * (math.sqrt(2.0)) ** 13 / (11.0 * n)) ** (
+            1.0 / 13.0
+        )  # bandwidth for psi_10
         psi10hat = bkfe(gcounts, 10, alpha, range_x=(sa, sb), binned=True)
         _val = -105.0 * math.sqrt(2.0 / math.pi) / (psi10hat * n)
         alpha = math.copysign(abs(_val) ** (1.0 / 11.0), _val)  # bandwidth for psi_8
@@ -903,7 +933,9 @@ def dpik(
         alpha = math.copysign(abs(_val) ** (1.0 / 7.0), _val)  # bandwidth for psi_4
         psi4hat = bkfe(gcounts, 4, alpha, range_x=(sa, sb), binned=True)
     elif level == 5:
-        alpha = (2.0 * (math.sqrt(2.0)) ** 15 / (13.0 * n)) ** (1.0 / 15.0)  # bandwidth for psi_12
+        alpha = (2.0 * (math.sqrt(2.0)) ** 15 / (13.0 * n)) ** (
+            1.0 / 15.0
+        )  # bandwidth for psi_12
         psi12hat = bkfe(gcounts, 12, alpha, range_x=(sa, sb), binned=True)
         _val = 945.0 * math.sqrt(2.0 / math.pi) / (psi12hat * n)
         alpha = math.copysign(abs(_val) ** (1.0 / 13.0), _val)  # bandwidth for psi_10
@@ -922,8 +954,8 @@ def dpik(
 
 
 def dpill(
-    x: _F64Array,
-    y: _F64Array,
+    x: np.ndarray[Any, np.dtype[np.float64]],
+    y: np.ndarray[Any, np.dtype[np.float64]],
     blockmax: int = 5,
     divisor: int = 20,
     trim: float = 0.01,
@@ -957,8 +989,8 @@ def dpill(
     # Bin the data
     gpoints = np.linspace(a, b, M)
     out = rlbin(x, y, gpoints, truncate)
-    xcounts = out['xcounts']
-    ycounts = out['ycounts']
+    xcounts = out["xcounts"]
+    ycounts = out["ycounts"]
 
     # Choose the value of N using Mallow's C_p
     Nmax = max(min(int(np.floor(n / divisor)), blockmax), 1)
@@ -967,19 +999,20 @@ def dpill(
     # Estimate sig^2, theta_22 and theta_24 using quartic fits
     # on 'Nval' blocks.
     out = blkest(x, y, Nval, 4)
-    sigsqQ = out['sigsqe']
-    th24Q = out['th24e']
+    sigsqQ = out["sigsqe"]
+    th24Q = out["th24e"]
 
     # Estimate theta_22 using a local cubic fit
     # with a 'rule-of-thumb' bandwidth: 'gamseh'
-    gamseh = (sigsqQ * (b - a) / (np.abs(th24Q) * n))
+    gamseh = sigsqQ * (b - a) / (np.abs(th24Q) * n)
     if th24Q < 0:
         gamseh = (3 * gamseh / (8 * np.sqrt(np.pi))) ** (1 / 7)
     if th24Q > 0:
         gamseh = (15 * gamseh / (16 * np.sqrt(np.pi))) ** (1 / 7)
 
-    mddest = locpoly(xcounts, ycounts, drv=2, bandwidth=gamseh,
-                     range_x=range_x, binned=True)['y']
+    mddest = locpoly(
+        xcounts, ycounts, drv=2, bandwidth=gamseh, range_x=range_x, binned=True
+    )["y"]
 
     llow = int(np.floor(proptrun * M))
     lupp = M - int(np.floor(proptrun * M))
@@ -989,16 +1022,15 @@ def dpill(
     # with a 'direct plug-in' bandwidth: 'lamseh'
     C3K = (1 / 2) + 2 * np.sqrt(2) - (4 / 3) * np.sqrt(3)
     C3K = (4 * C3K / np.sqrt(2 * np.pi)) ** (1 / 9)
-    lamseh = C3K * (((sigsqQ ** 2) * (b - a) / ((th22kn * n) ** 2)) ** (1 / 9))
+    lamseh = C3K * (((sigsqQ**2) * (b - a) / ((th22kn * n) ** 2)) ** (1 / 9))
 
     # Now compute a local linear kernel estimate of the variance.
-    mest = locpoly(xcounts, ycounts, bandwidth=lamseh,
-                   range_x=range_x, binned=True)['y']
-    Sdg = sdiag(xcounts, bandwidth=lamseh,
-                range_x=range_x, binned=True)['y']
-    SSTdg = sstdiag(xcounts, bandwidth=lamseh,
-                    range_x=range_x, binned=True)['y']
-    sigsqn = np.sum(y ** 2) - 2 * np.sum(mest * ycounts) + np.sum((mest ** 2) * xcounts)
+    mest = locpoly(xcounts, ycounts, bandwidth=lamseh, range_x=range_x, binned=True)[
+        "y"
+    ]
+    Sdg = sdiag(xcounts, bandwidth=lamseh, range_x=range_x, binned=True)["y"]
+    SSTdg = sstdiag(xcounts, bandwidth=lamseh, range_x=range_x, binned=True)["y"]
+    sigsqn = np.sum(y**2) - 2 * np.sum(mest * ycounts) + np.sum((mest**2) * xcounts)
     sigsqd = n - 2 * np.sum(Sdg * xcounts) + np.sum(SSTdg * xcounts)
     sigsqkn = sigsqn / sigsqd
 

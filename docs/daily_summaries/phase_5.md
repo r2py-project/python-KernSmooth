@@ -91,7 +91,6 @@ Seven defect categories were identified (detailed in Section 3).
 - The multi-line R-centric comment block inside `_on_unload` explaining R's `library.dynam.unload` semantics — removed with the function.
 
 *Additions:*
-- `_F64Array = np.ndarray[Any, np.dtype[np.float64]]` — a module-level private type alias that reduces the annotation `np.ndarray[Any, np.dtype[np.float64]]` (37 characters) to `_F64Array` (9 characters) throughout all signatures, directly enabling PEP 8-compliant line lengths.
 - `_resolve_choice(val, choices, param_name)` — a private helper that encapsulates the repeated prefix-match validation idiom (exact match → unique prefix match → ambiguous prefix error → no-match error). Replaces three identical inline blocks in `bkde` (for `kernel`), `dpih` (for `scalest`), and `dpik` (for both `kernel` and `scalest`), reducing each call site to a single line.
 - `_discretize_bandwidth(bandwidth, M, delta, Q, tau)` — a private helper returning `(hdisc, Lvec, indic, Q)` that encapsulates the 27-line bandwidth-discretization block (scalar path, vector-of-length-M path, error path) previously copy-pasted verbatim into `locpoly`, `sdiag`, and `sstdiag`. The helper also corrects a robustness defect in the scalar-detection logic: the original code used `elif len(bandwidth) == 1`, which raises `TypeError` for 0-d numpy arrays (produced by `np.asarray` on a plain Python float or `np.float64` scalar); the helper instead gates on `bw.ndim == 0 or len(bw) == 1`, mirroring the pattern already used correctly in `bkde2D`.
 
@@ -120,7 +119,7 @@ The bandwidth-discretization block and the prefix-match validation block each ap
 
 **Line-length violations**
 
-The most extreme signatures (`locpoly`, `sdiag`, `sstdiag`) reached 210+ characters on a single line. The `_F64Array` alias alone reduced each annotation by 28 characters; combined with multi-line formatting, all signatures now conform to the 88-character limit.
+The most extreme signatures (`locpoly`, `sdiag`, `sstdiag`) reached 210+ characters on a single line.
 
 **Conformance assessment**
 

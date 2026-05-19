@@ -15,8 +15,8 @@ Rewrite a provided R function into Python. You will receive the R function code,
 
 Identify all parameters and return types by referencing the R function's CRAN documentation (e.g., the `KernSmooth` reference manual `https://cran.r-project.org/web/packages/KernSmooth/refman/KernSmooth.html`).
 * Create a Python function prototype using complete type annotations.
-* **Never omit any types or subtypes inside type annotations.** For example, `dict[str, int]` or `np.ndarray[np.float64]` cannot be simplified as `dict` or `np.ndarray` if the subtypes are known. Also, if there are multiple possible types for a parameter, include all of them in the annotation (e.g., `str | None`).
-* *Example:* `def example_function(param1: int, param2: np.ndarray[np.float64]) -> np.ndarray[np.float64]:`
+* **Never omit any types or subtypes inside type annotations.** For example, `dict[str, int]` or `np.ndarray[Any, np.dtype[np.float64]]` cannot be simplified as `dict` or `np.ndarray` if the subtypes are known. Also, if there are multiple possible types for a parameter, include all of them in the annotation (e.g., `str | None`).
+* *Example:* `def example_function(param1: int, param2: np.ndarray[Any, np.dtype[np.float64]]) -> np.ndarray[Any, np.dtype[np.float64]]:`
 
 ### Step 2: Resolve Dependencies
 

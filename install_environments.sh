@@ -5,3 +5,4 @@
 module load gcc
 conda activate r-to-python
 conda install -c conda-forge meson-python numpy pandas scipy scikit-learn matplotlib r-kernsmooth -y
+conda install -c conda-forge r-cardata -y

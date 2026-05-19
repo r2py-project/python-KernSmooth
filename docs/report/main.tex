@@ -81,7 +81,7 @@
 }
 
 %% Language definition for Markdown files (used in the appendix)
-%  No keyword highlighting — we want verbatim reproduction with a framed box.
+%  No keyword highlighting - we want verbatim reproduction with a framed box.
 \lstdefinelanguage{Markdown}{
   basicstyle=\ttfamily\scriptsize,
   breaklines=true,
@@ -294,7 +294,7 @@ The sub-agent parses the R file, identifies every user-defined function, and cla
   \item[\texttt{external\_dependencies}] Calls via \texttt{.Fortran()}, \texttt{.C()}, \texttt{.Call()}, or \texttt{.External()} to compiled native-code entry points.
 \end{description}
 
-The result is a JSON object keyed by function name, each value containing the three dependency arrays. The output was written to \texttt{structural\_analysis/R/all.json}.
+The result is a JSON object keyed by function name, with each value containing the three dependency arrays, each listing unique function names for the dependencies. The output was written to \texttt{structural\_analysis/R/all.json}.
 
 \subsection{Architecture Synthesis}
 
@@ -400,7 +400,7 @@ Every computationally non-trivial function in \texttt{KernSmooth} adopts the sam
 
 \subsubsection{Note on Fortran Source Analysis}
 
-A complete cross-language dependency map would also require analysing the compiled Fortran sources in \texttt{KernSmooth/src/}. The \texttt{/analyze-c-folder-dependencies} skill (Appendix~\ref{app:commands}) was identified as a candidate tool for this task (it handles both C and Fortran), but this analysis has not yet been executed.
+A complete cross-language dependency map would also require analysing the compiled Fortran sources in \texttt{KernSmooth/src/}. The \texttt{/analyze-c-folder-dependencies} skill (Appendix~\ref{app:commands}) was identified as a candidate tool for this task (it handles both C and Fortran), but this analysis has not yet been executed. Due to the nature of \texttt{KernSmooth} package, the Fortran sources are relatively self-contained and do not call back into R, so the lack of a Fortran-level dependency map has not posed a significant obstacle to subsequent phases. The Fortran code is treated as a black box that is called by the R wrappers, so the focus has been on understanding the R-level structure and dependencies.
 
 % =============================================================================
 \section{Phase 2: Establishing the Python Build Infrastructure}
@@ -544,28 +544,32 @@ After successful installation, \texttt{import KernSmooth} and \texttt{import Ker
 
 The automated function conversion in Phase~4 maps each R construct to its Python equivalent. For most R standard-library functions, a na\"{i}ve translation to the apparent NumPy or SciPy analogue introduces silent numerical errors. Documented examples include: R's \texttt{fft(inverse=TRUE)} is unnormalised while NumPy's \texttt{ifft} normalises by $1/N$; R's \texttt{var()} uses Bessel's correction while \texttt{np.var} does not; R's \texttt{as.integer()} targets 32-bit integers while NumPy defaults to 64-bit.
 
-Phase~3 systematically catalogs every R standard-library function used in \texttt{all.R}, records its precise call sites, and generates a dedicated translation guide for each. By encoding these nuances in machine-readable Markdown files that are later fed to the conversion sub-agent, the translation quality is improved without depending on the agent's training-data knowledge of R semantics.
+One may argue that these discrepancies are well-known and can be handled on a case-by-case basis during the conversion process in Phase~4. However, due to the random nature of the LLM, we cannot guarantee that all language dependencies will be correctly identified and translated whenever a function is converted. If there is not a unified, machine-readable reference of all language dependencies and their translation nuances, then the risk of silent numerical errors in the final Python package is unacceptably high. (Even if the translation is mostly correct, we cannot ensure the consistency of choices or styles, which can make debugging significantly difficult.) Also, there are many language dependencies in R that have so many variations in their usage that it is hard to guarantee a correct translation without a comprehensive reference. For example, the \texttt{as.double()} function is used in many different contexts (such as on scalars, vectors, matrices, or even data frames), and its translation to Python can vary depending on the context. If we rely directly on the LLM to identify and translate each usage correctly during the conversion process, we may miss some cases or introduce errors. By contrast, if we systematically extract all language dependencies and their call sites in Phase~3, and then generate detailed conversion guides for each scenario for each dependency, we can ensure that the translation in Phase~4 is consistent and accurate across all functions.
+
+Phase~3 systematically catalogs every R standard-library function used in \texttt{all.R}, records its precise call sites, and generates a dedicated translation guide for each. By encoding these nuances in machine-readable Markdown files that are later fed to the conversion sub-agent, the translation quality is improved without depending on the agent's training-data knowledge of R semantics solely.
 
 \subsection{Language Dependency Extraction}
 
 The \texttt{/extract-r-folder-language-dependencies} skill (Appendix~\ref{app:commands}, \S\ref{appentry:extract-r-folder-language-dependencies}) was invoked:
 
 \begin{lstlisting}[style=shell]
-/extract-r-folder-language-dependencies KernSmooth/R/
+/extract-r-folder-language-dependencies \
+    KernSmooth/R/ \
+    structural_analysis/R/
 \end{lstlisting}
 
-The skill dispatches the \texttt{@extract-r-file-language-dependencies} sub-agent (Appendix~\ref{app:agents}, \S\ref{appentry:extract-r-file-language-dependencies}) on each R file together with its pre-computed structural-analysis JSON. The sub-agent reads the structural JSON to identify the language dependencies of each function, then scans the R source line by line to record, for every individual call site: the dependency name, the enclosing function name, the line number, and the complete call expression (including multi-line calls).
+The skill dispatches the \texttt{@extract-r-file-language-dependencies} sub-agent (Appendix~\ref{app:agents}, \S\ref{appentry:extract-r-file-language-dependencies}) on each R file together with its pre-computed structural-analysis JSON. The sub-agent reads the structural JSON to identify the language dependencies of each function, then rescans the R source line by line to record, for every individual call site: the dependency name, the enclosing function name, the line number, and the complete call expression (including multi-line calls).
 
 The result was written to \texttt{language\_dependency\_analysis/R/all.csv}: a 370-row, 4-column CSV (\texttt{language\_dependency}, \texttt{function\_name}, \texttt{line\_number}, \texttt{call\_body}) covering all 16 functions in \texttt{all.R}.
 
-A utility script \texttt{language\_dependency\_analysis/combine\_csvs.py} was also written (but not yet executed) to:
+A utility script \texttt{language\_dependency\_analysis/combine\_csvs.py} was also written to:
 \begin{itemize}
   \item Recursively glob all \texttt{.csv} files under \texttt{language\_dependency\_analysis/R/}.
   \item Insert a \texttt{file\_path} column (the relative path of the source R file within the \texttt{R/} folder, \texttt{.csv} extension replaced with \texttt{.R}).
   \item Concatenate, sort by \texttt{[language\_dependency, file\_path, function\_name, line\_number]}, and save the combined result to \texttt{language\_dependency\_analysis/combined\_table.csv}.
 \end{itemize}
 
-This script is designed to support future analysis of additional R files beyond \texttt{all.R}.
+This script is designed to sort the entries in the original \texttt{all.csv} to make the entries for the same language dependency contiguous and convenient to be extracted for further tasks. It also makes it easier to support future analysis of additional R files beyond \texttt{all.R}.
 
 \subsection{Conversion Guide Generation}
 
@@ -909,23 +913,13 @@ def _resolve_choice(val, choices, param_name):
 
 Both helpers are private (underscore-prefixed) and absent from \texttt{\_\_all\_\_}, preserving the public API surface.
 
-\subsubsection{Type Alias for Line-Length Compliance}
-
-The annotation \texttt{np.ndarray[Any,~np.dtype[np.float64]]} (37~characters) appeared in every public function signature. A module-level alias was introduced:
-
-\begin{lstlisting}[style=python]
-_F64Array = np.ndarray[Any, np.dtype[np.float64]]
-\end{lstlisting}
-
-This reduces each occurrence to 9~characters, directly enabling PEP~8-compliant line lengths ($\leq 88$ characters) without any loss of annotation precision.
-
 \subsubsection{PEP~8 Signature Reformatting}
 
 All function signatures exceeding 88 characters were reformatted to multi-line style with one parameter per line. The most extreme cases (\texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}) had reached 210+ characters on a single line prior to reformatting.
 
 \subsection{State of the Package After Phase~5}
 
-The rewritten \texttt{py-KernSmooth/KernSmooth/\_\_init\_\_.py} is 1,006 lines and satisfies the following properties:
+The rewritten \texttt{py-KernSmooth/KernSmooth/\_\_init\_\_.py} is 1,052 lines and satisfies the following properties:
 
 \begin{itemize}
   \item No dead code or unused imports.
