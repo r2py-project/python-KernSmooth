@@ -1,10 +1,10 @@
 import numpy as np
-import KernSmooth
+import r2py_kernsmooth
 
 
 def main():
     x = np.array([1, 2, 3, 4, 5])
-    y = KernSmooth.bkde(x)
+    y = r2py_kernsmooth.bkde(x)
     print(y)
 
 

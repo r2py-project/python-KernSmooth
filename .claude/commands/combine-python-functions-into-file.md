@@ -27,7 +27,7 @@ For each JSON file, extract the `imports`, `function_prototype`, and `function_b
 {
   "imports": [
     "import numpy as np",
-    "from KernSmooth import _KernSmooth"
+    "from . import _KernSmooth"
   ],
   "function_prototype": "def rlbin(X: np.ndarray[np.float64], Y: np.ndarray[np.float64], gpoints: np.ndarray[np.float64], truncate: bool = True) -> dict:",
   "function_body": [

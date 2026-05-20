@@ -7,7 +7,7 @@ import io
 import urllib.request
 
 import numpy as np
-import KernSmooth
+import r2py_kernsmooth
 
 
 def load_prestige():
@@ -25,10 +25,10 @@ def load_prestige():
 def main():
     income, prestige = load_prestige()
 
-    result_truncate = KernSmooth.locpoly(income, prestige, bandwidth=5000)
+    result_truncate = r2py_kernsmooth.locpoly(income, prestige, bandwidth=5000)
     print(result_truncate)
 
-    result_no_truncate = KernSmooth.locpoly(
+    result_no_truncate = r2py_kernsmooth.locpoly(
         income, prestige, bandwidth=5000, truncate=False
     )
     print(result_no_truncate)

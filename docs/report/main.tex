@@ -107,10 +107,12 @@
 
 % --- Headers and footers ---
 \usepackage{fancyhdr}
+\setlength{\headheight}{13.59999pt}
+\addtolength{\topmargin}{-1.59999pt}
 \pagestyle{fancy}
 \fancyhf{}
 \renewcommand{\headrulewidth}{0.4pt}
-\fancyhead[L]{\small\itshape python-KernSmooth --- Technical Report}
+\fancyhead[L]{\small\itshape python-KernSmooth}
 \fancyhead[R]{\small\itshape \nouppercase{\leftmark}}
 \fancyfoot[C]{\small\thepage}
 \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
@@ -190,7 +192,7 @@
 \addcontentsline{toc}{section}{Abstract}
 % =============================================================================
 
-This report documents the ongoing work to port the R package \texttt{KernSmooth} (version~2.23-26, released 2024-12-10) into an installable Python package of the same name. \texttt{KernSmooth} is a \emph{recommended} package shipped with every standard R installation; it implements kernel smoothing methods from Wand \& Jones~\cite{wandjones1995} and has no runtime dependencies on any external CRAN package.
+This report documents the ongoing work to port the R package \texttt{KernSmooth} (version~2.23-26, released 2024-12-10) into an installable Python package named \texttt{r2py\_kernsmooth}. \texttt{KernSmooth} is a \emph{recommended} package shipped with every standard R installation; it implements kernel smoothing methods from Wand \& Jones~\cite{wandjones1995} and has no runtime dependencies on any external CRAN package.
 
 The conversion strategy retains the original Fortran~77 computational core verbatim, compiles it into a Python C-extension via \texttt{numpy.f2py}, and replaces the R wrapper layer with semantically equivalent Python functions. The project proceeds in five phases: (1)~static architectural analysis of the R package, (2)~Python build-system establishment, (3)~language-dependency cataloguing and per-dependency conversion guide generation, (4)~automated R-to-Python function conversion and package assembly, and (5)~code-quality audit and namespace refinement. All five phases have been executed. The resulting package installs under Python~3.14 (CPython) in a \texttt{conda} environment on a Red Hat Enterprise Linux~9 HPC node and produces numerically correct output.
 
@@ -229,8 +231,8 @@ Path & Contents \\
 \midrule
 \texttt{KernSmooth/} &
   Unmodified R package source (v2.23-26). \\
-\texttt{py-KernSmooth/} &
-  Python package under development; contains \texttt{KernSmooth/\_\_init\_\_.py}, \texttt{meson.build}, \texttt{pyproject.toml}, Fortran sources in \texttt{src/}, and \texttt{tests/test.py}. \\
+\texttt{r2py\_kernsmooth/} &
+  Python package under development; contains \texttt{r2py\_kernsmooth/\_\_init\_\_.py}, \texttt{meson.build}, \texttt{pyproject.toml}, Fortran sources in \texttt{src/}, and \texttt{tests/test.py}. \\
 \texttt{structural\_analysis/} &
   Dependency-graph visualisation artefacts (\texttt{dependency\_graph.\{py,html,pdf,png\}}), the function-level CSV (\texttt{dependency\_levels.csv}), and the JSON analysis outputs per R file. \\
 \texttt{language\_dependency\_analysis/} &
@@ -416,7 +418,7 @@ Phase~2 addresses all build-system and packaging concerns before any wrapper cod
 
 \subsection{Build System Design}
 
-The build system uses \texttt{meson-python} as the build backend, declared in \texttt{py-KernSmooth/pyproject.toml}:
+The build system uses \texttt{meson-python} as the build backend, declared in \texttt{r2py\_kernsmooth/pyproject.toml}:
 
 \begin{lstlisting}[style=shell]
 [build-system]
@@ -424,16 +426,16 @@ build-backend = "mesonpy"
 requires = ["meson-python", "numpy"]
 
 [project]
-name = "KernSmooth"
+name = "r2py_kernsmooth"
 version = "0.1.0"
-dependencies = ["numpy"]
+dependencies = ["numpy", "scipy"]
 \end{lstlisting}
 
-The complete build definition resides in \texttt{py-KernSmooth/meson.build}.
+The complete build definition resides in \texttt{r2py\_kernsmooth/meson.build}.
 
 \subsubsection{Fortran Sources}
 
-Thirteen Fortran~77 fixed-form source files in \texttt{py-KernSmooth/src/} are compiled into the extension:
+Thirteen Fortran~77 fixed-form source files in \texttt{r2py\_kernsmooth/src/} are compiled into the extension:
 
 \begin{center}
 \begin{tabular}{p{0.36\textwidth}p{0.55\textwidth}}
@@ -516,11 +518,11 @@ The final \texttt{declare\_dependency} hard-codes the absolute path as a last re
 The Python package exposes two components:
 
 \begin{description}
-  \item[\texttt{KernSmooth/\_KernSmooth}] The compiled Fortran C-extension (private backend). All 11 original subroutines are accessible via \texttt{KernSmooth.\_KernSmooth.\textit{name}}.
-  \item[\texttt{KernSmooth/\_\_init\_\_.py}] The Python wrapper layer that defines the public API.
+  \item[\texttt{r2py\_kernsmooth/\_KernSmooth}] The compiled Fortran C-extension (private backend). All 11 original subroutines are accessible via \texttt{r2py\_kernsmooth.\_KernSmooth.\textit{name}}.
+  \item[\texttt{r2py\_kernsmooth/\_\_init\_\_.py}] The Python wrapper layer that defines the public API.
 \end{description}
 
-An early design exposed the raw Fortran subroutines directly in the \texttt{KernSmooth} namespace. This was identified as architecturally incorrect: the Fortran subroutines have a low-level calling convention (all arguments passed by reference, no input validation, no Python-idiomatic defaults) and should not be part of the public API. \texttt{\_\_init\_\_.py} was revised to contain only \texttt{from . import \_KernSmooth} and \texttt{\_\_all\_\_ = []}, deferring all public-API decisions to the wrapper functions to be written in Phase~4.
+An early design exposed the raw Fortran subroutines directly in the \texttt{r2py\_kernsmooth} namespace. This was identified as architecturally incorrect: the Fortran subroutines have a low-level calling convention (all arguments passed by reference, no input validation, no Python-idiomatic defaults) and should not be part of the public API. \texttt{\_\_init\_\_.py} was revised to contain only \texttt{from . import \_KernSmooth} and \texttt{\_\_all\_\_ = []}, deferring all public-API decisions to the wrapper functions to be written in Phase~4.
 
 \subsection{Installation}
 
@@ -532,9 +534,9 @@ pip install --no-build-isolation .
 
 The \texttt{--no-build-isolation} flag is required because the conda environment provides \texttt{numpy} and \texttt{meson-python} directly, and the Meson configure step calls \texttt{numpy.get\_include()} and \texttt{numpy.f2py.get\_include()} at configure time. With build isolation, pip would install \texttt{numpy} into an isolated build environment, producing a different path that may conflict with the runtime environment.
 
-The full invocation, including the cluster's \texttt{module load gcc} and \texttt{conda activate r-to-python} steps, is captured in \texttt{py-KernSmooth/pip\_install.sh}. This script is also suitable for submission as a cluster batch job (\texttt{\#\$ -pe smp 1}, \texttt{\#\$ -q long} directives are included).
+The full invocation, including the cluster's \texttt{module load gcc} and \texttt{conda activate r-to-python} steps, is captured in \texttt{r2py\_kernsmooth/pip\_install.sh}. This script is also suitable for submission as a cluster batch job (\texttt{\#\$ -pe smp 1}, \texttt{\#\$ -q long} directives are included).
 
-After successful installation, \texttt{import KernSmooth} and \texttt{import KernSmooth.\_KernSmooth} both succeed without error.
+After successful installation, \texttt{import r2py\_kernsmooth} and \texttt{import r2py\_kernsmooth.\_KernSmooth} both succeed without error.
 
 % =============================================================================
 \section{Phase 3: Language Dependency Catalogue and Conversion Guides}
@@ -716,7 +718,7 @@ The \texttt{/combine-python-functions-into-file} skill (Appendix~\ref{app:comman
 \begin{lstlisting}[style=shell]
 /combine-python-functions-into-file \
     conversion_results/R/all.R/ \
-    py-KernSmooth/KernSmooth/__init__.py
+    r2py_kernsmooth/r2py_kernsmooth/__init__.py
 \end{lstlisting}
 
 Before writing, the skill performed a structural scan of \texttt{meson.build} and the existing \texttt{\_\_init\_\_.py} to verify the correct import path for the Fortran extension (\texttt{from~.~import~\_KernSmooth}), then corrected discrepancies found in the per-function JSON artefacts:
@@ -726,9 +728,9 @@ Before writing, the skill performed a structural scan of \texttt{meson.build} an
 \toprule
 Original (in JSON artefacts) & Corrected \\
 \midrule
-\texttt{from KernSmooth import \_KernSmooth} &
+\texttt{from r2py\_kernsmooth import \_KernSmooth} &
   \texttt{from . import \_KernSmooth} \\
-\texttt{from KernSmooth.linbin import linbin} &
+\texttt{from r2py\_kernsmooth.linbin import linbin} &
   removed (functions are co-located) \\
 \texttt{from scipy.stats import norm} (duplicate) &
   merged: \texttt{from scipy.stats import beta as beta\_dist, norm} \\
@@ -795,7 +797,7 @@ Subroutine & Output argument(s) & Type \\
 
 \subsubsection{Patches Applied}
 
-Seven targeted edits were made to \texttt{py-KernSmooth/KernSmooth/\_\_init\_\_.py}:
+Seven targeted edits were made to \texttt{r2py\_kernsmooth/r2py\_kernsmooth/\_\_init\_\_.py}:
 
 \begin{enumerate}
   \item \textbf{\texttt{linbin}} --- Removed \texttt{[6]} subscript; read \texttt{gcnts} (pre-allocated \texttt{np.zeros(M)}) directly after the call.
@@ -811,7 +813,7 @@ A post-patch \texttt{grep} confirmed zero remaining stale \texttt{out[integer]} 
 
 \subsection{Output Validation}
 
-The test script \texttt{py-KernSmooth/tests/test.py} invoked \texttt{KernSmooth.bkde(np.array([1,2,3,4,5]))} with default parameters and printed the result. The output was verified analytically:
+The test script \texttt{r2py\_kernsmooth/tests/test.py} invoked \texttt{r2py\_kernsmooth.bkde(np.array([1,2,3,4,5]))} with default parameters and printed the result. The output was verified analytically:
 
 \begin{itemize}
   \item \textbf{Grid range:} $[-4.244,\,10.244]$. Expected $[\min(x)-\tau h,\,\max(x)+\tau h]$ where $\tau=4$ and $h \approx \delta_0 \cdot (243/175)^{1/5} \cdot \sigma \approx 0.776 \times 1.069 \times 1.581 \approx 1.312$, giving $[-4.248,\,10.248]$. \checkmark
@@ -859,10 +861,10 @@ The \texttt{NDArray[np.float64]} alias from \texttt{numpy.typing} was evaluated 
 
 \subsection{Namespace Privacy Investigation}
 
-Importing \texttt{numpy as np} at module level exposes \texttt{KernSmooth.np} as a public package attribute, which is undesirable but difficult to prevent. Two strategies were evaluated:
+Importing \texttt{numpy as np} at module level exposes \texttt{r2py\_kernsmooth.np} as a public package attribute, which is undesirable but difficult to prevent. Two strategies were evaluated:
 
 \begin{description}
-  \item[Underscore aliasing] All imports renamed to \texttt{\_np}, \texttt{\_math}, etc., with global replacement of all references throughout the file. Implemented and tested (confirmed \texttt{hasattr(KernSmooth, `np')} returned \texttt{False}), then \textbf{reverted}. A survey of major scientific Python packages (NumPy, SciPy, pandas) confirmed that underscore-aliasing of dependency imports is not standard practice; all use conventional import names at module level.
+  \item[Underscore aliasing] All imports renamed to \texttt{\_np}, \texttt{\_math}, etc., with global replacement of all references throughout the file. Implemented and tested (confirmed \texttt{hasattr(r2py\_kernsmooth, `np')} returned \texttt{False}), then \textbf{reverted}. A survey of major scientific Python packages (NumPy, SciPy, pandas) confirmed that underscore-aliasing of dependency imports is not standard practice; all use conventional import names at module level.
   \item[\texttt{del} cleanup] Applicable only to imports used \emph{exclusively at module initialisation time}. Only \texttt{atexit} qualified: it appeared solely in the \texttt{atexit.register(\_on\_unload)} call. \texttt{del atexit} was added immediately after that registration. No other import could be safely deleted because all others (\texttt{math}, \texttt{np}, etc.) are referenced inside function bodies, where deletion would cause \texttt{NameError} at call time.
 \end{description}
 
@@ -919,7 +921,7 @@ All function signatures exceeding 88 characters were reformatted to multi-line s
 
 \subsection{State of the Package After Phase~5}
 
-The rewritten \texttt{py-KernSmooth/KernSmooth/\_\_init\_\_.py} is 1,052 lines and satisfies the following properties:
+The rewritten \texttt{r2py\_kernsmooth/r2py\_kernsmooth/\_\_init\_\_.py} is 1,052 lines and satisfies the following properties:
 
 \begin{itemize}
   \item No dead code or unused imports.

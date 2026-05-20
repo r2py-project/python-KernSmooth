@@ -1,4 +1,4 @@
-project('KernSmooth', 'c', 'fortran')
+project('r2py_kernsmooth', 'c', 'fortran')
 py_mod = import('python')
 py = py_mod.find_installation(pure: false)
 numpy_dep = dependency('numpy')
@@ -21,8 +21,8 @@ incdir_f2py = run_command(py, ['-c', 'import numpy.f2py; print(numpy.f2py.get_in
 fortranobject_c = incdir_f2py / 'fortranobject.c'
 numpy_include = include_directories(incdir_numpy, incdir_f2py)
 py.install_sources(
-  'KernSmooth/__init__.py',
-  subdir: 'KernSmooth'
+  'r2py_kernsmooth/__init__.py',
+  subdir: 'r2py_kernsmooth'
 )
 fortran_sources = files(
   'src/blkest.f',
@@ -50,6 +50,6 @@ py.extension_module(
   [fortranobject_c, fortran_sources, f2py_gen],
   include_directories: numpy_include,
   install: true,
-  subdir: 'KernSmooth',
+  subdir: 'r2py_kernsmooth',
   dependencies: [numpy_dep, blas_dep]
 )

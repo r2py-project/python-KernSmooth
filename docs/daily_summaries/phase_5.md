@@ -1,7 +1,7 @@
 # Phase 5 Session Report — python-KernSmooth
 
 **Date:** 2026-05-18
-**File Modified:** `py-KernSmooth/KernSmooth/__init__.py`
+**File Modified:** `r2py_kernsmooth/r2py_kernsmooth/__init__.py`
 
 ---
 
@@ -9,7 +9,7 @@
 
 ### 1. Abstract
 
-This session focused on two sequential improvements to `py-KernSmooth/KernSmooth/__init__.py`: (1) completing incomplete type annotations across all 14 public function prototypes, and (2) investigating and applying the standard Python convention for restricting the package's public namespace. The session concluded with a fully annotated public API and a single `del atexit` statement added to remove the one init-time-only import from the module namespace.
+This session focused on two sequential improvements to `r2py_kernsmooth/r2py_kernsmooth/__init__.py`: (1) completing incomplete type annotations across all 14 public function prototypes, and (2) investigating and applying the standard Python convention for restricting the package's public namespace. The session concluded with a fully annotated public API and a single `del atexit` statement added to remove the one init-time-only import from the module namespace.
 
 ---
 
@@ -17,7 +17,7 @@ This session focused on two sequential improvements to `py-KernSmooth/KernSmooth
 
 **Task 1 — Type Annotation Completion**
 
-- Reviewed all function signatures in `py-KernSmooth/KernSmooth/__init__.py` to identify annotations missing dtype or container subtypes.
+- Reviewed all function signatures in `r2py_kernsmooth/r2py_kernsmooth/__init__.py` to identify annotations missing dtype or container subtypes.
 - Added `from typing import Any` to the stdlib import block.
 - Updated every `np.ndarray` parameter and return annotation to `np.ndarray[Any, np.dtype[np.float64]]`, reflecting the exclusive use of 64-bit floating-point arrays throughout the module.
 - Updated all bare `dict` return types to parameterized forms:
@@ -29,8 +29,8 @@ This session focused on two sequential improvements to `py-KernSmooth/KernSmooth
 
 **Task 2 — Namespace Privacy Investigation and Resolution**
 
-- Identified that importing `numpy as np`, `math`, `sys`, etc. at the module level exposes those names as attributes of the `KernSmooth` package (e.g., `KernSmooth.np`).
-- **Attempt 1:** Renamed all imports to underscore-prefixed aliases (`import numpy as _np`, `import math as _math`, etc.) and performed a global replace of all references throughout the file. Confirmed via runtime test that `hasattr(KernSmooth, 'np')` returned `False`.
+- Identified that importing `numpy as np`, `math`, `sys`, etc. at the module level exposes those names as attributes of the `r2py_kernsmooth` package (e.g., `r2py_kernsmooth.np`).
+- **Attempt 1:** Renamed all imports to underscore-prefixed aliases (`import numpy as _np`, `import math as _math`, etc.) and performed a global replace of all references throughout the file. Confirmed via runtime test that `hasattr(r2py_kernsmooth, 'np')` returned `False`.
 - **Reversal:** Following a web research query on the conventions of major scientific Python packages (scipy, numpy, pandas), found that underscore-aliasing of dependency imports is not the standard practice. Reverted all aliases to their conventional forms.
 - **Finding:** Major packages use `del` to remove init-time-only imports, and rely on `__all__` as the authoritative public API contract. Names used inside function bodies cannot be deleted without causing `NameError` at call time.
 - **Final action:** Added `del atexit` on the line immediately following `atexit.register(_on_unload)`, the sole location where `atexit` is used.
@@ -49,7 +49,7 @@ This session focused on two sequential improvements to `py-KernSmooth/KernSmooth
 
 ### 4. Conclusion
 
-`py-KernSmooth/KernSmooth/__init__.py` received complete, parameterized type annotations on all public functions and a `del atexit` statement removing the one safely deletable import from the module namespace. The remaining dependency imports (`np`, `math`, `sys`, `warnings`, `norm`, `beta_dist`, `Any`) were intentionally retained, consistent with the standard practice of relying on `__all__` for public API enforcement. No further namespace-privacy actions were possible without restructuring function bodies to avoid module-level globals.
+`r2py_kernsmooth/r2py_kernsmooth/__init__.py` received complete, parameterized type annotations on all public functions and a `del atexit` statement removing the one safely deletable import from the module namespace. The remaining dependency imports (`np`, `math`, `sys`, `warnings`, `norm`, `beta_dist`, `Any`) were intentionally retained, consistent with the standard practice of relying on `__all__` for public API enforcement. No further namespace-privacy actions were possible without restructuring function bodies to avoid module-level globals.
 
 ---
 ---
@@ -58,7 +58,7 @@ This session focused on two sequential improvements to `py-KernSmooth/KernSmooth
 
 ### 1. Abstract
 
-This session performed a thorough, in-depth review of `py-KernSmooth/KernSmooth/__init__.py` to evaluate conformance with standard Python packaging conventions. Seven distinct categories of defects were identified — ranging from dead R-porting artifacts and a silent crash bug to structural code duplication and PEP 8 violations — and all were subsequently resolved in a single comprehensive rewrite of the file. The file grew from 981 lines to 1,006 lines, reflecting the net addition of two private helper functions that replaced duplicated inline logic.
+This session performed a thorough, in-depth review of `r2py_kernsmooth/r2py_kernsmooth/__init__.py` to evaluate conformance with standard Python packaging conventions. Seven distinct categories of defects were identified — ranging from dead R-porting artifacts and a silent crash bug to structural code duplication and PEP 8 violations — and all were subsequently resolved in a single comprehensive rewrite of the file. The file grew from 981 lines to 1,006 lines, reflecting the net addition of two private helper functions that replaced duplicated inline logic.
 
 ---
 
@@ -66,7 +66,7 @@ This session performed a thorough, in-depth review of `py-KernSmooth/KernSmooth/
 
 **Step 1 — Full File Audit**
 
-The complete text of `py-KernSmooth/KernSmooth/__init__.py` (981 lines) was read and analyzed function by function. The audit examined:
+The complete text of `r2py_kernsmooth/r2py_kernsmooth/__init__.py` (981 lines) was read and analyzed function by function. The audit examined:
 - Import usage across the entire module, not just at the import site.
 - Every function signature for correctness of type annotations and default values.
 - Each function body for correctness relative to its declared interface.
@@ -78,7 +78,7 @@ Seven defect categories were identified (detailed in Section 3).
 
 **Step 2 — Rewrite and Application of All Fixes**
 
-`py-KernSmooth/KernSmooth/__init__.py` was rewritten in full. The specific changes applied are itemized below.
+`r2py_kernsmooth/r2py_kernsmooth/__init__.py` was rewritten in full. The specific changes applied are itemized below.
 
 *Removals:*
 - `import atexit` (line 1) — rendered unused after removing `_on_unload` and its registration.
@@ -134,7 +134,7 @@ The following aspects were confirmed as standard and correct prior to this sessi
 
 ### 4. Conclusion & Next Steps
 
-All seven defect categories identified in the audit have been resolved. `py-KernSmooth/KernSmooth/__init__.py` now:
+All seven defect categories identified in the audit have been resolved. `r2py_kernsmooth/r2py_kernsmooth/__init__.py` now:
 - Contains no dead code or unused imports.
 - Raises a clear `ValueError` (rather than a cryptic `TypeError`) when `bandwidth=None` is passed to `locpoly`, `sdiag`, or `sstdiag`.
 - Has no duplicated bandwidth-discretization or kernel/scalest-validation logic.
@@ -145,6 +145,6 @@ All seven defect categories identified in the audit have been resolved. `py-Kern
 The `_resolve_choice` and `_discretize_bandwidth` helpers are private (underscore-prefixed) and absent from `__all__`, preserving the public API surface unchanged.
 
 **Suggested next steps:**
-- Expand `py-KernSmooth/tests/test.py` beyond the single `bkde` smoke test to cover all 14 public functions, including boundary conditions such as `bandwidth` near zero, `level` at 0 and 5 for `dpih`/`dpik`, and the binned vs. unbinned code paths.
-- Validate numerical agreement between `py-KernSmooth` outputs and the reference R `KernSmooth` package (v2.23-22) on a shared dataset for each function.
+- Expand `r2py_kernsmooth/tests/test.py` beyond the single `bkde` smoke test to cover all 14 public functions, including boundary conditions such as `bandwidth` near zero, `level` at 0 and 5 for `dpih`/`dpik`, and the binned vs. unbinned code paths.
+- Validate numerical agreement between `r2py_kernsmooth` outputs and the reference R `KernSmooth` package (v2.23-22) on a shared dataset for each function.
 - Consider adding `__version__ = "2.23"` to `__init__.py` to expose the mirrored R package version programmatically.

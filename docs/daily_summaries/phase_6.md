@@ -1,8 +1,8 @@
 # Phase 6 Session Report — python-KernSmooth
 
 **Date:** 2026-05-19
-**Files Created:** `py-KernSmooth/tests/test_bkfe.py`, `py-KernSmooth/tests/test_locpoly.py`, `py-KernSmooth/tests/R/locpoly.R`
-**Files Modified:** `py-KernSmooth/KernSmooth/__init__.py`
+**Files Created:** `r2py_kernsmooth/tests/test_bkfe.py`, `r2py_kernsmooth/tests/test_locpoly.py`, `r2py_kernsmooth/tests/R/locpoly.R`
+**Files Modified:** `r2py_kernsmooth/r2py_kernsmooth/__init__.py`
 
 ---
 
@@ -10,7 +10,7 @@
 
 ### 1. Abstract
 
-This session converted the two existing R regression tests (`KernSmooth/tests/bkfe.R`, `KernSmooth/tests/locpoly.R`) into Python equivalents, validated `test_bkfe.py` numerically against R, and diagnosed and fully repaired a two-layer f2py compatibility bug in `py-KernSmooth/KernSmooth/__init__.py` that caused `test_locpoly.py` to crash at runtime under NumPy 2.4.3. Both Python tests now produce output numerically identical to their R counterparts (verified to 7 significant figures). An R reference script was additionally written to enable future side-by-side comparison of `locpoly` outputs.
+This session converted the two existing R regression tests (`KernSmooth/tests/bkfe.R`, `KernSmooth/tests/locpoly.R`) into Python equivalents, validated `test_bkfe.py` numerically against R, and diagnosed and fully repaired a two-layer f2py compatibility bug in `r2py_kernsmooth/r2py_kernsmooth/__init__.py` that caused `test_locpoly.py` to crash at runtime under NumPy 2.4.3. Both Python tests now produce output numerically identical to their R counterparts (verified to 7 significant figures). An R reference script was additionally written to enable future side-by-side comparison of `locpoly` outputs.
 
 ---
 
@@ -21,19 +21,19 @@ This session converted the two existing R regression tests (`KernSmooth/tests/bk
 The `/convert-r-tests-to-python` skill was invoked with the following path arguments:
 - R test source folder: `KernSmooth/tests/`
 - R library folder: `KernSmooth/`
-- Python library folder: `py-KernSmooth/`
-- Output folder: `py-KernSmooth/tests/`
+- Python library folder: `r2py_kernsmooth/`
+- Output folder: `r2py_kernsmooth/tests/`
 
 A `find` scan of `KernSmooth/tests/` identified two R scripts: `bkfe.R` and `locpoly.R`. Each was converted by a dedicated `convert-r-test-to-python` sub-agent.
 
-**`py-KernSmooth/tests/test_bkfe.py`** — converted from `KernSmooth/tests/bkfe.R`:
+**`r2py_kernsmooth/tests/test_bkfe.py`** — converted from `KernSmooth/tests/bkfe.R`:
 - The original R script is a plain regression test (no `testthat`) verifying that `bkde` and `dpik` do not crash when `gridsize` is an exact power of 2 (a historical bug fixed in KernSmooth 2.23-5).
 - `x <- 1:100` mapped to `np.arange(1, 101, dtype=np.float64)`.
 - R's `range(x)` (returning `c(min, max)`) mapped to `(np.min(x), np.max(x))` passed as the `range_x` keyword.
 - Both calls (`dpik(x, gridsize=256)` and `bkde(x, gridsize=256, range.x=range(x))`) are reproduced verbatim with parameter name conversion (`range.x` → `range_x`).
 - Top-level R auto-printing reproduced via `print()`. Structure follows `main()` / `if __name__ == "__main__"` guard.
 
-**`py-KernSmooth/tests/test_locpoly.py`** — converted from `KernSmooth/tests/locpoly.R`:
+**`r2py_kernsmooth/tests/test_locpoly.py`** — converted from `KernSmooth/tests/locpoly.R`:
 - The original R script conditionally loads `carData` and plots `locpoly` curves with `truncate=TRUE` and `truncate=FALSE` to demonstrate a penultimate-point artifact bug (Peter Dalgaard, 2020-11-24). No numeric assertions are present.
 - The `carData::Prestige` dataset was sourced from the Rdatasets public CSV mirror (`https://vincentarelbundock.github.io/Rdatasets/csv/carData/Prestige.csv`) using `urllib.request` and `csv.DictReader`, avoiding any non-stdlib dependency.
 - `income` and `prestige` columns extracted in dataset row order (matching R's `Prestige$income`, `Prestige$prestige`).
@@ -54,7 +54,7 @@ Running `test_locpoly.py` produced the following crash:
 _KernSmooth.error: (shape(ss, 0) == m) failed for 1st keyword m: locpol:m=0
 ```
 
-at `py-KernSmooth/KernSmooth/__init__.py`, line 399, inside `locpoly`.
+at `r2py_kernsmooth/r2py_kernsmooth/__init__.py`, line 399, inside `locpoly`.
 
 **Investigation — Layer 1 (incorrect, but partially valid):**
 
@@ -75,7 +75,7 @@ The Python call in `locpoly` still passed the full original positional list (19 
 
 The identical misalignment affected `sdiag` (mapping `np.int32(M)` → `iq`, `np.int32(Q)` → `fkap`, `fkap` → `ss`) and `sstdg` (same pattern with an additional `uu` shift).
 
-**Fixes applied to `py-KernSmooth/KernSmooth/__init__.py`:**
+**Fixes applied to `r2py_kernsmooth/r2py_kernsmooth/__init__.py`:**
 
 *Memory layout corrections (Layer 1 fix — 7 sites):*
 
@@ -106,7 +106,7 @@ pip install . --no-build-isolation --force-reinstall
 
 #### 2.4 Writing the R Reference Script
 
-The user requested an R file at `py-KernSmooth/tests/R/locpoly.R` that replicates the Python test logic exactly, for future numerical comparison. The file was created with the following structure:
+The user requested an R file at `r2py_kernsmooth/tests/R/locpoly.R` that replicates the Python test logic exactly, for future numerical comparison. The file was created with the following structure:
 
 ```r
 library(KernSmooth)
@@ -126,7 +126,7 @@ This replicates the Python test exactly: `carData::Prestige` is the same dataset
 
 #### 2.5 Output Verification
 
-The user ran both `py-KernSmooth/tests/R/locpoly.R` (via `Rscript`) and `py-KernSmooth/tests/test_locpoly.py` and submitted the full outputs for comparison.
+The user ran both `r2py_kernsmooth/tests/R/locpoly.R` (via `Rscript`) and `r2py_kernsmooth/tests/test_locpoly.py` and submitted the full outputs for comparison.
 
 ---
 
@@ -187,10 +187,10 @@ Note: `blkest` and `cpblock` were called correctly by `dpik` in the pre-fix stat
 
 ### 4. Conclusion & Next Steps
 
-All five Fortran call sites in `py-KernSmooth/KernSmooth/__init__.py` have been corrected for NumPy 2.4.3 compatibility. Both Python test scripts (`test_bkfe.py`, `test_locpoly.py`) now run without error and produce output numerically identical to the reference R `KernSmooth` 2.23 implementation. The R comparison file `py-KernSmooth/tests/R/locpoly.R` is in place for future regression comparisons.
+All five Fortran call sites in `r2py_kernsmooth/r2py_kernsmooth/__init__.py` have been corrected for NumPy 2.4.3 compatibility. Both Python test scripts (`test_bkfe.py`, `test_locpoly.py`) now run without error and produce output numerically identical to the reference R `KernSmooth` 2.23 implementation. The R comparison file `r2py_kernsmooth/tests/R/locpoly.R` is in place for future regression comparisons.
 
 **Suggested next steps:**
-- Write an analogous `py-KernSmooth/tests/R/bkfe.R` reference script (the existing `KernSmooth/tests/bkfe.R` cannot be used directly as it targets the installed R package, not the comparison dataset structure).
+- Write an analogous `r2py_kernsmooth/tests/R/bkfe.R` reference script (the existing `KernSmooth/tests/bkfe.R` cannot be used directly as it targets the installed R package, not the comparison dataset structure).
 - Extend testing to `sdiag`, `sstdiag`, `dpih`, `dpill`, and `bkde2D`, which have not yet been exercised in Python since the f2py argument-order fix.
 - Add numerical assertion-based tests (e.g., using `numpy.testing.assert_allclose`) to all test scripts to convert smoke tests into regression tests with explicit tolerance bounds.
 - Consider pinning `numpy>=2.4` in `pyproject.toml` to make the f2py interface dependency explicit, or alternatively add a `.pyf` interface file to stabilize the Fortran wrapper signature against future f2py changes.

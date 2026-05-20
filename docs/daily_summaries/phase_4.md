@@ -45,20 +45,20 @@ Each function was passed to the `convert-r-function-to-python` subagent sequenti
 
 #### 2.2 Assembly into Package (`/combine-python-functions-into-file`)
 
-**Target file:** `py-KernSmooth/KernSmooth/__init__.py`
+**Target file:** `r2py_kernsmooth/r2py_kernsmooth/__init__.py`
 
 **Structural scan performed on:**
-- `py-KernSmooth/meson.build` — confirmed `_KernSmooth` extension is built via `numpy.f2py --lower` and installed under `KernSmooth/` subdir; correct relative import is `from . import _KernSmooth`.
-- `py-KernSmooth/pyproject.toml` — `meson-python` build backend, dependencies `numpy` and `scipy`.
+- `r2py_kernsmooth/meson.build` — confirmed `_KernSmooth` extension is built via `numpy.f2py --lower` and installed under `r2py_kernsmooth/` subdir; correct relative import is `from . import _KernSmooth`.
+- `r2py_kernsmooth/pyproject.toml` — `meson-python` build backend, dependencies `numpy` and `scipy`.
 - Existing `__init__.py` — contained only `from . import _KernSmooth` and `__all__ = []`.
 
 **Import corrections applied before writing:**
 
 | Original (in JSON files) | Corrected |
 |---|---|
-| `from KernSmooth import _KernSmooth` | `from . import _KernSmooth` |
-| `from KernSmooth.linbin import linbin` | removed (co-located in same file) |
-| `from KernSmooth.linbin2D import linbin2D` | removed |
+| `from r2py_kernsmooth import _KernSmooth` | `from . import _KernSmooth` |
+| `from r2py_kernsmooth.linbin import linbin` | removed (co-located in same file) |
+| `from r2py_kernsmooth.linbin2D import linbin2D` | removed |
 | `from .linbin import linbin` (and all other internal relative imports) | removed |
 | `from scipy.stats import norm` + `from scipy.stats import norm, beta as beta_dist` | merged to `from scipy.stats import beta as beta_dist, norm` |
 
@@ -106,7 +106,7 @@ The conversion agent for `linbin` incorrectly assumed f2py returns an argument t
 | `sdiag` | `Sdg(*)` | `double precision` array |
 | `sstdg` | `SSTd(*)` | `double precision` array |
 
-**Patches applied to `py-KernSmooth/KernSmooth/__init__.py`** (7 edits):
+**Patches applied to `r2py_kernsmooth/r2py_kernsmooth/__init__.py`** (7 edits):
 
 1. **`linbin`** (line 36): Removed `[6]` subscript. `gcnts` pre-allocated as `np.zeros(M)`, read after call.
 2. **`linbin2D`** (line 207–208): Removed `out = ...` and `out[8]`. `gcnts` read directly then reshaped with `order='F'`.
@@ -120,7 +120,7 @@ Post-patch grep confirmed zero remaining stale `out[integer]` indexing on Fortra
 
 #### 2.4 Output Validation
 
-The test script `py-KernSmooth/tests/test.py` called `KernSmooth.bkde(np.array([1,2,3,4,5]))` with default parameters and printed the result successfully.
+The test script `r2py_kernsmooth/tests/test.py` called `r2py_kernsmooth.bkde(np.array([1,2,3,4,5]))` with default parameters and printed the result successfully.
 
 ---
 
@@ -144,10 +144,10 @@ The most significant finding of this phase is that f2py subroutine wrappers retu
 
 ### 4. Conclusion & Next Steps
 
-The phase 4 session successfully completed the full R-to-Python translation pipeline for `KernSmooth/R/all.R`: 16 functions were converted, assembled into `py-KernSmooth/KernSmooth/__init__.py`, and validated end-to-end. All seven f2py FFI bugs have been resolved. The package is now in a runnable state.
+The phase 4 session successfully completed the full R-to-Python translation pipeline for `KernSmooth/R/all.R`: 16 functions were converted, assembled into `r2py_kernsmooth/r2py_kernsmooth/__init__.py`, and validated end-to-end. All seven f2py FFI bugs have been resolved. The package is now in a runnable state.
 
 **Recommended next steps:**
-1. **Expand the test suite** in `py-KernSmooth/tests/test.py` to cover `bkde2D`, `dpik`, `dpih`, `dpill`, `locpoly`, and the regression bandwidth selectors (`sdiag`, `sstdiag`), including numerical comparison against R reference outputs.
+1. **Expand the test suite** in `r2py_kernsmooth/tests/test.py` to cover `bkde2D`, `dpik`, `dpih`, `dpill`, `locpoly`, and the regression bandwidth selectors (`sdiag`, `sstdiag`), including numerical comparison against R reference outputs.
 2. **Validate `blkest` scalar outputs** — the length-1 array workaround for `sigsqe/th22e/th24e` should be confirmed to produce numerically correct values against R's `blkest` on a matched dataset.
 3. **Investigate `locpoly` 2D matrix flattening** — `ss`, `tt`, `Smat` are passed as `flatten(order='F')` creating copies; verify that Fortran writes into the *original* flattened buffer, as f2py may not propagate changes back to the calling Python variables when a fresh flattened copy is passed.
 4. **Consider a `.pyf` interface file** to explicitly annotate `intent(out)` for all Fortran scalar outputs, eliminating the length-1 array workaround and making the FFI contract explicit.
