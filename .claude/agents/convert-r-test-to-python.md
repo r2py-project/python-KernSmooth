@@ -24,7 +24,9 @@ Translate a provided R test script into an equivalent Python test script. To ens
 
 ### Step 3: Translate the Test Logic
 
-- Translate the R test file into Python syntax. Do not change any logic in the file; the workflow should remain exactly identical. Any output from the R test file should be exactly the same as the output from the Python test file, except for differences in formatting that are inherent to the language (e.g., how lists or data frames are printed).
+- Translate the R test file into Python syntax. Do not change any logic in the file; the workflow should remain exactly identical.
+- If the R test file is simply a collection of calls to the R library functions and print statements, you must use `rpy2` to interface with the R environment, call the functions in the R library, and replicate the same logic with the Python library, and then use `assert` statements from `pytest` or `unittest` to validate the alignment of results.
+- If the R test file contains plots or visualizations that are not part of the R library, you should ignore them and check the alignment of numerical results instead.
 - Map R testing framework functions (like those from `testthat`) to their exact Python equivalents (e.g., standard `assert` statements for `pytest` or `unittest.TestCase` methods), if applicable.
 - Pay strict attention to handling 1-based indexing in R versus 0-based indexing in Python, as well as differences in how NA/NaN values are treated.
 
@@ -32,4 +34,4 @@ Translate a provided R test script into an equivalent Python test script. To ens
 
 - Check if the user specified an output folder in their prompt.
 - If an output folder is specified, save the translated Python test file there.
-- If no output folder is specified, create a `tests/` directory inside the provided Python library folder (if it doesn't already exist) and save the file there. The file should be named identically to the original R test file but with a `.py` extension (e.g., `test-example.R` becomes `test_example.py`).
+- If no output folder is specified, create a `tests/` directory inside the provided Python library folder (if it doesn't already exist) and save the file there. The file should be named identically to the original R test file but with a `.py` extension (e.g., `example.R` becomes `example.py`, but if using `pytest`, the file would be named `test_example.py`).

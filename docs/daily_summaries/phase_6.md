@@ -194,3 +194,113 @@ All five Fortran call sites in `r2py_kernsmooth/r2py_kernsmooth/__init__.py` hav
 - Extend testing to `sdiag`, `sstdiag`, `dpih`, `dpill`, and `bkde2D`, which have not yet been exercised in Python since the f2py argument-order fix.
 - Add numerical assertion-based tests (e.g., using `numpy.testing.assert_allclose`) to all test scripts to convert smoke tests into regression tests with explicit tolerance bounds.
 - Consider pinning `numpy>=2.4` in `pyproject.toml` to make the f2py interface dependency explicit, or alternatively add a `.pyf` interface file to stabilize the Fortran wrapper signature against future f2py changes.
+
+---
+---
+
+## Session 2 — Assertion-Based Test Generation with rpy2 and pytest Integration
+
+### 1. Abstract
+
+This session re-ran the `/convert-r-tests-to-python` skill with corrected paths (`r2py_kernsmooth/` in place of the non-existent `py-KernSmooth/`) to produce fully assertion-based, pytest-compatible test files for both `bkfe.R` and `locpoly.R`. The resulting files — `r2py_kernsmooth/tests/test_bkfe.py` and `r2py_kernsmooth/tests/test_locpoly.py` — use `rpy2` to obtain live R reference values and assert element-wise numerical agreement against the Python implementation. All 4 pytest test cases pass cleanly in 2.94 seconds under Python 3.14.4 / pytest 9.0.3.
+
+---
+
+### 2. Methodology & Actions Taken
+
+#### 2.1 Path Correction and Re-invocation
+
+The previous session's `/convert-r-tests-to-python` invocation had used `py-KernSmooth/` as the Python library and output path. That directory does not exist on the groups filesystem (`/groups/jli9/Yufei/python-KernSmooth/`); the actual package directory is `r2py_kernsmooth/`. The skill was re-invoked with corrected arguments:
+
+- R test source folder: `KernSmooth/tests/`
+- R library folder: `KernSmooth/`
+- Python library folder: `r2py_kernsmooth/`
+- Output folder: `r2py_kernsmooth/tests/`
+
+Two `convert-r-test-to-python` sub-agents were dispatched sequentially, one per R file.
+
+#### 2.2 Conversion of `bkfe.R` → `test_bkfe.py`
+
+The sub-agent read `KernSmooth/tests/bkfe.R` and the installed Python library at `r2py_kernsmooth/r2py_kernsmooth/__init__.py`, then produced `r2py_kernsmooth/tests/test_bkfe.py` (initially as `bkfe.py`; renamed post-hoc).
+
+**Test structure:**
+
+- Module-level: `importr("KernSmooth")` loads the R package once via `rpy2`. All R reference values are computed live at test time, not hardcoded.
+- `test_dpik_gridsize_power_of_2`: constructs `x = 1:100` as both `ro.IntVector(range(1, 101))` (R) and `np.arange(1, 101, dtype=float)` (Python), calls `dpik(..., gridsize=256)` through each, asserts both results are finite and `abs(py - r) < 1e-6`.
+- `test_bkde_gridsize_power_of_2`: uses a fixed 10-element float vector. The R call passes `range.x` via `**{"range.x": ro.r("range")(r_x)}` to handle the dot in the R parameter name. The Python call uses `range_x=(np.min(x_py), np.max(x_py))`. Asserts: grid lengths match, all values finite, grid points agree at `rtol=1e-10`, density estimates agree at `rtol=1e-6` (via `np.testing.assert_allclose`).
+
+#### 2.3 Conversion of `locpoly.R` → `test_locpoly.py`
+
+The sub-agent produced `r2py_kernsmooth/tests/test_locpoly.py` (initially as `locpoly.py`; renamed post-hoc).
+
+**Test structure:**
+
+- Module-level: `importr("KernSmooth")` and `importr("carData")` load R packages. The `Prestige` dataset is extracted from R via `ro.r("Prestige$income")` and `ro.r("Prestige$prestige")` (102 observations each), converted to `np.ndarray`, then also wrapped back as `ro.FloatVector` for the R reference calls. `_BANDWIDTH = 5000.0` is defined as a module-level constant.
+- `test_locpoly_truncate_true`: calls `_ks.locpoly(_r_income, _r_prestige, bandwidth=5000.0)` (R) and `r2py_kernsmooth.locpoly(_income, _prestige, bandwidth=5000.0)` (Python). Asserts: dict keys `"x"` and `"y"` present, lengths match, all values finite, grid agrees at `rtol=1e-10`, estimates agree at `rtol=1e-6`.
+- `test_locpoly_truncate_false`: identical structure with `truncate=False` passed to both R and Python calls.
+
+#### 2.4 Filename Fix
+
+Both sub-agents produced output without the `test_` prefix (`bkfe.py`, `locpoly.py`), which pytest requires for automatic test discovery. Both files were renamed:
+
+```
+mv r2py_kernsmooth/tests/bkfe.py   r2py_kernsmooth/tests/test_bkfe.py
+mv r2py_kernsmooth/tests/locpoly.py r2py_kernsmooth/tests/test_locpoly.py
+```
+
+#### 2.5 Test Execution
+
+```
+/users/ycai9/.conda/envs/r-to-python/bin/python -m pytest \
+    r2py_kernsmooth/tests/test_bkfe.py \
+    r2py_kernsmooth/tests/test_locpoly.py -v
+```
+
+---
+
+### 3. Key Findings & Results
+
+#### 3.1 All 4 Tests Pass
+
+```
+platform linux -- Python 3.14.4, pytest-9.0.3, pluggy-1.6.0
+rootdir: /groups/jli9/Yufei/python-KernSmooth/r2py_kernsmooth
+configfile: pyproject.toml
+
+r2py_kernsmooth/tests/test_bkfe.py::test_dpik_gridsize_power_of_2   PASSED
+r2py_kernsmooth/tests/test_bkfe.py::test_bkde_gridsize_power_of_2   PASSED
+r2py_kernsmooth/tests/test_locpoly.py::test_locpoly_truncate_true    PASSED
+r2py_kernsmooth/tests/test_locpoly.py::test_locpoly_truncate_false   PASSED
+
+4 passed in 2.94s
+```
+
+#### 3.2 Test Methodology Upgrade
+
+Compared to the print-and-inspect scripts from Session 1, the new files use:
+- **Live R reference via `rpy2`** rather than hardcoded values — reference values automatically stay in sync with the installed R `KernSmooth` version.
+- **`np.testing.assert_allclose`** with explicit `rtol` — grid points at `rtol=1e-10`, regression estimates at `rtol=1e-6` — providing quantified, reproducible tolerance bounds.
+- **`pytest` function-level test isolation** — each test is independently discoverable, runnable, and reportable.
+
+#### 3.3 `rpy2` Integration Pattern
+
+The `rpy2`-based pattern established in these files — loading R packages once at module level, passing data as `ro.FloatVector`/`ro.IntVector`, extracting results with `.rx2()`, converting to NumPy with `np.array()` — is now the project's standard approach for R-vs-Python regression tests. The dot-in-parameter-name workaround (`**{"range.x": ...}`) is correctly handled for `bkde`'s `range.x` argument.
+
+#### 3.4 Test File Contents Summary
+
+| File | Tests | R packages used | Tolerance (grid) | Tolerance (estimates) |
+|---|---|---|---|---|
+| `test_bkfe.py` | 2 | `KernSmooth` | `rtol=1e-10` | `rtol=1e-6` |
+| `test_locpoly.py` | 2 | `KernSmooth`, `carData` | `rtol=1e-10` | `rtol=1e-6` |
+
+---
+
+### 4. Conclusion & Next Steps
+
+`r2py_kernsmooth/tests/` now contains three pytest-discoverable test files (`test.py`, `test_bkfe.py`, `test_locpoly.py`) with 4 assertion-based tests covering `dpik`, `bkde`, and `locpoly` (both truncation modes). All tests verify live numerical agreement against the reference R `KernSmooth` 2.23 package via `rpy2`.
+
+**Suggested next steps:**
+- Extend test coverage to `sdiag`, `sstdiag`, `dpih`, `dpill`, and `bkde2D` using the same `rpy2` pattern.
+- Add `test_dpik` and `test_dpill` tests with varied `kernel` and `scalest` arguments to exercise the `_resolve_choice` helper under non-default inputs.
+- Confirm `rpy2` is listed as a test dependency in `r2py_kernsmooth/pyproject.toml` so CI environments install it automatically.
+- Consider adding a `conftest.py` that skips all `rpy2`-dependent tests when R is not available, for portability to environments without R installed.

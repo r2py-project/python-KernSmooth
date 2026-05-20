@@ -14,7 +14,12 @@ if not blas_dep.found()
   blas_dep = fc.find_library('blas', required: false)
 endif
 if not blas_dep.found()
-  blas_dep = declare_dependency(link_args: ['/usr/lib64/libopenblaso.so.0'])
+  fs = import('fs')
+  if fs.is_file('/usr/lib64/libopenblaso.so.0')
+    blas_dep = declare_dependency(link_args: ['/usr/lib64/libopenblaso.so.0'])
+  else
+    error('BLAS not found. Install openblas-devel (Linux) or run: brew install openblas (macOS).')
+  endif
 endif
 incdir_numpy = run_command(py, ['-c', 'import numpy; print(numpy.get_include())'], check: true).stdout().strip()
 incdir_f2py = run_command(py, ['-c', 'import numpy.f2py; print(numpy.f2py.get_include())'], check: true).stdout().strip()

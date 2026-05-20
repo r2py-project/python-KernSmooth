@@ -12,15 +12,28 @@ jobs:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-13, macos-latest]
-        # macos-13 = x86_64 (Intel), macos-latest = arm64 (Apple Silicon)
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-13, macos-latest, windows-latest]
+        # ubuntu-latest = Linux x86_64, ubuntu-24.04-arm = Linux aarch64 (native, no QEMU)
+        # macos-13 = macOS x86_64 (Intel), macos-latest = macOS arm64 (Apple Silicon)
 
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Fortran and BLAS (Windows)
+        if: runner.os == 'Windows'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc-fortran
+            mingw-w64-x86_64-openblas
+            mingw-w64-x86_64-pkg-config
+
       - name: Build wheels
-        uses: pypa/cibuildwheel@v2.22.0
+        uses: pypa/cibuildwheel@v2
 
       - uses: actions/upload-artifact@v4
         with:
@@ -36,6 +49,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
+
+      - name: Install BLAS (required by meson-python sdist)
+        run: sudo apt-get install -y libopenblas-dev
 
       - name: Build sdist
         run: |

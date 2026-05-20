@@ -181,7 +181,7 @@
   \vfill
   {\normalsize\textit{Status:~Work in Progress}\par}
   \vspace{0.3cm}
-  {\normalsize Last updated:~2026-05-18\par}
+  {\normalsize Last updated:~2026-05-20\par}
 \end{titlepage}
 
 \tableofcontents
@@ -222,7 +222,7 @@ The original R package reference manual is archived at \texttt{docs/KernSmooth.p
 
 \subsection{Repository Structure}
 
-The working directory \texttt{python-KernSmooth/} is organized as follows.
+The working directory \texttt{python-KernSmooth/} is the working tree of the \texttt{python-KernSmooth} repository hosted at \texttt{github.com/caiyufei8/python-KernSmooth}. The \texttt{r2py\_kernsmooth/} subdirectory is additionally managed as a git subtree linked to a separate repository at \texttt{github.com/caiyufei8/r2py\_kernsmooth}, allowing the Python package to be versioned and published to PyPI independently of the broader project. The cluster scripts \texttt{git\_pull.sh} and \texttt{git\_push.sh} at the project root encapsulate the subtree synchronisation commands required to keep both remotes up to date from the HPC node.
 
 \begin{center}
 \begin{tabular}{p{0.42\textwidth}p{0.50\textwidth}}
@@ -232,7 +232,7 @@ Path & Contents \\
 \texttt{KernSmooth/} &
   Unmodified R package source (v2.23-26). \\
 \texttt{r2py\_kernsmooth/} &
-  Python package under development; contains \texttt{r2py\_kernsmooth/\_\_init\_\_.py}, \texttt{meson.build}, \texttt{pyproject.toml}, Fortran sources in \texttt{src/}, and \texttt{tests/test.py}. \\
+  Git subtree linked to \texttt{github.com/caiyufei8/r2py\_kernsmooth}; the installable Python package. Internal structure detailed in the table below. \\
 \texttt{structural\_analysis/} &
   Dependency-graph visualisation artefacts (\texttt{dependency\_graph.\{py,html,pdf,png\}}), the function-level CSV (\texttt{dependency\_levels.csv}), and the JSON analysis outputs per R file. \\
 \texttt{language\_dependency\_analysis/} &
@@ -245,6 +245,35 @@ Path & Contents \\
   Sub-agent specification Markdown files. \\
 \texttt{.claude/commands/} &
   Skill (slash command) specification Markdown files. \\
+\texttt{git\_pull.sh} &
+  Cluster batch script; pulls from the \texttt{python-KernSmooth} main remote and merges changes from the \texttt{r2py\_kernsmooth} subtree remote into \texttt{r2py\_kernsmooth/}. \\
+\texttt{git\_push.sh} &
+  Cluster batch script; pushes to the \texttt{python-KernSmooth} main remote and propagates \texttt{r2py\_kernsmooth/} changes to the \texttt{r2py\_kernsmooth} subtree remote via \texttt{git subtree push}. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The internal structure of \texttt{r2py\_kernsmooth/} is as follows.
+
+\begin{center}
+\begin{tabular}{p{0.46\textwidth}p{0.46\textwidth}}
+\toprule
+Path (relative to \texttt{r2py\_kernsmooth/}) & Contents \\
+\midrule
+\texttt{r2py\_kernsmooth/\_\_init\_\_.py} &
+  The main Python module; defines the public API (\texttt{\_\_all\_\_}) and all wrapper functions. \\
+\texttt{meson.build} &
+  Meson build definition: f2py wrapper generation, NumPy include discovery, BLAS detection, and extension module compilation. \\
+\texttt{pyproject.toml} &
+  Package metadata, build-system declaration (\texttt{meson-python}), runtime dependencies, and cibuildwheel platform configuration. \\
+\texttt{src/} &
+  Thirteen Fortran~77 source files: eleven from the original \texttt{KernSmooth} package and two LINPACK routines sourced from Netlib. \\
+\texttt{tests/} &
+  Test scripts for validating the package against the R \texttt{KernSmooth} package. \\
+\texttt{pip\_install.sh} &
+  Cluster batch script for local development installation via \texttt{pip install --no-build-isolation}. \\
+\texttt{.github/workflows/python-publish.yml} &
+  GitHub Actions workflow; builds binary wheels for five platforms and publishes them to PyPI on every release via OIDC trusted publishing. \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -405,25 +434,24 @@ Every computationally non-trivial function in \texttt{KernSmooth} adopts the sam
 A complete cross-language dependency map would also require analysing the compiled Fortran sources in \texttt{KernSmooth/src/}. The \texttt{/analyze-c-folder-dependencies} skill (Appendix~\ref{app:commands}) was identified as a candidate tool for this task (it handles both C and Fortran), but this analysis has not yet been executed. Due to the nature of \texttt{KernSmooth} package, the Fortran sources are relatively self-contained and do not call back into R, so the lack of a Fortran-level dependency map has not posed a significant obstacle to subsequent phases. The Fortran code is treated as a black box that is called by the R wrappers, so the focus has been on understanding the R-level structure and dependencies.
 
 % =============================================================================
+% =============================================================================
 \section{Phase 2: Establishing the Python Build Infrastructure}
 % =============================================================================
 
 \subsection{Motivation}
 
-The conversion strategy requires the original Fortran~77 sources to be compiled into a Python C-extension so that Python wrapper functions can call them directly. This approach avoids re-implementing numerically sensitive routines and provides a strong guarantee of numerical equivalence with the R package.
+The conversion strategy retains the original Fortran~77 sources verbatim and relies on \texttt{f2py} (part of NumPy) to parse them and generate a Python-callable C-extension. This approach provides a strong correctness guarantee: numerical differences between the Python and R packages can originate only in the R-to-Python wrapper translation, not in the underlying computational routines. Phase~2 addresses all build-system and packaging concerns before any wrapper code is written.
 
-The R package's Fortran integration uses R's internal \texttt{.Fortran()} mechanism. Replicating this in Python requires \texttt{f2py} (part of NumPy), which parses Fortran source files and automatically generates C wrapper code and Python callable interfaces. The resulting extension must be integrated into a proper Python package with an installable structure.
-
-Phase~2 addresses all build-system and packaging concerns before any wrapper code is written.
+Two related objectives determine the scope of this phase. The first is local: the extension must compile and install correctly in the HPC development environment so that Python wrapper functions can be developed and tested. The second is distribution: once complete, the package must be available as pre-compiled binary wheels on PyPI for all major platforms, so that end users can install it with a plain \texttt{pip install r2py\_kernsmooth} without requiring a local Fortran compiler, BLAS library, or build toolchain. Because a Fortran extension produces a platform-specific binary, a separate wheel must be built for each combination of operating system, processor architecture, and CPython version.
 
 \subsection{Build System Design}
 
-The build system uses \texttt{meson-python} as the build backend, declared in \texttt{r2py\_kernsmooth/pyproject.toml}:
+The build backend is \texttt{meson-python}, declared in \texttt{r2py\_kernsmooth/pyproject.toml}:
 
 \begin{lstlisting}[style=shell]
 [build-system]
 build-backend = "mesonpy"
-requires = ["meson-python", "numpy"]
+requires = ["meson-python", "meson", "ninja", "numpy"]
 
 [project]
 name = "r2py_kernsmooth"
@@ -431,7 +459,7 @@ version = "0.1.0"
 dependencies = ["numpy", "scipy"]
 \end{lstlisting}
 
-The complete build definition resides in \texttt{r2py\_kernsmooth/meson.build}.
+The \texttt{meson} and \texttt{ninja} entries in \texttt{requires} ensure that PEP~517 isolated builds can locate the Meson build system and the Ninja build tool without requiring them to be pre-installed in the user's environment. The complete build definition resides in \texttt{r2py\_kernsmooth/meson.build}.
 
 \subsubsection{Fortran Sources}
 
@@ -490,9 +518,10 @@ incdir_f2py = run_command(py,
 
 \texttt{fortranobject.c} (located in \texttt{incdir\_f2py}) is included directly in the extension module's source list.
 
-\subsubsection{BLAS Discovery and Fallback Chain}
+\subsubsection{BLAS Discovery}
+\label{sec:phase2-blas}
 
-The HPC node (Red~Hat Enterprise Linux~9, GFortran~15.2.0, \texttt{ld.bfd~2.35.2-67}) provides OpenBLAS at \texttt{/usr/lib64/libopenblaso.so.0}, but the unversioned symlink (\texttt{libopenblaso.so}) normally installed by the \texttt{openblas-openmp-devel} package is absent. Meson's standard \texttt{find\_library} and \texttt{dependency('blas')} mechanisms cannot resolve a bare \texttt{.so.0} file. The following four-stage fallback chain in \texttt{meson.build} addresses this:
+The HPC node (Red~Hat Enterprise Linux~9, GFortran~15.2.0, \texttt{ld.bfd~2.35.2-67}) provides OpenBLAS at \texttt{/usr/lib64/libopenblaso.so.0}, but the unversioned symlink (\texttt{libopenblaso.so}) normally installed by the \texttt{openblas-openmp-devel} package is absent. Meson's standard \texttt{find\_library} and \texttt{dependency('blas')} mechanisms cannot resolve a bare \texttt{.so.0} file. The following discovery chain in \texttt{meson.build} addresses this while remaining portable across all build platforms:
 
 \begin{lstlisting}[style=shell]
 blas_dep = dependency('blas', required: false)
@@ -506,12 +535,18 @@ if not blas_dep.found()
   blas_dep = fc.find_library('blas', required: false)
 endif
 if not blas_dep.found()
-  blas_dep = declare_dependency(link_args:
-    ['/usr/lib64/libopenblaso.so.0'])
+  fs = import('fs')
+  if fs.is_file('/usr/lib64/libopenblaso.so.0')
+    blas_dep = declare_dependency(link_args:
+      ['/usr/lib64/libopenblaso.so.0'])
+  else
+    error('BLAS not found. Install openblas-devel (Linux) '
+        + 'or run: brew install openblas (macOS).')
+  endif
 endif
 \end{lstlisting}
 
-The final \texttt{declare\_dependency} hard-codes the absolute path as a last resort. The presence of each fallback stage allows the build to succeed on other systems that may have BLAS installed in the standard way.
+The first four stages cover systems where BLAS is installed conventionally: \texttt{dependency('blas')} queries \texttt{pkg-config}; the three \texttt{find\_library} calls search standard library directories for \texttt{openblaso}, \texttt{openblas}, and \texttt{blas} by name. The fifth and final stage is specific to the HPC cluster, where the \texttt{openblas-openmp-devel} package that would provide the unversioned symlink is absent but \texttt{/usr/lib64/libopenblaso.so.0} is present. Meson's \texttt{fs.is\_file()} guard verifies the file's existence before constructing the link argument, ensuring that on any platform where the hardcoded path is absent---such as macOS or a standard Ubuntu installation---the build fails at configure time with a clear, actionable error rather than proceeding silently to a linker failure.
 
 \subsubsection{Package Structure}
 
@@ -538,7 +573,90 @@ The full invocation, including the cluster's \texttt{module load gcc} and \textt
 
 After successful installation, \texttt{import r2py\_kernsmooth} and \texttt{import r2py\_kernsmooth.\_KernSmooth} both succeed without error.
 
-% =============================================================================
+\subsection{PyPI Distribution Infrastructure}
+
+A package containing compiled Fortran code produces a platform-specific binary wheel that cannot be installed on a different operating system or processor architecture. Distributing pre-compiled wheels for all major platforms requires building them in CI on a representative of each target environment; the tool used for this purpose is \texttt{cibuildwheel}, the standard wheel-building tool in the scientific Python ecosystem, which manages the appropriate Docker containers for Linux builds and native runners for macOS and Windows automatically.
+
+\subsubsection{GitHub Actions Workflow}
+\label{sec:phase2-workflow}
+
+The workflow \texttt{r2py\_kernsmooth/.github/workflows/python-publish.yml} is triggered on every GitHub Release publication. It consists of three jobs.
+
+The \textbf{\texttt{build\_wheels}} job runs on the runner matrix \texttt{[ubuntu-latest,} \texttt{ubuntu-24.04-arm,} \texttt{macos-13,} \texttt{macos-latest,} \texttt{windows-latest]}. \texttt{ubuntu-latest} (Linux~x86\_64) and \texttt{ubuntu-24.04-arm} (Linux~aarch64, a native ARM64 runner that requires no QEMU emulation) each launch both \texttt{manylinux} (glibc) and \texttt{musllinux} (Alpine/musl-libc) Docker containers managed by cibuildwheel, producing PEP~600-compliant wheels for all configured Python versions on both Linux libc variants. \texttt{macos-13} and \texttt{macos-latest} build macOS~x86\_64 (Intel) and macOS~arm64 (Apple~Silicon) wheels natively, respectively. \texttt{windows-latest} builds Windows~x86\_64 wheels natively; a preceding step using the \texttt{msys2/setup-msys2} action installs \texttt{gfortran}, OpenBLAS, and \texttt{pkg-config} into the MSYS2 MinGW64 environment before cibuildwheel is invoked. All configuration options are read from the \texttt{[tool.cibuildwheel]} table in \texttt{pyproject.toml} (\S\ref{sec:phase2-cibw-config}).
+
+The \textbf{\texttt{build\_sdist}} job runs on \texttt{ubuntu-latest}, executes \texttt{python~-m~build~--sdist}, and uploads the resulting \texttt{.tar.gz} archive. The sdist allows users on platforms with no pre-built wheel---and users with non-standard build environments---to compile from source.
+
+The \textbf{\texttt{pypi-publish}} job, which depends on both preceding jobs, downloads all wheel and sdist artifacts into a single \texttt{dist/} directory and publishes them via \texttt{pypa/gh-action-pypi-publish@release/v1}. Authentication uses OIDC-based \emph{trusted publishing}: the job requests a short-lived identity token (\texttt{id-token:~write} permission) that PyPI validates against the registered GitHub repository and Actions environment (\texttt{environment:~name:~pypi}), eliminating the need to store any long-lived credential in GitHub~Secrets.
+
+\subsubsection{Platform Coverage}
+\label{sec:phase2-cibw-config}
+
+The \texttt{[tool.cibuildwheel]} configuration in \texttt{pyproject.toml} is as follows:
+
+\begin{lstlisting}[style=shell]
+[build-system]
+build-backend = "mesonpy"
+requires = ["meson-python", "meson", "ninja", "numpy"]
+
+[project]
+name = "r2py_kernsmooth"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = ["numpy", "scipy"]
+
+[tool.cibuildwheel]
+build = "cp310-* cp311-* cp312-* cp313-* cp314-*"
+skip = ["*-manylinux_i686"]
+build-frontend = "build"
+
+[tool.cibuildwheel.linux]
+before-all = "command -v dnf && dnf install -y openblas-devel || command -v yum && yum install -y openblas-devel || apk add --no-cache gfortran openblas-dev"
+
+[tool.cibuildwheel.macos]
+before-all = "brew install openblas"
+
+[tool.cibuildwheel.macos.environment]
+PKG_CONFIG_PATH = "$(brew --prefix openblas)/lib/pkgconfig"
+
+[tool.cibuildwheel.windows]
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel}"
+
+[tool.cibuildwheel.windows.environment]
+PATH = "C:\\msys64\\mingw64\\bin;{PATH}"
+PKG_CONFIG_PATH = "C:\\msys64\\mingw64\\lib\\pkgconfig"
+\end{lstlisting}
+
+The principal design decisions are as follows.
+
+\begin{description}
+  \item[Python versions.] \texttt{cp310-*} through \texttt{cp314-*} cover CPython~3.10--3.14; 32-bit Linux (\texttt{*-manylinux\_i686}) is the only excluded target.
+
+  \item[Build frontend.] \texttt{build-frontend~=~"build"} invokes the PEP~517 \texttt{build} tool rather than \texttt{pip~wheel}, which is more compatible with \texttt{meson-python}.
+
+  \item[Linux dependencies.] \texttt{before-all} runs once per container environment (not once per Python version) and installs OpenBLAS via a package-manager detection chain: \texttt{dnf} for manylinux\_2\_28 / AlmaLinux~8 base images, \texttt{yum} for manylinux2014 / CentOS~7 base images, and \texttt{apk} for musllinux / Alpine base images. The \texttt{apk} branch additionally installs \texttt{gfortran}, since Alpine-based musllinux containers do not include it by default, unlike the manylinux containers.
+
+  \item[macOS dependencies.] \texttt{brew install openblas} installs OpenBLAS via Homebrew. The \texttt{PKG\_CONFIG\_PATH} override directs Meson's \texttt{dependency('blas')} call to the Homebrew installation via \texttt{pkg-config}; without it, the first four stages of the BLAS discovery chain exhaust their search and the configure-time error in the fifth stage is raised.
+
+  \item[Windows toolchain.] The \texttt{PATH} and \texttt{PKG\_CONFIG\_PATH} overrides expose the MSYS2 MinGW64 installation (set up by the preceding workflow step) to Meson inside each cibuildwheel build subprocess. \texttt{delvewheel}---the Windows counterpart of Linux \texttt{auditwheel} and macOS \texttt{delocate}---bundles the OpenBLAS DLL into the wheel, making it self-contained for users without MSYS2.
+\end{description}
+
+Across the five runners, up to 35 binary wheels are produced per release (five Python versions $\times$ seven platform/libc combinations: Linux~x86\_64 manylinux, Linux~x86\_64 musllinux, Linux~aarch64 manylinux, Linux~aarch64 musllinux, macOS~x86\_64, macOS~arm64, Windows~x86\_64).
+
+\subsubsection{Coverage Limitations}
+
+Three platform categories present in established scientific Python distributions such as scikit-learn are not covered.
+
+\begin{description}
+  \item[Windows arm64.] Native wheels for Qualcomm Snapdragon-based Windows PCs require a Fortran compiler for the Windows~arm64 ABI. The only readily available option is LLVM \texttt{flang} via the MSYS2 CLANGARM64 environment, but its integration with \texttt{f2py} and Meson is not yet production-stable. As an interim measure, Windows~arm64 users can install the \texttt{win\_amd64} wheel, which runs transparently under the Windows Prism x86-64 emulation layer.
+
+  \item[Linux ppc64le and s390x.] IBM~POWER and IBM~Z mainframe architectures would require QEMU emulation in CI, at approximately 40~minutes per Python version per architecture. Given the extreme rarity of these platforms in scientific Python workflows, they are not included.
+
+  \item[Free-threaded Python (cp313t, cp314t).] The experimental no-GIL CPython builds are supported by scikit-learn on selected platforms. Compatibility of the \texttt{f2py}-generated C extension with the free-threaded CPython ABI has not been verified and is deferred until the free-threaded build reaches stable status.
+\end{description}
+
+Before the first release, \texttt{r2py\_kernsmooth} must be registered on PyPI and the GitHub Actions \texttt{pypi} environment configured as a trusted publisher in the project's PyPI settings.
+
 \section{Phase 3: Language Dependency Catalogue and Conversion Guides}
 % =============================================================================
 

@@ -1,82 +1,86 @@
-\contentsline {section}{Abstract}{3}{section*.2}%
-\contentsline {section}{\numberline {1}Introduction}{3}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Background and Motivation}{3}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Repository Structure}{4}{subsection.1.2}%
-\contentsline {subsection}{\numberline {1.3}Automated Workflow Infrastructure}{4}{subsection.1.3}%
-\contentsline {section}{\numberline {2}Phase 1: Static Analysis of the KernSmooth R Package}{5}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Motivation}{5}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}R Dependency Analysis}{5}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Architecture Synthesis}{6}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Key Findings}{6}{subsection.2.4}%
-\contentsline {subsubsection}{\numberline {2.4.1}Package Scope and External Dependencies}{6}{subsubsection.2.4.1}%
-\contentsline {subsubsection}{\numberline {2.4.2}Function Inventory}{7}{subsubsection.2.4.2}%
-\contentsline {subsubsection}{\numberline {2.4.3}Three-Level Dependency Hierarchy}{7}{subsubsection.2.4.3}%
-\contentsline {subsubsection}{\numberline {2.4.4}Fortran Integration Convention}{8}{subsubsection.2.4.4}%
-\contentsline {subsubsection}{\numberline {2.4.5}Architectural Design: Binned Approximation}{8}{subsubsection.2.4.5}%
-\contentsline {subsubsection}{\numberline {2.4.6}Note on Fortran Source Analysis}{8}{subsubsection.2.4.6}%
-\contentsline {section}{\numberline {3}Phase 2: Establishing the Python Build Infrastructure}{8}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Motivation}{8}{subsection.3.1}%
-\contentsline {subsection}{\numberline {3.2}Build System Design}{9}{subsection.3.2}%
-\contentsline {subsubsection}{\numberline {3.2.1}Fortran Sources}{9}{subsubsection.3.2.1}%
-\contentsline {subsubsection}{\numberline {3.2.2}f2py Wrapper Generation}{10}{subsubsection.3.2.2}%
-\contentsline {subsubsection}{\numberline {3.2.3}NumPy Include Directories}{10}{subsubsection.3.2.3}%
-\contentsline {subsubsection}{\numberline {3.2.4}BLAS Discovery and Fallback Chain}{10}{subsubsection.3.2.4}%
-\contentsline {subsubsection}{\numberline {3.2.5}Package Structure}{11}{subsubsection.3.2.5}%
-\contentsline {subsection}{\numberline {3.3}Installation}{11}{subsection.3.3}%
-\contentsline {section}{\numberline {4}Phase 3: Language Dependency Catalogue and Conversion Guides}{12}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Motivation}{12}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Language Dependency Extraction}{12}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Conversion Guide Generation}{13}{subsection.4.3}%
-\contentsline {subsection}{\numberline {4.4}Selected Translation Nuances}{14}{subsection.4.4}%
-\contentsline {subsubsection}{\numberline {4.4.1}FFT Normalisation (\texttt {fft.md})}{14}{subsubsection.4.4.1}%
-\contentsline {subsubsection}{\numberline {4.4.2}Fortran FFI Type Coercions (\texttt {as.double.md}, \texttt {as.integer.md})}{14}{subsubsection.4.4.2}%
-\contentsline {subsubsection}{\numberline {4.4.3}Sample Variance Denominator (\texttt {var.md})}{14}{subsubsection.4.4.3}%
-\contentsline {subsubsection}{\numberline {4.4.4}Optional Argument Detection (\texttt {missing.md})}{14}{subsubsection.4.4.4}%
-\contentsline {subsubsection}{\numberline {4.4.5}Negative-Base Fractional Exponentiation (\texttt {sqrt.md})}{14}{subsubsection.4.4.5}%
-\contentsline {subsubsection}{\numberline {4.4.6}Array Memory Order (\texttt {matrix.md})}{15}{subsubsection.4.4.6}%
-\contentsline {subsubsection}{\numberline {4.4.7}Package Lifecycle Hooks (\texttt {library.dynam.unload.md})}{15}{subsubsection.4.4.7}%
-\contentsline {subsubsection}{\numberline {4.4.8}Partial String Matching (\texttt {match.arg.md})}{15}{subsubsection.4.4.8}%
-\contentsline {subsubsection}{\numberline {4.4.9}R \texttt {switch} on Strings (\texttt {switch.md})}{15}{subsubsection.4.4.9}%
-\contentsline {section}{\numberline {5}Phase 4: Automated Function Conversion and Package Assembly}{15}{section.5}%
-\contentsline {subsection}{\numberline {5.1}Motivation}{15}{subsection.5.1}%
-\contentsline {subsection}{\numberline {5.2}Function Conversion}{16}{subsection.5.2}%
-\contentsline {subsubsection}{\numberline {5.2.1}Notable Per-Function Translation Decisions}{16}{subsubsection.5.2.1}%
-\contentsline {subsection}{\numberline {5.3}Package Assembly}{17}{subsection.5.3}%
-\contentsline {subsection}{\numberline {5.4}The f2py Return-Value Bug}{17}{subsection.5.4}%
-\contentsline {subsubsection}{\numberline {5.4.1}Observed Symptom}{17}{subsubsection.5.4.1}%
-\contentsline {subsubsection}{\numberline {5.4.2}Root Cause: R \texttt {.Fortran()} vs.\ f2py Semantics}{18}{subsubsection.5.4.2}%
-\contentsline {subsubsection}{\numberline {5.4.3}Fortran Output Argument Audit}{18}{subsubsection.5.4.3}%
-\contentsline {subsubsection}{\numberline {5.4.4}Patches Applied}{18}{subsubsection.5.4.4}%
-\contentsline {subsection}{\numberline {5.5}Output Validation}{19}{subsection.5.5}%
-\contentsline {section}{\numberline {6}Phase 5: Code Quality Audit and Namespace Refinement}{19}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Motivation}{19}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Type Annotation Completion}{20}{subsection.6.2}%
-\contentsline {subsection}{\numberline {6.3}Namespace Privacy Investigation}{20}{subsection.6.3}%
-\contentsline {subsection}{\numberline {6.4}Full Code Audit and Systematic Refactoring}{21}{subsection.6.4}%
-\contentsline {subsubsection}{\numberline {6.4.1}Dead Code from R Porting}{21}{subsubsection.6.4.1}%
-\contentsline {subsubsection}{\numberline {6.4.2}Silent Crash Bug in Three Public Functions}{21}{subsubsection.6.4.2}%
-\contentsline {subsubsection}{\numberline {6.4.3}Structural Code Duplication}{21}{subsubsection.6.4.3}%
-\contentsline {subsubsection}{\numberline {6.4.4}PEP~8 Signature Reformatting}{22}{subsubsection.6.4.4}%
-\contentsline {subsection}{\numberline {6.5}State of the Package After Phase~5}{22}{subsection.6.5}%
-\contentsline {section}{Appendices}{24}{section*.4}%
-\contentsline {section}{\numberline {A}Agent Specifications}{24}{section.1.A}%
-\contentsline {subsection}{\numberline {A.1}Agents Used in Phase~1}{24}{subsection.1.A.1}%
-\contentsline {subsubsection}{\texttt {analyze-r-file-dependencies}}{24}{section*.6}%
-\contentsline {subsection}{\numberline {A.2}Agents Used in Phase~3}{25}{subsection.1.A.2}%
-\contentsline {subsubsection}{\texttt {extract-r-file-language-dependencies}}{25}{section*.8}%
-\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guide}}{26}{section*.10}%
-\contentsline {subsection}{\numberline {A.3}Agents Used in Phase~4}{27}{subsection.1.A.3}%
-\contentsline {subsubsection}{\texttt {convert-r-function-to-python}}{27}{section*.12}%
-\contentsline {subsection}{\numberline {A.4}Supplementary Agent}{28}{subsection.1.A.4}%
-\contentsline {subsubsection}{\texttt {analyze-c-file-dependencies}}{28}{section*.14}%
-\contentsline {section}{\numberline {B}Skill (Command) Specifications}{30}{section.1.B}%
-\contentsline {subsection}{\numberline {B.1}Skills Used in Phase~1}{30}{subsection.1.B.1}%
-\contentsline {subsubsection}{\texttt {analyze-r-folder-dependencies}}{30}{section*.16}%
-\contentsline {subsection}{\numberline {B.2}Skills Used in Phase~3}{30}{subsection.1.B.2}%
-\contentsline {subsubsection}{\texttt {extract-r-folder-language-dependencies}}{30}{section*.18}%
-\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guides}}{31}{section*.20}%
-\contentsline {subsection}{\numberline {B.3}Skills Used in Phase~4}{32}{subsection.1.B.3}%
-\contentsline {subsubsection}{\texttt {convert-r-file-to-python}}{32}{section*.22}%
-\contentsline {subsubsection}{\texttt {combine-python-functions-into-file}}{33}{section*.24}%
-\contentsline {subsection}{\numberline {B.4}Workflow Utility}{34}{subsection.1.B.4}%
-\contentsline {subsubsection}{\texttt {summarize-research-report}}{34}{section*.26}%
+\contentsline {section}{Abstract}{4}{section*.2}%
+\contentsline {section}{\numberline {1}Introduction}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Background and Motivation}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Repository Structure}{5}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Automated Workflow Infrastructure}{7}{subsection.1.3}%
+\contentsline {section}{\numberline {2}Phase 1: Static Analysis of the KernSmooth R Package}{8}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Motivation}{8}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}R Dependency Analysis}{8}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Architecture Synthesis}{9}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Key Findings}{9}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Package Scope and External Dependencies}{9}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}Function Inventory}{9}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Three-Level Dependency Hierarchy}{10}{subsubsection.2.4.3}%
+\contentsline {subsubsection}{\numberline {2.4.4}Fortran Integration Convention}{10}{subsubsection.2.4.4}%
+\contentsline {subsubsection}{\numberline {2.4.5}Architectural Design: Binned Approximation}{11}{subsubsection.2.4.5}%
+\contentsline {subsubsection}{\numberline {2.4.6}Note on Fortran Source Analysis}{11}{subsubsection.2.4.6}%
+\contentsline {section}{\numberline {3}Phase 2: Establishing the Python Build Infrastructure}{11}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Motivation}{11}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Build System Design}{12}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1}Fortran Sources}{12}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2}f2py Wrapper Generation}{13}{subsubsection.3.2.2}%
+\contentsline {subsubsection}{\numberline {3.2.3}NumPy Include Directories}{13}{subsubsection.3.2.3}%
+\contentsline {subsubsection}{\numberline {3.2.4}BLAS Discovery}{13}{subsubsection.3.2.4}%
+\contentsline {subsubsection}{\numberline {3.2.5}Package Structure}{14}{subsubsection.3.2.5}%
+\contentsline {subsection}{\numberline {3.3}Installation}{15}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}PyPI Distribution Infrastructure}{15}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}GitHub Actions Workflow}{15}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Platform Coverage}{16}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.3}Coverage Limitations}{17}{subsubsection.3.4.3}%
+\contentsline {section}{\numberline {4}Phase 3: Language Dependency Catalogue and Conversion Guides}{18}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Motivation}{18}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Language Dependency Extraction}{18}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Conversion Guide Generation}{19}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Selected Translation Nuances}{20}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}FFT Normalisation (\texttt {fft.md})}{20}{subsubsection.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}Fortran FFI Type Coercions (\texttt {as.double.md}, \texttt {as.integer.md})}{20}{subsubsection.4.4.2}%
+\contentsline {subsubsection}{\numberline {4.4.3}Sample Variance Denominator (\texttt {var.md})}{20}{subsubsection.4.4.3}%
+\contentsline {subsubsection}{\numberline {4.4.4}Optional Argument Detection (\texttt {missing.md})}{20}{subsubsection.4.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.5}Negative-Base Fractional Exponentiation (\texttt {sqrt.md})}{20}{subsubsection.4.4.5}%
+\contentsline {subsubsection}{\numberline {4.4.6}Array Memory Order (\texttt {matrix.md})}{21}{subsubsection.4.4.6}%
+\contentsline {subsubsection}{\numberline {4.4.7}Package Lifecycle Hooks (\texttt {library.dynam.unload.md})}{21}{subsubsection.4.4.7}%
+\contentsline {subsubsection}{\numberline {4.4.8}Partial String Matching (\texttt {match.arg.md})}{21}{subsubsection.4.4.8}%
+\contentsline {subsubsection}{\numberline {4.4.9}R \texttt {switch} on Strings (\texttt {switch.md})}{21}{subsubsection.4.4.9}%
+\contentsline {section}{\numberline {5}Phase 4: Automated Function Conversion and Package Assembly}{21}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Motivation}{21}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}Function Conversion}{22}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Notable Per-Function Translation Decisions}{22}{subsubsection.5.2.1}%
+\contentsline {subsection}{\numberline {5.3}Package Assembly}{23}{subsection.5.3}%
+\contentsline {subsection}{\numberline {5.4}The f2py Return-Value Bug}{23}{subsection.5.4}%
+\contentsline {subsubsection}{\numberline {5.4.1}Observed Symptom}{23}{subsubsection.5.4.1}%
+\contentsline {subsubsection}{\numberline {5.4.2}Root Cause: R \texttt {.Fortran()} vs.\ f2py Semantics}{24}{subsubsection.5.4.2}%
+\contentsline {subsubsection}{\numberline {5.4.3}Fortran Output Argument Audit}{24}{subsubsection.5.4.3}%
+\contentsline {subsubsection}{\numberline {5.4.4}Patches Applied}{24}{subsubsection.5.4.4}%
+\contentsline {subsection}{\numberline {5.5}Output Validation}{25}{subsection.5.5}%
+\contentsline {section}{\numberline {6}Phase 5: Code Quality Audit and Namespace Refinement}{25}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Motivation}{25}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Type Annotation Completion}{26}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Namespace Privacy Investigation}{26}{subsection.6.3}%
+\contentsline {subsection}{\numberline {6.4}Full Code Audit and Systematic Refactoring}{27}{subsection.6.4}%
+\contentsline {subsubsection}{\numberline {6.4.1}Dead Code from R Porting}{27}{subsubsection.6.4.1}%
+\contentsline {subsubsection}{\numberline {6.4.2}Silent Crash Bug in Three Public Functions}{27}{subsubsection.6.4.2}%
+\contentsline {subsubsection}{\numberline {6.4.3}Structural Code Duplication}{27}{subsubsection.6.4.3}%
+\contentsline {subsubsection}{\numberline {6.4.4}PEP~8 Signature Reformatting}{28}{subsubsection.6.4.4}%
+\contentsline {subsection}{\numberline {6.5}State of the Package After Phase~5}{28}{subsection.6.5}%
+\contentsline {section}{Appendices}{30}{section*.4}%
+\contentsline {section}{\numberline {A}Agent Specifications}{30}{section.1.A}%
+\contentsline {subsection}{\numberline {A.1}Agents Used in Phase~1}{30}{subsection.1.A.1}%
+\contentsline {subsubsection}{\texttt {analyze-r-file-dependencies}}{30}{section*.6}%
+\contentsline {subsection}{\numberline {A.2}Agents Used in Phase~3}{31}{subsection.1.A.2}%
+\contentsline {subsubsection}{\texttt {extract-r-file-language-dependencies}}{31}{section*.8}%
+\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guide}}{32}{section*.10}%
+\contentsline {subsection}{\numberline {A.3}Agents Used in Phase~4}{33}{subsection.1.A.3}%
+\contentsline {subsubsection}{\texttt {convert-r-function-to-python}}{33}{section*.12}%
+\contentsline {subsection}{\numberline {A.4}Supplementary Agent}{34}{subsection.1.A.4}%
+\contentsline {subsubsection}{\texttt {analyze-c-file-dependencies}}{34}{section*.14}%
+\contentsline {section}{\numberline {B}Skill (Command) Specifications}{36}{section.1.B}%
+\contentsline {subsection}{\numberline {B.1}Skills Used in Phase~1}{36}{subsection.1.B.1}%
+\contentsline {subsubsection}{\texttt {analyze-r-folder-dependencies}}{36}{section*.16}%
+\contentsline {subsection}{\numberline {B.2}Skills Used in Phase~3}{36}{subsection.1.B.2}%
+\contentsline {subsubsection}{\texttt {extract-r-folder-language-dependencies}}{36}{section*.18}%
+\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guides}}{37}{section*.20}%
+\contentsline {subsection}{\numberline {B.3}Skills Used in Phase~4}{38}{subsection.1.B.3}%
+\contentsline {subsubsection}{\texttt {convert-r-file-to-python}}{38}{section*.22}%
+\contentsline {subsubsection}{\texttt {combine-python-functions-into-file}}{39}{section*.24}%
+\contentsline {subsection}{\numberline {B.4}Workflow Utility}{40}{subsection.1.B.4}%
+\contentsline {subsubsection}{\texttt {summarize-research-report}}{40}{section*.26}%
