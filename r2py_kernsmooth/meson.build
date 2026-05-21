@@ -46,9 +46,9 @@ fortran_sources = files(
 )
 f2py_gen = custom_target(
   'f2py_wrapper',
-  input: fortran_sources,
+  input: ['src/_KernSmooth.pyf'],
   output: ['_KernSmoothmodule.c', '_KernSmooth-f2pywrappers.f'],
-  command: [py, '-m', 'numpy.f2py', '@INPUT@', '-m', '_KernSmooth', '--lower']
+  command: [py, '-m', 'numpy.f2py', '@INPUT@']
 )
 py.extension_module(
   '_KernSmooth',

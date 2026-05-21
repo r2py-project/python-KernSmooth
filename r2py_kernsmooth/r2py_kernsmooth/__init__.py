@@ -25,20 +25,13 @@ __all__ = [
 ]
 
 
-def _resolve_choice(val: str, choices: tuple[str, ...], param_name: str) -> str:
+def _resolve_choice(val: str, choices: tuple[str, ...]) -> str:
     if val in choices:
         return val
     matches = [c for c in choices if c.startswith(val)]
     if len(matches) == 1:
         return matches[0]
-    if len(matches) > 1:
-        raise ValueError(
-            f"'{param_name}' = '{val}' matches multiple choices: {matches}; "
-            f"must be one of {choices}."
-        )
-    raise ValueError(
-        f"'{param_name}' = '{val}' is not a valid choice; must be one of {choices}."
-    )
+    raise ValueError("'arg' should be one of " + ", ".join(f'"{c}"' for c in choices))
 
 
 def _discretize_bandwidth(
@@ -214,11 +207,10 @@ def blkest(
     Xmat = np.zeros((n, qq), dtype=np.float64, order="F")
     wk = np.zeros(n, dtype=np.float64)
     qraux = np.zeros(qq, dtype=np.float64)
-    sigsqe = np.zeros(1, dtype=np.float64)
-    th22e = np.zeros(1, dtype=np.float64)
-    th24e = np.zeros(1, dtype=np.float64)
 
-    _KernSmooth.blkest(
+    # The f2py interface (via src/_KernSmooth.pyf with intent(out) directives) returns
+    # sigsqe, th22e, th24e as a tuple rather than requiring them as input arrays.
+    sigsqe, th22e, th24e = _KernSmooth.blkest(
         x,
         y,
         np.int32(q),
@@ -229,12 +221,9 @@ def blkest(
         Xmat,
         wk,
         qraux,
-        sigsqe,
-        th22e,
-        th24e,
     )
 
-    return {"sigsqe": sigsqe[0], "th22e": th22e[0], "th24e": th24e[0]}
+    return {"sigsqe": sigsqe, "th22e": th22e, "th24e": th24e}
 
 
 def cpblock(
@@ -318,11 +307,8 @@ def locpoly(
     binned: bool = False,
     truncate: bool = True,
 ) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
-    if bandwidth is None:
-        raise ValueError("'bandwidth' must be specified")
-
     # Install safeguard against non-positive bandwidths:
-    if np.any(np.asarray(bandwidth) <= 0):
+    if bandwidth is not None and np.any(np.asarray(bandwidth) <= 0):
         raise ValueError("'bandwidth' must be strictly positive")
 
     drv = int(drv)
@@ -428,9 +414,6 @@ def sdiag(
     binned: bool = False,
     truncate: bool = True,
 ) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
-    if bandwidth is None:
-        raise ValueError("'bandwidth' must be specified")
-
     if range_x is None and not binned:
         range_x = (np.min(x), np.max(x))
 
@@ -500,9 +483,6 @@ def sstdiag(
     binned: bool = False,
     truncate: bool = True,
 ) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:
-    if bandwidth is None:
-        raise ValueError("'bandwidth' must be specified")
-
     if range_x is None and not binned:
         range_x = (np.min(x), np.max(x))
 
@@ -576,7 +556,7 @@ def bkde(
     if bandwidth is not None and bandwidth <= 0:
         raise ValueError("'bandwidth' must be strictly positive")
     valid_kernels = ("normal", "box", "epanech", "biweight", "triweight")
-    kernel = _resolve_choice(kernel, valid_kernels, "kernel")
+    kernel = _resolve_choice(kernel, valid_kernels)
     n = len(x)
     M = gridsize
     del0_map = {
@@ -746,7 +726,7 @@ def dpih(
 
     # Compute scale estimate
     _SCALEST_CHOICES = ("minim", "stdev", "iqr")
-    scalest = _resolve_choice(scalest, _SCALEST_CHOICES, "scalest")
+    scalest = _resolve_choice(scalest, _SCALEST_CHOICES)
 
     std_val = np.std(x, ddof=1)
     iqr_val = (np.quantile(x, 0.75) - np.quantile(x, 0.25)) / 1.349
@@ -838,7 +818,7 @@ def dpik(
 
     # Validate kernel argument
     _KERNEL_CHOICES = ("normal", "box", "epanech", "biweight", "triweight")
-    kernel = _resolve_choice(kernel, _KERNEL_CHOICES, "kernel")
+    kernel = _resolve_choice(kernel, _KERNEL_CHOICES)
 
     # Set kernel constants
     if canonical:
@@ -867,7 +847,7 @@ def dpik(
 
     # Compute scale estimate
     _SCALEST_CHOICES = ("minim", "stdev", "iqr")
-    scalest = _resolve_choice(scalest, _SCALEST_CHOICES, "scalest")
+    scalest = _resolve_choice(scalest, _SCALEST_CHOICES)
 
     std_val = np.std(x, ddof=1)
     iqr_val = (np.quantile(x, 0.75) - np.quantile(x, 0.25)) / 1.349
@@ -972,13 +952,15 @@ def dpill(
     x = x[sort_idx]
     y = y[sort_idx]
 
-    if range_x is None:
-        range_x = (x[0], x[-1])
-
     indlow = int(np.floor(trim * len(x)))
     indupp = len(x) - int(np.floor(trim * len(x)))
     x = x[indlow:indupp]
     y = y[indlow:indupp]
+
+    # In R, range.x = range(x) is a lazy default evaluated after trimming.
+    # Match that behaviour: compute range from the trimmed x when not supplied.
+    if range_x is None:
+        range_x = (x[0], x[-1])
 
     # Rename common parameters
     n = len(x)

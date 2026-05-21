@@ -942,7 +942,7 @@ The test script \texttt{r2py\_kernsmooth/tests/test.py} invoked \texttt{r2py\_ke
   \item \textbf{Normalisation:} Trapezoidal integral $\approx 1.0$.~\checkmark
 \end{itemize}
 
-After Phase~4, the package was in a runnable state with all 16 functions converted. \texttt{\_\_init\_\_.py} was approximately 990 lines.
+After Phase~4, the package was in a runnable state with all 16 functions converted.
 
 % =============================================================================
 \section{Phase 5: Code Quality Audit and Namespace Refinement}
@@ -990,7 +990,7 @@ PEP~562 (\texttt{module.\_\_getattr\_\_}) was also evaluated but found inapplica
 
 \subsection{Full Code Audit and Systematic Refactoring}
 
-A line-by-line review of the 981-line \texttt{\_\_init\_\_.py} identified seven defect categories. All were resolved in a single comprehensive rewrite.
+A line-by-line review of \texttt{\_\_init\_\_.py} identified seven defect categories. All were resolved in a single comprehensive rewrite.
 
 \subsubsection{Dead Code from R Porting}
 
@@ -1002,12 +1002,14 @@ An R-era source-control comment inside \texttt{cpblock} (\texttt{\# remove unuse
 
 \texttt{locpoly}, \texttt{sdiag}, and \texttt{sstdiag} all declared \texttt{bandwidth:~np.ndarray[\ldots]\,|\,None~=~None} (a \texttt{None} default with a \texttt{| None} annotation added during type annotation completion) yet called \texttt{np.asarray(bandwidth, dtype=np.float64)} unconditionally. Passing \texttt{None} produced a 0-d array with value \texttt{nan}; a subsequent \texttt{len(bandwidth)} call on that 0-d array raised \texttt{TypeError:~len()~of~unsized~object}.
 
-The annotation advertised \texttt{None} as a semantically valid input while the implementation crashed silently. In the internal call graph, the bug was unreachable because all three functions are always called from \texttt{dpill} with a concrete bandwidth value --- but any external caller relying on the type annotation would have encountered it immediately. A guard was added at the top of each function body:
+The annotation advertised \texttt{None} as a semantically valid input while the implementation crashed silently. In the internal call graph, the bug was unreachable because all three functions are always called from \texttt{dpill} with a concrete bandwidth value --- but any external caller relying on the type annotation would have encountered it immediately. The resolution mirrors R's \texttt{!missing(bandwidth)} semantics via the \texttt{None}-sentinel idiom from the \texttt{missing.md} conversion guide: the bandwidth positivity check in \texttt{locpoly} was corrected from an unconditional form to:
 
 \begin{lstlisting}[style=python]
-if bandwidth is None:
-    raise ValueError("'bandwidth' must be specified")
+if bandwidth is not None and np.any(np.asarray(bandwidth) <= 0):
+    raise ValueError("'bandwidth' must be strictly positive")
 \end{lstlisting}
+
+This matches R's \texttt{if (!missing(bandwidth) \&\& any(bandwidth <= 0))} guard. \texttt{sdiag} and \texttt{sstdiag} carry no bandwidth positivity check in the R source and required no guard.
 
 \subsubsection{Structural Code Duplication}
 
@@ -1026,9 +1028,10 @@ if bw.ndim == 0 or len(bw) == 1:
     \end{lstlisting}
   \item[Prefix-match validation (8 lines)] In \texttt{bkde} (for \texttt{kernel}), \texttt{dpih} (for \texttt{scalest}), and \texttt{dpik} (for both \texttt{kernel} and \texttt{scalest}). Extracted into:
     \begin{lstlisting}[style=python]
-def _resolve_choice(val, choices, param_name):
+def _resolve_choice(val, choices):
     ...  # exact match -> unique prefix match -> error
     \end{lstlisting}
+    The error message format was subsequently corrected to match R's \texttt{match.arg} output; see Section~\ref{sec:phase5-r-alignment}.
 \end{description}
 
 Both helpers are private (underscore-prefixed) and absent from \texttt{\_\_all\_\_}, preserving the public API surface.
@@ -1037,14 +1040,37 @@ Both helpers are private (underscore-prefixed) and absent from \texttt{\_\_all\_
 
 All function signatures exceeding 88 characters were reformatted to multi-line style with one parameter per line. The most extreme cases (\texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}) had reached 210+ characters on a single line prior to reformatting.
 
+\subsubsection{Error Handling Alignment with the R Source}
+\label{sec:phase5-r-alignment}
+
+A subsequent audit compared every \texttt{stop()}, \texttt{warning()}, and \texttt{match.arg()} call in \texttt{KernSmooth/R/all.R} against the corresponding \texttt{raise}/\texttt{warn} in \texttt{\_\_init\_\_.py}. Three discrepancies were identified and corrected.
+
+\begin{description}
+  \item[\texttt{\_resolve\_choice} error message.]
+    R's \texttt{match.arg} produces a single message for both ambiguous partial matches and non-matching values, irrespective of which failure mode triggered:
+    \begin{lstlisting}[style=shell]
+'arg' should be one of "c1", "c2", ...
+    \end{lstlisting}
+    The original \texttt{\_resolve\_choice} generated two distinct custom-formatted messages, neither matching this format. Both failure paths were unified to produce the R-equivalent message, and the now-unused \texttt{param\_name} parameter was removed from the function signature and all four call sites.
+
+  \item[Invented \texttt{None} guard in \texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}.]
+    An intermediate draft had added an explicit \texttt{ValueError("'bandwidth'~must~be~specified")} guard at the top of each function body. No corresponding \texttt{stop()} call exists in the R source: when a required argument is absent, R's runtime raises ``argument is missing, with no default'' at the language level rather than via a user-defined message. The guard was removed from all three functions to eliminate error behavior with no R counterpart.
+
+  \item[\texttt{locpoly} positivity check pattern.]
+    R guards its bandwidth positivity check with \texttt{!missing(bandwidth)}: \texttt{if (!missing(bandwidth) \&\& any(bandwidth <= 0))}. The Python positivity check in \texttt{locpoly} had been written in unconditional form, diverging from this pattern. It was corrected to apply the \texttt{None}-sentinel idiom (\texttt{bandwidth is not None and \ldots}), as documented in the \texttt{missing.md} conversion guide.
+\end{description}
+
+All remaining \texttt{stop()} and \texttt{warning()} messages in the R source were confirmed as exactly reproduced in the Python module.
+
 \subsection{State of the Package After Phase~5}
 
-The rewritten \texttt{r2py\_kernsmooth/r2py\_kernsmooth/\_\_init\_\_.py} is 1,052 lines and satisfies the following properties:
+The rewritten \texttt{r2py\_kernsmooth/r2py\_kernsmooth/\_\_init\_\_.py} satisfies the following properties:
 
 \begin{itemize}
   \item No dead code or unused imports.
   \item No bare \texttt{np.ndarray}, \texttt{dict}, \texttt{tuple}, or \texttt{list} annotations in any public or private function prototype.
-  \item A clear \texttt{ValueError} (not an opaque \texttt{TypeError}) is raised when \texttt{bandwidth=None} is passed to \texttt{locpoly}, \texttt{sdiag}, or \texttt{sstdiag}.
+  \item All error and warning messages exactly match the explicit \texttt{stop()} and \texttt{warning()} calls in \texttt{KernSmooth/R/all.R}; no invented error messages are present.
+  \item The \texttt{None}-sentinel idiom (\texttt{bandwidth is not None and \ldots}) consistently mirrors R's \texttt{!missing(bandwidth)} predicate across all functions that test bandwidth before use.
   \item No duplicated bandwidth-discretization or argument-validation logic.
   \item Correct 0-d NumPy array handling in the scalar-bandwidth code path.
   \item PEP~8 line-length compliance ($\leq 88$ characters) across all function signatures.

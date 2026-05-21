@@ -58,7 +58,7 @@ This session focused on two sequential improvements to `r2py_kernsmooth/r2py_ker
 
 ### 1. Abstract
 
-This session performed a thorough, in-depth review of `r2py_kernsmooth/r2py_kernsmooth/__init__.py` to evaluate conformance with standard Python packaging conventions. Seven distinct categories of defects were identified — ranging from dead R-porting artifacts and a silent crash bug to structural code duplication and PEP 8 violations — and all were subsequently resolved in a single comprehensive rewrite of the file. The file grew from 981 lines to 1,006 lines, reflecting the net addition of two private helper functions that replaced duplicated inline logic.
+This session performed a thorough, in-depth review of `r2py_kernsmooth/r2py_kernsmooth/__init__.py` to evaluate conformance with standard Python packaging conventions. Seven distinct categories of defects were identified — ranging from dead R-porting artifacts and a silent crash bug to structural code duplication and PEP 8 violations — and all were subsequently resolved in a single comprehensive rewrite of the file.
 
 ---
 
@@ -66,7 +66,7 @@ This session performed a thorough, in-depth review of `r2py_kernsmooth/r2py_kern
 
 **Step 1 — Full File Audit**
 
-The complete text of `r2py_kernsmooth/r2py_kernsmooth/__init__.py` (981 lines) was read and analyzed function by function. The audit examined:
+The complete text of `r2py_kernsmooth/r2py_kernsmooth/__init__.py` was read and analyzed function by function. The audit examined:
 - Import usage across the entire module, not just at the import site.
 - Every function signature for correctness of type annotations and default values.
 - Each function body for correctness relative to its declared interface.
@@ -148,3 +148,58 @@ The `_resolve_choice` and `_discretize_bandwidth` helpers are private (underscor
 - Expand `r2py_kernsmooth/tests/test.py` beyond the single `bkde` smoke test to cover all 14 public functions, including boundary conditions such as `bandwidth` near zero, `level` at 0 and 5 for `dpih`/`dpik`, and the binned vs. unbinned code paths.
 - Validate numerical agreement between `r2py_kernsmooth` outputs and the reference R `KernSmooth` package (v2.23-22) on a shared dataset for each function.
 - Consider adding `__version__ = "2.23"` to `__init__.py` to expose the mirrored R package version programmatically.
+
+---
+---
+
+## Session 3 — R-Source Alignment Audit: Unused Parameters and Error Handling
+
+### 1. Abstract
+
+This session investigated two questions raised by inspection of the ported `r2py_kernsmooth/r2py_kernsmooth/__init__.py`: (1) why the `drv` and `kernel` parameters appear in the signatures of `sdiag` and `sstdiag` yet are never referenced in their bodies, and (2) whether all error behaviors in the Python module exactly match those defined in `KernSmooth/R/all.R`. The first question was answered by examining both the Fortran source and the R reference implementation. The second revealed three discrepancies that were corrected: the `_resolve_choice` error message format, an invented `bandwidth=None` guard in `locpoly`/`sdiag`/`sstdiag`, and the bandwidth positivity check pattern in `locpoly`.
+
+---
+
+### 2. Methodology & Actions Taken
+
+**Task 1 — Investigation of Unused `drv` and `kernel` Parameters**
+
+- Read `r2py_kernsmooth/src/sdiag.f` and `r2py_kernsmooth/src/sstdiag.f` to understand why `drv` is absent from their Fortran interfaces.
+- Read `r2py_kernsmooth/src/locpoly.f` for contrast, noting its `idrv` parameter.
+- Read `KernSmooth/R/all.R` to confirm R's `sdiag` and `sstdiag` carry the same unused parameters in identical signatures.
+
+**Task 2 — Error Handling Audit**
+
+- Extracted every `stop()`, `warning()`, and `match.arg()` call from `KernSmooth/R/all.R` (16 total error/warning emissions across 8 functions).
+- Compared each against the corresponding `raise`/`warn` in `r2py_kernsmooth/r2py_kernsmooth/__init__.py`.
+- Applied three targeted fixes to align the Python behavior with the R source.
+
+---
+
+### 3. Key Findings & Results
+
+**Unused `drv` and `kernel` parameters in `sdiag`/`sstdiag`**
+
+Two independent sources confirm these parameters are intentional non-operative artifacts inherited from the R source:
+
+1. **Fortran source**: `sdiag.f` and `sstdiag.f` hardcode the Gaussian kernel via `exp(-(delta*j/hdisc(i))**2/2)` with no kernel-type argument. Both subroutines always extract `Smat(1,1)` — the [1,1] entry of the inverted local design matrix — hardcoding derivative order zero; there is no `idrv` parameter. By contrast, `locpoly.f` selects the requested derivative coefficient via `cvest(k) = Tvec(idrv+1)`.
+
+2. **R source**: R's `sdiag` and `sstdiag` in `KernSmooth/R/all.R` carry `drv = 0L` and `kernel = "normal"` in their signatures but never reference either in their bodies. The Python port faithfully reproduces this design; both parameters exist purely for API symmetry with `locpoly`.
+
+**Error handling discrepancies found and corrected**
+
+A systematic comparison of every `stop()`, `warning()`, and `match.arg()` call in `KernSmooth/R/all.R` against the Python module revealed three discrepancies:
+
+1. **`_resolve_choice` error message**: Python generated two distinct custom messages — one for ambiguous partial matches and one for non-matching values — neither matching R's `match.arg` format. R's `match.arg` raises the same message for both cases: `'arg' should be one of "c1", "c2", ...`. Python's `_resolve_choice` was rewritten to produce this single unified message for both failure paths. The now-unused `param_name` parameter was removed from the function signature and all four call sites.
+
+2. **Invented `ValueError` in `locpoly`, `sdiag`, `sstdiag`**: The Session 2 rewrite added `if bandwidth is None: raise ValueError("'bandwidth' must be specified")` to all three functions. No corresponding `stop()` call exists in the R source. In R, a missing required argument causes a language-level error (`argument "bandwidth" is missing, with no default`), not a user-defined message. This invented guard was removed from all three functions to eliminate error behavior that has no R counterpart.
+
+3. **`locpoly` positivity check pattern**: Session 2 left `locpoly` with `if np.any(np.asarray(bandwidth) <= 0):` as an unconditional positivity guard. R's equivalent is `if (!missing(bandwidth) && any(bandwidth <= 0)) stop(...)`. The correct Python translation mirrors the `!missing()` sentinel idiom documented in the `missing.md` conversion guide: `if bandwidth is not None and np.any(np.asarray(bandwidth) <= 0):`. The check was corrected accordingly.
+
+The following error and warning behaviors were confirmed as correctly matching R's explicit `stop()`/`warning()` calls: `bkde` (bandwidth positivity, canonical check, binning-grid warning), `bkde2D` (bandwidth positivity, binning-grid warning), `bkfe` (bandwidth positivity, binning-grid warning), `dpih` (level range, scale-estimate zero), `dpik` (level range, scale-estimate zero), `locpoly` (bandwidth positivity, scalar/length error, binning-grid error), `sdiag` and `sstdiag` (scalar/length error).
+
+---
+
+### 4. Conclusion
+
+All Python error behaviors in `r2py_kernsmooth/r2py_kernsmooth/__init__.py` now correspond exactly to the explicit `stop()` and `warning()` calls in `KernSmooth/R/all.R`. No invented error messages are present, and no R-defined messages are missing. The `!missing(bandwidth) && condition` pattern in R is consistently translated as `bandwidth is not None and condition` across all functions (`bkfe`, `bkde`, `bkde2D`, `locpoly`) that test bandwidth before use. The next priority remains comprehensive test coverage against R's reference output.

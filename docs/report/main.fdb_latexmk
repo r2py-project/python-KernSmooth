@@ -1,12 +1,12 @@
 # Fdb version 4
-["pdflatex"] 1779305215.43163 "/users/ycai9/Yufei/python-KernSmooth/docs/report/main.tex" "main.pdf" "main" 1779305218.45248 0
+["pdflatex"] 1779375169.41154 "/users/ycai9/Yufei/python-KernSmooth/docs/report/main.tex" "main.pdf" "main" 1779375172.15159 0
   "../../.claude/agents/analyze-c-file-dependencies.md" 1778607225.6926 3113 27bec7b604c14d8a4b6878dd9dc8bae0 ""
   "../../.claude/agents/analyze-r-file-dependencies.md" 1778607225.70758 2848 98903cb425f31ea184d96dcc048dd76c ""
   "../../.claude/agents/convert-r-function-to-python.md" 1779210111.4322 3493 9ed527ef2284bd88c0d0dc2d0d2455ad ""
   "../../.claude/agents/extract-r-file-language-dependencies.md" 1778689295.47088 2349 7f679aa57cd4fbd4c44087337ec24d34 ""
   "../../.claude/agents/generate-language-dependency-conversion-guide.md" 1778699307.58734 3776 d5f10b17095dcafb71d670a9cab97147 ""
   "../../.claude/commands/analyze-r-folder-dependencies.md" 1778687784.87422 1686 dfe6236a79ce4cba33472709dae94c76 ""
-  "../../.claude/commands/combine-python-functions-into-file.md" 1779287882.00591 3103 9e78997349280d52de4b61c6e9e8455c ""
+  "../../.claude/commands/combine-python-functions-into-file.md" 1779309064.31625 3103 9e78997349280d52de4b61c6e9e8455c ""
   "../../.claude/commands/convert-r-file-to-python.md" 1778784978.82652 2360 745f9de31ab754d8d9f0a1d8e6d39f81 ""
   "../../.claude/commands/extract-r-folder-language-dependencies.md" 1778691040.542 2660 8e3456c3e494e1b8c32362949df9b469 ""
   "../../.claude/commands/generate-language-dependency-conversion-guides.md" 1779123112.81712 2750 d6318e6e09532e3e20dbcd426b103a1e ""
@@ -142,10 +142,10 @@
   "/software/t/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1779135676 5573040 5cf6d45dfd30c1d1bff9454f98c8864b ""
   "/software/t/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1779135902 3651062 d235d35aa376642b6b5d5cddcacab078 ""
   "/software/t/texlive/2026/texmf.cnf" 1779135640.18643 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
-  "/users/ycai9/Yufei/python-KernSmooth/docs/report/main.tex" 1779305203.82863 75905 387e6f99ecaa714c430479e19cede482 ""
-  "main.aux" 1779305218.23958 16086 c944b3957c58924333663feb622fa1c4 "pdflatex"
-  "main.out" 1779305218.24358 17822 e13d1bc517e880cf20c32368f1e31843 "pdflatex"
-  "main.toc" 1779305218.24558 8394 a96ea76af7f67d77acbb6be836553935 "pdflatex"
+  "/users/ycai9/Yufei/python-KernSmooth/docs/report/main.tex" 1779375063.0256 78767 ad8a4b61879045ed8089209cd063a0cd ""
+  "main.aux" 1779375171.94168 16360 99b389164b80a069402983bfab63a08e "pdflatex"
+  "main.out" 1779375171.94568 18118 9c7932b39477e09542bcbf2b1b825690 "pdflatex"
+  "main.toc" 1779375171.94768 8513 f5f7ad486fc968e8fafa3fd720305b7c "pdflatex"
   (generated)
   "main.aux"
   "main.log"

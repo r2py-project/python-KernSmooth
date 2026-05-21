@@ -61,26 +61,27 @@
 \contentsline {subsubsection}{\numberline {6.4.2}Silent Crash Bug in Three Public Functions}{27}{subsubsection.6.4.2}%
 \contentsline {subsubsection}{\numberline {6.4.3}Structural Code Duplication}{27}{subsubsection.6.4.3}%
 \contentsline {subsubsection}{\numberline {6.4.4}PEP~8 Signature Reformatting}{28}{subsubsection.6.4.4}%
-\contentsline {subsection}{\numberline {6.5}State of the Package After Phase~5}{28}{subsection.6.5}%
-\contentsline {section}{Appendices}{30}{section*.4}%
-\contentsline {section}{\numberline {A}Agent Specifications}{30}{section.1.A}%
-\contentsline {subsection}{\numberline {A.1}Agents Used in Phase~1}{30}{subsection.1.A.1}%
-\contentsline {subsubsection}{\texttt {analyze-r-file-dependencies}}{30}{section*.6}%
-\contentsline {subsection}{\numberline {A.2}Agents Used in Phase~3}{31}{subsection.1.A.2}%
-\contentsline {subsubsection}{\texttt {extract-r-file-language-dependencies}}{31}{section*.8}%
-\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guide}}{32}{section*.10}%
-\contentsline {subsection}{\numberline {A.3}Agents Used in Phase~4}{33}{subsection.1.A.3}%
-\contentsline {subsubsection}{\texttt {convert-r-function-to-python}}{33}{section*.12}%
-\contentsline {subsection}{\numberline {A.4}Supplementary Agent}{34}{subsection.1.A.4}%
-\contentsline {subsubsection}{\texttt {analyze-c-file-dependencies}}{34}{section*.14}%
-\contentsline {section}{\numberline {B}Skill (Command) Specifications}{36}{section.1.B}%
-\contentsline {subsection}{\numberline {B.1}Skills Used in Phase~1}{36}{subsection.1.B.1}%
-\contentsline {subsubsection}{\texttt {analyze-r-folder-dependencies}}{36}{section*.16}%
-\contentsline {subsection}{\numberline {B.2}Skills Used in Phase~3}{36}{subsection.1.B.2}%
-\contentsline {subsubsection}{\texttt {extract-r-folder-language-dependencies}}{36}{section*.18}%
-\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guides}}{37}{section*.20}%
-\contentsline {subsection}{\numberline {B.3}Skills Used in Phase~4}{38}{subsection.1.B.3}%
-\contentsline {subsubsection}{\texttt {convert-r-file-to-python}}{38}{section*.22}%
-\contentsline {subsubsection}{\texttt {combine-python-functions-into-file}}{39}{section*.24}%
-\contentsline {subsection}{\numberline {B.4}Workflow Utility}{40}{subsection.1.B.4}%
-\contentsline {subsubsection}{\texttt {summarize-research-report}}{40}{section*.26}%
+\contentsline {subsubsection}{\numberline {6.4.5}Error Handling Alignment with the R Source}{28}{subsubsection.6.4.5}%
+\contentsline {subsection}{\numberline {6.5}State of the Package After Phase~5}{29}{subsection.6.5}%
+\contentsline {section}{Appendices}{31}{section*.4}%
+\contentsline {section}{\numberline {A}Agent Specifications}{31}{section.1.A}%
+\contentsline {subsection}{\numberline {A.1}Agents Used in Phase~1}{31}{subsection.1.A.1}%
+\contentsline {subsubsection}{\texttt {analyze-r-file-dependencies}}{31}{section*.6}%
+\contentsline {subsection}{\numberline {A.2}Agents Used in Phase~3}{32}{subsection.1.A.2}%
+\contentsline {subsubsection}{\texttt {extract-r-file-language-dependencies}}{32}{section*.8}%
+\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guide}}{33}{section*.10}%
+\contentsline {subsection}{\numberline {A.3}Agents Used in Phase~4}{34}{subsection.1.A.3}%
+\contentsline {subsubsection}{\texttt {convert-r-function-to-python}}{34}{section*.12}%
+\contentsline {subsection}{\numberline {A.4}Supplementary Agent}{35}{subsection.1.A.4}%
+\contentsline {subsubsection}{\texttt {analyze-c-file-dependencies}}{35}{section*.14}%
+\contentsline {section}{\numberline {B}Skill (Command) Specifications}{37}{section.1.B}%
+\contentsline {subsection}{\numberline {B.1}Skills Used in Phase~1}{37}{subsection.1.B.1}%
+\contentsline {subsubsection}{\texttt {analyze-r-folder-dependencies}}{37}{section*.16}%
+\contentsline {subsection}{\numberline {B.2}Skills Used in Phase~3}{37}{subsection.1.B.2}%
+\contentsline {subsubsection}{\texttt {extract-r-folder-language-dependencies}}{37}{section*.18}%
+\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guides}}{38}{section*.20}%
+\contentsline {subsection}{\numberline {B.3}Skills Used in Phase~4}{39}{subsection.1.B.3}%
+\contentsline {subsubsection}{\texttt {convert-r-file-to-python}}{39}{section*.22}%
+\contentsline {subsubsection}{\texttt {combine-python-functions-into-file}}{40}{section*.24}%
+\contentsline {subsection}{\numberline {B.4}Workflow Utility}{41}{subsection.1.B.4}%
+\contentsline {subsubsection}{\texttt {summarize-research-report}}{41}{section*.26}%
