@@ -371,24 +371,31 @@ def test_dpill_blockmax_1_matches_r():
 
 
 # ---------------------------------------------------------------------------
-# Wide range_x that triggers NaN in R (documented divergence handled with skip)
+# Wide range_x that triggers failure in both Python and R
 # ---------------------------------------------------------------------------
 
 
-def test_dpill_wider_range_x_matches_r_if_r_succeeds():
-    """dpill with range_x moderately wider than data matches R if R succeeds."""
+def test_dpill_wider_range_x_consistent_with_r():
+    """dpill with range_x wider than data: Python and R fail consistently."""
     rng = np.random.default_rng(42)
     x = rng.normal(0, 1, 200)
     y = np.sin(2 * x) + rng.normal(0, 0.3, 200)
     # Slightly wider than data (0.5 units on each side)
     range_x = (float(x.min()) - 0.5, float(x.max()) + 0.5)
     r_raised, r_result = _r_dpill_catch(x, y, range_x=range_x)
-    if r_raised or not np.isfinite(r_result):
-        pytest.skip(
-            f"R does not return a finite value for this range_x: {r_result}"
-        )
-    py_val = r2py_kernsmooth.dpill(x, y, range_x=range_x)
-    _assert_close(py_val, r_result, label="range_x slightly wider than data")
+    r_fails = r_raised or not np.isfinite(r_result)
+    py_val = None
+    py_raised = False
+    try:
+        py_val = r2py_kernsmooth.dpill(x, y, range_x=range_x)
+    except Exception:
+        py_raised = True
+    py_fails = py_raised or (py_val is not None and not np.isfinite(float(py_val)))
+    if r_fails:
+        assert py_fails, f"R failed but Python returned finite {py_val}"
+    else:
+        assert not py_fails, f"R succeeded ({r_result}) but Python failed"
+        _assert_close(py_val, r_result, label="range_x slightly wider than data")
 
 
 # ---------------------------------------------------------------------------

@@ -138,7 +138,7 @@ Several Python/R behavioral divergences were documented via `UserWarning` emissi
 
 ### 1. Abstract
 
-The `/fix-bugs-found-in-tests` skill was invoked to systematically resolve all failing tests. Starting from 49 failures (all in `dpill` tests), three bugs were identified and fixed: (1) the `blkest` f2py scalar-output binding, (2) a `dpill` range computation ordering error matching R's lazy-evaluation semantics, and (3) a NaN-equality comparison error in two test assertions. The final state is **515 passed, 3 skipped, 0 failed** across all 21 test files.
+The `/fix-bugs-found-in-tests` skill was invoked to systematically resolve all failing tests. Starting from 49 failures (all in `dpill` tests), three bugs were identified and fixed: (1) the `blkest` f2py scalar-output binding, (2) a `dpill` range computation ordering error matching R's lazy-evaluation semantics, and (3) a NaN-equality comparison error in two test assertions. The final state is **518 passed, 0 skipped, 0 failed** across all 21 test files.
 
 ---
 
@@ -262,10 +262,8 @@ in `test_dpill_positive.py` (line ~411) and `test_dpill_edge.py` (line ~409).
 #### 2.8 Final Test Run
 
 ```
-515 passed, 3 skipped, 0 failed in 6.61s
+518 passed, 0 skipped, 0 failed in 6.40s
 ```
-
-The 3 skipped tests are pre-existing skips (not introduced this session).
 
 ---
 
@@ -295,10 +293,9 @@ Bug 1 was pre-existing from at least Phase 6 (the f2py argument-order fix sessio
 
 ### 4. Conclusion & Next Steps
 
-The `r2py_kernsmooth` Python package now has a comprehensive `pytest` suite of **515 passing tests** across **21 test files** covering all 7 public KernSmooth functions. Three pre-existing bugs were found and fixed: a Fortran f2py binding error in `blkest`, a range-computation ordering error in `dpill`, and two test assertions that incorrectly handled the `NaN == NaN` case.
+The `r2py_kernsmooth` Python package now has a comprehensive `pytest` suite of **518 passing tests** across **21 test files** covering all 7 public KernSmooth functions. Three pre-existing bugs were found and fixed: a Fortran f2py binding error in `blkest`, a range-computation ordering error in `dpill`, and two test assertions that incorrectly handled the `NaN == NaN` case.
 
 **Suggested next steps:**
 - The `dpill` function's R lazy-evaluation pattern (`range.x = range(x)` evaluated post-trim) should be checked against all other functions in `__init__.py` that accept `range_x=None` defaults (`bkfe`, `dpih`, `dpik`, `locpoly`, `sdiag`, `sstdiag`). None of these trim `x` before setting the range, so no analogous bug exists there — but the audit should be confirmed explicitly.
 - The `blkest` `.pyf` file should be reviewed to ensure all other Fortran routines (`locpol`, `sdiag`, `sstdg`, `cp`, `lbtwod`, `linbin`, `rlbin`) also have correct `intent` declarations for any modified-in-place array arguments that f2py would otherwise treat as input-only.
 - Consider adding a `conftest.py`-level `pytest.ini` marker to tag tests that require `rpy2` and R, so the suite can be run in partial mode without an R installation.
-- The 3 skipped tests should be audited to confirm they are intentional and document the skip reasons in a `SKIP_REASONS.md` or inline comments.

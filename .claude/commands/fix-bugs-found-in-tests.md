@@ -26,7 +26,7 @@ You will be provided with a folder containing Python test files, a target Python
 
 ### Step 3: Validate and Loop
 
-- Once the `@fix-bug-found-in-test` agent has finished its task, rerun the entire test suite using `pytest` across all `test_*.py` files to ensure the fix worked and no regressions were introduced.
+- Once the `@fix-bug-found-in-test` agent has finished its task, reinstall the fixed package, and then rerun the entire test suite using `pytest` across all `test_*.py` files to ensure the fix worked and no regressions were introduced.
 - If new or remaining tests fail, repeat Steps 1 through 3 for the next failing test.
 - Continue this cycle until `pytest` returns a 100% pass rate.
 - *Safety Constraint:* If the `@fix-bug-found-in-test` agent attempts to fix the exact same failing test 3 times consecutively without the test passing, halt the loop and request user intervention to prevent an infinite loop.

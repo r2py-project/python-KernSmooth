@@ -63,25 +63,57 @@
 \contentsline {subsubsection}{\numberline {6.4.4}PEP~8 Signature Reformatting}{28}{subsubsection.6.4.4}%
 \contentsline {subsubsection}{\numberline {6.4.5}Error Handling Alignment with the R Source}{28}{subsubsection.6.4.5}%
 \contentsline {subsection}{\numberline {6.5}State of the Package After Phase~5}{29}{subsection.6.5}%
-\contentsline {section}{Appendices}{31}{section*.4}%
-\contentsline {section}{\numberline {A}Agent Specifications}{31}{section.1.A}%
-\contentsline {subsection}{\numberline {A.1}Agents Used in Phase~1}{31}{subsection.1.A.1}%
-\contentsline {subsubsection}{\texttt {analyze-r-file-dependencies}}{31}{section*.6}%
-\contentsline {subsection}{\numberline {A.2}Agents Used in Phase~3}{32}{subsection.1.A.2}%
-\contentsline {subsubsection}{\texttt {extract-r-file-language-dependencies}}{32}{section*.8}%
-\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guide}}{33}{section*.10}%
-\contentsline {subsection}{\numberline {A.3}Agents Used in Phase~4}{34}{subsection.1.A.3}%
-\contentsline {subsubsection}{\texttt {convert-r-function-to-python}}{34}{section*.12}%
-\contentsline {subsection}{\numberline {A.4}Supplementary Agent}{35}{subsection.1.A.4}%
-\contentsline {subsubsection}{\texttt {analyze-c-file-dependencies}}{35}{section*.14}%
-\contentsline {section}{\numberline {B}Skill (Command) Specifications}{37}{section.1.B}%
-\contentsline {subsection}{\numberline {B.1}Skills Used in Phase~1}{37}{subsection.1.B.1}%
-\contentsline {subsubsection}{\texttt {analyze-r-folder-dependencies}}{37}{section*.16}%
-\contentsline {subsection}{\numberline {B.2}Skills Used in Phase~3}{37}{subsection.1.B.2}%
-\contentsline {subsubsection}{\texttt {extract-r-folder-language-dependencies}}{37}{section*.18}%
-\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guides}}{38}{section*.20}%
-\contentsline {subsection}{\numberline {B.3}Skills Used in Phase~4}{39}{subsection.1.B.3}%
-\contentsline {subsubsection}{\texttt {convert-r-file-to-python}}{39}{section*.22}%
-\contentsline {subsubsection}{\texttt {combine-python-functions-into-file}}{40}{section*.24}%
-\contentsline {subsection}{\numberline {B.4}Workflow Utility}{41}{subsection.1.B.4}%
-\contentsline {subsubsection}{\texttt {summarize-research-report}}{41}{section*.26}%
+\contentsline {section}{\numberline {7}Phase 6: R Test Conversion and Regression Infrastructure}{29}{section.7}%
+\contentsline {subsection}{\numberline {7.1}Motivation}{29}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}R Test Conversion}{30}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}Conversion of \texttt {bkfe.R}}{30}{subsubsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2}Conversion of \texttt {locpoly.R}}{31}{subsubsection.7.2.2}%
+\contentsline {subsection}{\numberline {7.3}The Two-Layer f2py Compatibility Bug}{31}{subsection.7.3}%
+\contentsline {subsubsection}{\numberline {7.3.1}Layer 1: Strict 2D Shape Enforcement}{31}{subsubsection.7.3.1}%
+\contentsline {subsubsection}{\numberline {7.3.2}Layer 2: Absorbed Dimension Arguments}{31}{subsubsection.7.3.2}%
+\contentsline {subsubsection}{\numberline {7.3.3}Fixes Applied}{32}{subsubsection.7.3.3}%
+\contentsline {subsection}{\numberline {7.4}Upgrade to rpy2-Based Assertion Testing}{32}{subsection.7.4}%
+\contentsline {section}{\numberline {8}Phase 7: Comprehensive Test Suite Construction}{33}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Motivation}{33}{subsection.8.1}%
+\contentsline {subsection}{\numberline {8.2}Comprehensive Test Generation}{33}{subsection.8.2}%
+\contentsline {subsubsection}{\numberline {8.2.1}Public Interface Filtering}{34}{subsubsection.8.2.1}%
+\contentsline {subsubsection}{\numberline {8.2.2}Per-Function Test Content}{35}{subsubsection.8.2.2}%
+\contentsline {subsubsection}{\numberline {8.2.3}Test Count Summary}{36}{subsubsection.8.2.3}%
+\contentsline {subsection}{\numberline {8.3}Systematic Bug Resolution}{36}{subsection.8.3}%
+\contentsline {subsubsection}{\numberline {8.3.1}Bug~1: \texttt {blkest} f2py Scalar Output Binding}{36}{subsubsection.8.3.1}%
+\contentsline {subsubsection}{\numberline {8.3.2}Bug~2: \texttt {dpill} Range Computed Before Trimming}{37}{subsubsection.8.3.2}%
+\contentsline {subsubsection}{\numberline {8.3.3}Bug~3: \texttt {NaN == NaN} Test Assertion}{38}{subsubsection.8.3.3}%
+\contentsline {subsection}{\numberline {8.4}Documented Behavioural Divergences}{38}{subsection.8.4}%
+\contentsline {subsection}{\numberline {8.5}State of the Package After Phase~7}{38}{subsection.8.5}%
+\contentsline {section}{Appendices}{40}{section*.4}%
+\contentsline {section}{\numberline {A}Agent Specifications}{40}{section.1.A}%
+\contentsline {subsection}{\numberline {A.1}Agents Used in Phase~1}{40}{subsection.1.A.1}%
+\contentsline {subsubsection}{\texttt {analyze-r-file-dependencies}}{40}{section*.6}%
+\contentsline {subsection}{\numberline {A.2}Agents Used in Phase~3}{41}{subsection.1.A.2}%
+\contentsline {subsubsection}{\texttt {extract-r-file-language-dependencies}}{41}{section*.8}%
+\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guide}}{42}{section*.10}%
+\contentsline {subsection}{\numberline {A.3}Agents Used in Phase~4}{43}{subsection.1.A.3}%
+\contentsline {subsubsection}{\texttt {convert-r-function-to-python}}{43}{section*.12}%
+\contentsline {subsection}{\numberline {A.4}Agents Used in Phase~6}{44}{subsection.1.A.4}%
+\contentsline {subsubsection}{\texttt {convert-r-test-to-python}}{44}{section*.14}%
+\contentsline {subsection}{\numberline {A.5}Agents Used in Phase~7}{45}{subsection.1.A.5}%
+\contentsline {subsubsection}{\texttt {generate-python-function-tests}}{45}{section*.16}%
+\contentsline {subsubsection}{\texttt {fix-bug-found-in-test}}{47}{section*.18}%
+\contentsline {subsection}{\numberline {A.6}Supplementary Agent}{48}{subsection.1.A.6}%
+\contentsline {subsubsection}{\texttt {analyze-c-file-dependencies}}{48}{section*.20}%
+\contentsline {section}{\numberline {B}Skill (Command) Specifications}{49}{section.1.B}%
+\contentsline {subsection}{\numberline {B.1}Skills Used in Phase~1}{49}{subsection.1.B.1}%
+\contentsline {subsubsection}{\texttt {analyze-r-folder-dependencies}}{49}{section*.22}%
+\contentsline {subsection}{\numberline {B.2}Skills Used in Phase~3}{50}{subsection.1.B.2}%
+\contentsline {subsubsection}{\texttt {extract-r-folder-language-dependencies}}{50}{section*.24}%
+\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guides}}{50}{section*.26}%
+\contentsline {subsection}{\numberline {B.3}Skills Used in Phase~4}{51}{subsection.1.B.3}%
+\contentsline {subsubsection}{\texttt {convert-r-file-to-python}}{51}{section*.28}%
+\contentsline {subsubsection}{\texttt {combine-python-functions-into-file}}{52}{section*.30}%
+\contentsline {subsection}{\numberline {B.4}Skills Used in Phase~6}{53}{subsection.1.B.4}%
+\contentsline {subsubsection}{\texttt {convert-r-tests-to-python}}{53}{section*.32}%
+\contentsline {subsection}{\numberline {B.5}Skills Used in Phase~7}{54}{subsection.1.B.5}%
+\contentsline {subsubsection}{\texttt {generate-python-file-tests}}{54}{section*.34}%
+\contentsline {subsubsection}{\texttt {fix-bugs-found-in-tests}}{55}{section*.36}%
+\contentsline {subsection}{\numberline {B.6}Workflow Utility}{55}{subsection.1.B.6}%
+\contentsline {subsubsection}{\texttt {summarize-research-report}}{55}{section*.38}%
