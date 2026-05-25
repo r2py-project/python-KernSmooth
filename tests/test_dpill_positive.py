@@ -163,17 +163,17 @@ def test_dpill_divisor_40():
 
 
 def test_dpill_trim_0():
-    """dpill with trim=0.0 (no trimming) matches R when R returns a finite value."""
+    """dpill with trim=0.0 (no trimming): Python and R both return NaN for this dataset."""
     rng = np.random.default_rng(42)
     x = rng.normal(0, 1, 200)
     y = np.sin(2 * x) + rng.normal(0, 0.3, 200)
     r_val = _r_dpill(x, y, trim=0.0)
-    # R returns NaN here for this dataset (gamseh becomes undefined).
-    # We verify Python and R agree: both may return NaN or both raise.
-    if not np.isfinite(r_val):
-        pytest.skip("R returns non-finite result for trim=0.0 on this dataset")
     py_val = r2py_kernsmooth.dpill(x, y, trim=0.0)
-    _assert_close(py_val, r_val, label="trim=0.0")
+    if not np.isfinite(r_val):
+        assert not np.isfinite(float(py_val)), \
+            f"R returned NaN but Python returned finite {py_val}"
+    else:
+        _assert_close(py_val, r_val, label="trim=0.0")
 
 
 def test_dpill_trim_0_02():
@@ -247,7 +247,7 @@ def test_dpill_gridsize_801():
 
 
 def test_dpill_custom_range_x():
-    """dpill with an explicit range_x matches R."""
+    """dpill with an explicit range_x: Python and R both return NaN for this input."""
     rng = np.random.default_rng(42)
     x = rng.normal(0, 1, 200)
     y = np.sin(2 * x) + rng.normal(0, 0.3, 200)
@@ -255,8 +255,10 @@ def test_dpill_custom_range_x():
     r_val = _r_dpill(x, y, range_x=range_x)
     py_val = r2py_kernsmooth.dpill(x, y, range_x=range_x)
     if not np.isfinite(r_val):
-        pytest.skip("R returns non-finite result for this range_x")
-    _assert_close(py_val, r_val, label="custom range_x=data range")
+        assert not np.isfinite(float(py_val)), \
+            f"R returned NaN but Python returned finite {py_val}"
+    else:
+        _assert_close(py_val, r_val, label="custom range_x=data range")
 
 
 def test_dpill_truncate_false():
