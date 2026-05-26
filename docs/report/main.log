@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  25 MAY 2026 15:34
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  26 MAY 2026 11:32
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -703,22 +703,22 @@ Overfull \hbox (39.1598pt too wide) in paragraph at lines 689--690
 \T1/lmr/m/n/12 (-20) and save the com-bined re-sult to \T1/lmtt/m/n/12 language_dependency_analysis/combined_table.csv\T1/lmr/m/n/12 (-20) . 
  []
 
-
+[19]
 Overfull \hbox (34.83107pt too wide) in paragraph at lines 712--713
 []\T1/lmr/m/n/12 (-20) The 46 re-sult-ing guides were saved to \T1/lmtt/m/n/12 language_dependency_analysis/conversion_guides/
  []
 
-[19]
+
 Overfull \hbox (30.36656pt too wide) in paragraph at lines 724--725
 \T1/lmr/m/n/12 (-20) R's pre-allocation id-iom \T1/lmtt/m/n/12 as.double(rep(0, n)) \T1/lmr/m/n/12 (-20) maps to \T1/lmtt/m/n/12 np.zeros(n, dtype=np.float64)\T1/lmr/m/n/12 (-20) .
  []
 
 (/software/t/texlive/2026/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2025/11/14 1.11b listings language file
-)
+) [20]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10.95> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 738.
- [20]
+
 Overfull \hbox (0.56537pt too wide) in paragraph at lines 755--756
 \T1/lmr/m/n/12 (-20) R's \T1/lmtt/m/n/12 switch(key, case1=expr1, case2=expr2, ...) \T1/lmr/m/n/12 (-20) on string keys trans-lates cleanly
  []
@@ -733,12 +733,12 @@ Overfull \hbox (5.78407pt too wide) in paragraph at lines 815--816
 []\T1/lmtt/m/n/12 .Fortran(F_xxx, ...)[[k]] \T1/lmr/m/n/12 (-20) mapped to
  []
 
-
+[22]
 Overfull \hbox (11.77144pt too wide) in paragraph at lines 821--822
 []\T1/lmr/m/n/12 (-20) The \T1/lmtt/m/n/12 ss\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 Smat\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 uu\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 Umat \T1/lmr/m/n/12 (-20) ma-tri-ces are flat-tened column-major (\T1/lmtt/m/n/12 order=`F'\T1/lmr/m/n/12 (-20) )
  []
 
-[22]
+
 Underfull \hbox (badness 10000) in paragraph at lines 849--849
 []|\T1/lmtt/m/n/12 from r2py_kernsmooth import
  []
@@ -758,12 +758,12 @@ Overfull \hbox (2.87173pt too wide) in paragraph at lines 873--874
 []\T1/lmr/m/n/12 (-20) The \T1/lmtt/m/n/12 __all__ \T1/lmr/m/n/12 (-20) list was pop-u-lated with all 14 pub-lic func-tion names (ex-clud-ing \T1/lmtt/m/n/12 _on_attach
  []
 
-[23]
+[23] [24]
 Overfull \hbox (4.84358pt too wide) in paragraph at lines 923--924
 []\T1/lmtt/b/n/12 blkest \T1/lmr/m/n/12 (-20) --- Changed \T1/lmtt/m/n/12 sigsqe/th22e/th24e \T1/lmr/m/n/12 (-20) from \T1/lmtt/m/n/12 np.float64(0.0) \T1/lmr/m/n/12 (-20) to \T1/lmtt/m/n/12 np.zeros(1,
  []
 
-[24]
+
 Overfull \hbox (122.18715pt too wide) in paragraph at lines 934--935
 \T1/lmr/m/n/12 (-20) The test script \T1/lmtt/m/n/12 r2py_kernsmooth/tests/test.py \T1/lmr/m/n/12 (-20) in-voked \T1/lmtt/m/n/12 r2py_kernsmooth.bkde(np.array([1,2,3,4,5]))
  []
@@ -788,12 +788,12 @@ Overfull \hbox (8.73074pt too wide) in paragraph at lines 1012--1013
 []\T1/lmr/m/n/12 (-20) This matches R's \T1/lmtt/m/n/12 if (!missing(bandwidth) && any(bandwidth <= 0)) \T1/lmr/m/n/12 (-20) guard. \T1/lmtt/m/n/12 sdiag
  []
 
-[27]
+[27] [28]
 Overfull \hbox (8.01318pt too wide) in paragraph at lines 1057--1058
 []\T1/lmr/m/n/12 (-20) An in-ter-me-di-ate draft had added
  []
 
-[28]
+
 Overfull \hbox (7.09924pt too wide) in paragraph at lines 1060--1061
 \T1/lmtt/m/n/12 !missing(bandwidth)\T1/lmr/m/n/12 (-20) : \T1/lmtt/m/n/12 if (!missing(bandwidth) && any(bandwidth <= 0))\T1/lmr/m/n/12 (-20) .
  []
@@ -808,12 +808,12 @@ Overfull \hbox (39.65318pt too wide) in paragraph at lines 1106--1107
 []\T1/lmr/m/n/12 (-20) The skill scans the R test folder for \T1/lmtt/m/n/12 .R \T1/lmr/m/n/12 (-20) scripts, then dis-patches the \T1/lmtt/m/n/12 @convert-r-test-to-python
  []
 
-
+[30]
 Overfull \hbox (29.77444pt too wide) in paragraph at lines 1114--1115
 \T1/lmr/m/n/12 (-20) ror at \T1/lmtt/m/n/12 https://vincentarelbundock.github.io/Rdatasets/csv/carData/Prestige.csv
  []
 
-[30]
+
 Overfull \hbox (6.69258pt too wide) in paragraph at lines 1116--1117
 []\T1/lmr/m/n/12 (-20) An R ref-er-ence script was ad-di-tion-ally writ-ten at \T1/lmtt/m/n/12 r2py_kernsmooth/tests/R/locpoly.R
  []
@@ -823,7 +823,7 @@ Overfull \hbox (48.24232pt too wide) in paragraph at lines 1148--1149
 \T1/lmr/m/n/12 (-20) dated to add \T1/lmtt/m/n/12 order="F" \T1/lmr/m/n/12 (-20) to their \T1/lmtt/m/n/12 np.zeros() \T1/lmr/m/n/12 (-20) calls, with the cor-re-spond-ing \T1/lmtt/m/n/12 .flatten(order="F")
  []
 
-
+[32]
 Overfull \hbox (66.21918pt too wide) in paragraph at lines 1170--1171
 \T1/lmtt/m/n/12 test_locpoly.py\T1/lmr/m/n/12 (-20) , the \T1/lmtt/m/n/12 Prestige \T1/lmr/m/n/12 (-20) dataset is ex-tracted di-rectly from R via \T1/lmtt/m/n/12 ro.r("Prestige$income")
  []
@@ -833,12 +833,12 @@ Overfull \hbox (1.16011pt too wide) in paragraph at lines 1172--1173
 \T1/lmr/m/n/12 (-20) au-to-matic test-discovery; the files were re-named ac-cord-ingly (\T1/lmtt/m/n/12 bkfe.py $\OMS/lmsy/m/n/12 !$ \T1/lmtt/m/n/12 test_bkfe.py\T1/lmr/m/n/12 (-20) ,
  []
 
-[32] [33] [34] [35]
+[33] [34] [35] [36]
 Overfull \hbox (92.0349pt too wide) in paragraph at lines 1281--1282
 \T1/lmr/m/n/12 (-20) wrap-per via \T1/lmtt/m/n/12 python -c "import r2py_kernsmooth._KernSmooth as k; print(k.blkest.__doc__)"
  []
 
-[36]
+
 Overfull \hbox (13.1581pt too wide) in paragraph at lines 1297--1298
 \T1/lmr/m/n/12 (-20) tion and Python's ea-ger eval-u-a-tion. In R, \T1/lmtt/m/n/12 dpill\T1/lmr/m/n/12 (-20) 's sig-na-ture de-clares \T1/lmtt/m/n/12 range.x = range(x)\T1/lmr/m/n/12 (-20) :
  []
@@ -858,13 +858,13 @@ Package rerunfilecheck Info: File `main.out' has not changed.
 Here is how much of TeX's memory you used:
  18419 strings out of 467341
  283764 string characters out of 5414848
- 1873164 words of memory out of 5000000
+ 1874588 words of memory out of 5000000
  45952 multiletter control sequences out of 15000+600000
  697232 words of font info for 171 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  69i,13n,79p,1576b,2279s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmex10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr17.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtti10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on main.pdf (57 pages, 624288 bytes).
+Output written on main.pdf (57 pages, 624354 bytes).
 PDF statistics:
  2181 PDF objects out of 2487 (max. 8388607)
  2063 compressed objects within 21 object streams

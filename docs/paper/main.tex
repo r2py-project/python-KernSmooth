@@ -1,0 +1,273 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[top=1.1in,bottom=1.1in,left=1.1in,right=1.1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,array,longtable}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=green!50!black,urlcolor=blue!60!black]{hyperref}
+\usepackage[style=numeric,sorting=none,backend=biber,maxnames=3,minnames=1]{biblatex}
+\addbibresource{reference.bib}
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+\usepackage{enumitem}
+\setlist{noitemsep,topsep=4pt}
+\usepackage{fancyhdr}
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\itshape AI-Assisted R-to-Python Package Conversion}
+\fancyhead[R]{\small\itshape Cai}
+\fancyfoot[C]{\small\thepage}
+\newcommand{\skill}[1]{\texttt{/#1}}
+\newcommand{\agent}[1]{\texttt{@#1}}
+\newcommand{\pkg}[1]{\texttt{#1}}
+\newcommand{\suppnote}[1]{Supplementary Note~#1}
+\newcommand{\suppfig}[1]{Supplementary Fig.~#1}
+\newcommand{\supptext}[1]{Supplementary Information}
+\begin{document}
+\begin{titlepage}
+\centering
+\vspace*{2.5cm}
+{\LARGE\bfseries AI-Assisted Conversion of R Statistical Packages to Python: A Methodological Framework\par}
+\vspace{1.2cm}
+{\large Yufei Cai\par}
+{\large Jun Li\par}
+\vspace{0.5cm}
+{\normalsize Department of Applied and Computational Mathematics and Statistics\par}
+{\normalsize University of Notre Dame\par}
+{\normalsize \texttt{\{ycai9, jun.li\}@nd.edu}\par}
+\vfill
+{\normalsize\textit{Submitted for review}\par}
+\vspace{0.3cm}
+{\normalsize 2026\par}
+\end{titlepage}
+\section*{Abstract}
+
+The R statistical computing environment hosts a large body of validated, high-performance, typical statistical package implementations that are unavailable as native Python libraries. Converting these packages manually is time-consuming, error-prone, and fails to scale, while runtime bridging solutions such as rpy2~\cite{gautier2008rpy2} and reticulate~\cite{ushey2023reticulate} require an R installation and introduce inter-process overhead. Large language models (LLMs) offer a path towards automation~\cite{chen2021codex,roziere2020transcoder,wang2021codet5}, but unguided translation of statistical code introduces silent numerical errors arising from semantic differences between R and Python that are non-obvious from source inspection alone. Here we present a seven-phase AI-assisted methodology for the systematic, reproducible conversion of R packages to Python, implemented using a structured hierarchy of orchestrating skills (top-level slash commands) and specialized sub-agents within the Claude Code AI development environment. The methodology systematically addresses each source of translation error: it catalogues every language-specific call site and generates dedicated machine-readable translation guides before any code is written; it converts functions in topological dependency order; and it validates output numerically against the live R implementation at a specified tolerance. We demonstrate the framework on \pkg{KernSmooth}~\cite{wandjones1995} (v.\,2.23-26), a recommended R package implementing kernel smoothing methods~\cite{sheatherjones1991,ruppertsheatherwand1995,wand1994}. The resulting Python package passes 518 assertion tests against the R reference under Python~3.14, achieving agreement to 6--10 significant figures across all seven public functions.
+
+\section{Introduction}
+
+The R language and the Python scientific computing stack are the two dominant platforms for quantitative research~\cite{oliphant2007,harris2020numpy,virtanen2020scipy}. Despite this complementarity, the two ecosystems largely remain siloed: R's CRAN repository harbours thousands of validated statistical implementations---including \textit{recommended} packages bundled with every R installation---that have no native Python equivalent. Bridging libraries such as \texttt{rpy2}~\cite{gautier2008rpy2} and \texttt{reticulate}~\cite{ushey2023reticulate} can call R functions from Python at runtime, but this approach requires a full R installation as a runtime dependency, incurs inter-process communication overhead, and limits deployment to environments where both runtimes coexist. For applications that demand portability, containerisation, or embedding in Python-first infrastructure, a self-contained Python port---one that requires neither an R runtime nor any external bridging layer---is strongly preferable.
+
+Manual porting is the traditional remedy, but it does not scale. It requires expert knowledge of both languages' numerical semantics, is inconsistently documented across projects, and is prone to silent errors. Language-specific conventions that are invisible from source inspection can produce numerically incorrect output without raising any exception: R's \texttt{fft(inverse=TRUE)} returns an unnormalised inverse DFT while NumPy's \texttt{np.fft.ifft} normalises by $1/N$ by convention; R's \texttt{var(x)} applies Bessel's correction while \texttt{np.var} does not by default; Fortran \texttt{INTEGER} is 32~bits while NumPy defaults to 64~bits; and R evaluates default arguments lazily at first use while Python evaluates them eagerly at call time. Any of these discrepancies, if unaddressed, can corrupt numerical results without raising an error.
+
+Large language models have recently demonstrated substantial capability for cross-language code translation~\cite{chen2021codex,roziere2020transcoder,wang2021codet5}. Unsupervised neural machine translation between programming languages can achieve competitive functional equivalence rates~\cite{roziere2020transcoder}, and LLM-based approaches with formal verification can provide correctness guarantees on translated code~\cite{bhatia2024}. Scalable, validated translation of entire software projects using LLMs has been demonstrated on general-purpose codebases~\cite{zhang2024scalable}. However, statistical scientific software presents challenges that these approaches do not directly address: the correctness criterion is numerical equivalence of floating-point output rather than structural or logical equivalence; the relevant domain knowledge (statistical algorithms, Fortran FFI conventions, R numeric semantics) is diffuse and underrepresented in LLM training corpora; and silent numerical errors are far more consequential than runtime crashes for scientific reproducibility.
+
+A further challenge is consistency. Each converted function must use identical idioms for recurring patterns---FFT normalisation, integer coercions, missing-argument detection---regardless of the order in which conversion is performed. An agent operating on a single function without awareness of decisions made for other functions will produce code that is individually plausible but collectively inconsistent. This inconsistency makes downstream debugging significantly harder, because the root cause of a discrepancy may lie not in the function being tested but in a shared idiom applied differently across functions.
+
+We address these limitations with a seven-phase methodology that decomposes the translation problem into specialised, ordered steps, each executed by a dedicated AI skill that orchestrates one or more sub-agents. The methodology generates a machine-readable catalogue of all language dependencies and their translation nuances \textit{before} any code is written, ensuring consistency across all conversion agents. Functions are converted in topological dependency order, so each conversion agent can inspect the Python API of already-converted callees. The converted package is validated against the live R reference implementation using \texttt{rpy2} at a specified numerical tolerance, and an iterative automated bug-resolution loop continues until all tests pass. The resulting framework is designed to be reproducible, auditable, and extensible to packages of greater complexity.
+
+We demonstrate the methodology on \pkg{KernSmooth}~\cite{wandjones1995}, a recommended R package implementing kernel density estimation, plug-in bandwidth selection, and local polynomial regression. \pkg{KernSmooth} serves as an ideal proof-of-concept: it has zero runtime dependencies on contributed CRAN packages (eliminating the recursive dependency problem), its computationally intensive work is fully delegated to compiled Fortran~77 routines (testing the methodology's ability to handle the R Fortran foreign-function interface), and its seven public functions implement well-defined algorithms with exact numerical specifications, enabling rigorous validation. The framework is described at a level of generality intended for application beyond this specific example.
+
+\section{Results}
+
+\subsection{Overview of the Methodology}
+
+\begin{figure}[htbp]
+\centering
+\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Figure 1 placeholder]}\\\vspace{0.4em}\textit{Seven-phase pipeline overview. A horizontal flowchart with seven labelled boxes (Phase~1 through Phase~7) connected by rightward arrows. Each box names the phase, lists the primary skill invoked in that phase, and indicates the dispatch mode of its sub-agents (sequential, parallel, or iterative). Input and output artefacts are shown as labelled arrows entering and leaving each box: structural analysis JSON (Phase~1 output / Phase~3 input), language dependency CSV and 46 conversion guides (Phase~3 output / Phase~4 input), converted Python module (Phase~4 output / Phases 5--7 input), and test files (Phase~6--7 output). Phase~2, which involves no skill invocation, is marked ``Manual design.'' A legend distinguishes skill boxes (light blue) from sub-agent icons (gold) and manual steps (grey).}\\\vspace{1.2em}\end{minipage}}
+\caption{\textbf{Overview of the seven-phase AI-assisted R-to-Python conversion methodology.} The pipeline proceeds from static structural analysis (Phase~1) through build infrastructure (Phase~2), language dependency cataloguing (Phase~3), automated function conversion and assembly (Phase~4), code quality auditing (Phase~5), R test porting (Phase~6), and comprehensive test-suite construction with iterative bug resolution (Phase~7). The phase outputs form a directed chain of artefacts consumed by subsequent phases. Skills (top-level slash commands) and their sub-agents are indicated for each phase; the dispatch mode (sequential, parallel, or iterative) of each sub-agent fleet is shown explicitly.}
+\label{fig:pipeline}
+\end{figure}
+
+The methodology is structured as a pipeline of seven phases (Fig.~\ref{fig:pipeline}). Each phase is motivated by a distinct risk of error or inconsistency in the translation process; the phase is resolved by invoking one or more \textit{skills}---top-level slash commands encoded as structured natural-language specifications stored under \texttt{.claude/commands/}---which orchestrate one or more \textit{sub-agents}---specialised worker agents whose specifications reside under \texttt{.claude/agents/} (see \suppnote{1} for the architecture of skills and agents; full specifications are given in \suppnote{2} and \suppnote{3}). At the conclusion of each phase, the \skill{summarize-research-report} skill produced a structured phase summary saved to \texttt{docs/daily\_summaries/}, providing a durable record of decisions made.
+
+\subsection{Phase 1: Static Structural Analysis}
+\label{sec:phase1}
+
+Before any translation work can begin, a precise machine-readable map of the source package's internal structure is required. Without it, the conversion agent for each function must infer architectural facts independently, risking inconsistent dependency classification and missed foreign-function interface calls. We therefore began by analysing the source package statically.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Figure 2 placeholder]}\\\vspace{0.4em}\textit{Skill-agent orchestration architecture. A two-level diagram showing the general pattern. At the top level, a ``Skill'' box represents a slash command that reads multiple input files in parallel (shown as incoming arrows from file icons), applies context-construction logic, and then dispatches sub-agent instances. Two dispatch modes are illustrated side by side: (left) ``Sequential dispatch'' with a single agent instance processing items one at a time (topological order; used in Phases 1, 4, 6, 7a), and (right) ``Parallel dispatch'' with multiple simultaneous agent instances (used in Phase 3b). Each agent instance receives a per-item context bundle (R source fragment, JSON dependency map, conversion guide folder) and writes one output artefact. An ``Iterative dispatch'' variant (bottom right) shows the loop used in Phase 7b: run tests, dispatch fix-agent on first failure, reinstall package, repeat.}\\\vspace{1.2em}\end{minipage}}
+\caption{\textbf{Skill-agent orchestration architecture.} A skill (slash command) acts as an orchestrator: it assembles per-item context bundles from shared inputs and dispatches sub-agents in one of three modes. Sequential dispatch (Phases 1, 4, 6, and 7a) is used when each agent invocation must have access to the outputs of prior invocations. Parallel dispatch (Phase 3b) is used when agent invocations are independent and latency is the binding constraint. Iterative dispatch (Phase 7b) repeatedly invokes a fix-agent until a stopping criterion (all tests pass) is met.}
+\label{fig:orchestration}
+\end{figure}
+
+The \skill{analyze-r-folder-dependencies} skill (\suppnote{3}) was invoked with the R source directory as its argument. The skill scans the target folder for \texttt{.R} files and dispatches the \agent{analyze-r-file-dependencies} sub-agent (\suppnote{2}) once per file, sequentially. Because \pkg{KernSmooth} consolidates all R code into a single file (\texttt{KernSmooth/R/all.R}), exactly one agent invocation was required.
+
+The sub-agent parsed the R source and classified every function call within each user-defined function into three mutually exclusive categories: (i)~\textit{language dependencies}, calls to R built-in or standard-library functions; (ii)~\textit{internal dependencies}, calls to other functions defined within the same R file; and (iii)~\textit{external dependencies}, calls through the Fortran or C foreign-function interface (\texttt{.Fortran()}, \texttt{.C()}, \texttt{.Call()}, or \texttt{.External()}). The output is a JSON object keyed by function name. For \pkg{KernSmooth}, the result documented 16 functions, 5 distinct language dependencies (\texttt{dbeta}, \texttt{dnorm}, \texttt{fft}, \texttt{quantile}, \texttt{var}), an internal call graph with three dependency levels, and eight distinct Fortran entry points---a prerequisite for all subsequent phases.
+
+The structural analysis output was then synthesised with the package's \texttt{DESCRIPTION}, \texttt{NAMESPACE}, and all seven \texttt{.Rd} documentation files into a comprehensive architecture document (\texttt{docs/architecture-analysis.md}), providing a single human-readable reference consulted throughout all later phases. This synthesis step identified that \pkg{KernSmooth} has no runtime CRAN dependencies (only \texttt{stats}-package built-ins are called), substantially simplifying the translation scope.
+
+\subsection{Phase 2: Python Build Infrastructure}
+\label{sec:phase2}
+
+The conversion strategy retains the original Fortran~77 source files verbatim and compiles them into a Python C-extension via NumPy's f2py tool~\cite{peterson2009f2py}, isolating the risk of numerical error to the R-wrapper translation layer. Phase~2 established the packaging infrastructure necessary for both local development and broad distribution before any wrapper code was written.
+
+This phase did not involve a skill invocation; the build system was designed manually based on the architectural requirements identified in Phase~1. The \texttt{meson-python} backend was selected as the build system because it natively supports f2py targets and produces PEP~517-compliant wheels; details of the build system design, BLAS discovery logic, and PyPI distribution configuration are described in the Methods and \suppnote{5}. The key design principle is that numerical differences between the Python and R packages can originate only in the R-to-Python wrapper translation, not in the underlying Fortran routines, providing a strong correctness guarantee.
+
+\subsection{Phase 3: Language Dependency Catalogue and Translation Guide Generation}
+\label{sec:phase3}
+
+The central risk of any LLM-assisted code translation is the inconsistent handling of language-specific semantic differences across function conversion steps. This risk is especially acute for statistical software: an LLM operating on a single function may correctly handle the FFT normalisation convention in one instance but fail to do so in another, producing a package where the same underlying discrepancy is treated differently in different functions. To address this, Phase~3 systematically catalogued every R standard-library call in the source package and generated a dedicated, machine-readable translation guide for each distinct dependency before any conversion began.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Figure 3 placeholder]}\\\vspace{0.4em}\textit{Phase 3 pipeline. A two-stage diagram. Stage 1 (left): the \texttt{/extract-r-folder-language-dependencies} skill dispatches the \texttt{@extract-r-file-language-dependencies} agent sequentially per R file, producing a 4-column CSV (language\_dependency, function\_name, line\_number, call\_body) with 370 rows. A utility script merges per-file CSVs into a combined table and sorts rows by dependency name, making entries for the same dependency contiguous. Stage 2 (right): the \texttt{/generate-language-dependency-conversion-guides} skill reads the combined CSV, groups rows by dependency name to find 46 unique dependencies, and dispatches 46 instances of the \texttt{@generate-language-dependency-conversion-guide} agent simultaneously in a single parallel batch. Each agent reads its CSV subset and the corresponding R source lines, optionally consults online R documentation, and writes a Markdown conversion guide to \texttt{language\_dependency\_analysis/conversion\_guides/}. Arrows indicate data flow. An annotation highlights the key design choice: ``Parallel dispatch; agents are context-independent.''}\\\vspace{1.2em}\end{minipage}}
+\caption{\textbf{Phase~3: language dependency extraction and parallel conversion guide generation.} The first stage extracts the complete call-site table (370 rows, 4 columns) from the R source via sequential agent dispatch. The second stage launches 46 sub-agent instances simultaneously---one per unique language dependency---each producing a Markdown guide specifying the exact Python translation strategy with code examples. Parallel dispatch is appropriate because the guide for each dependency is context-independent of all other guides.}
+\label{fig:phase3}
+\end{figure}
+
+Two skills were deployed in this phase (Fig.~\ref{fig:phase3}). First, the \skill{extract-r-folder-language-dependencies} skill (\suppnote{3}) was invoked with the R source directory and the Phase~1 structural analysis JSON directory as arguments. The skill dispatched the \agent{extract-r-file-language-dependencies} sub-agent (\suppnote{2}) once per R file together with its structural analysis JSON, which pre-classifies each function's language dependencies, eliminating the need for the agent to infer dependency types from scratch. The agent rescanned the R source line by line and recorded, for every individual call site, the dependency name, the enclosing function name, the line number, and the complete call expression (including multi-line calls). The result was a 370-row, 4-column CSV covering all 16 functions in \texttt{all.R}. A utility script merged per-file CSVs into a combined table sorted by dependency name, making all call sites for each dependency contiguous for subsequent processing.
+
+Second, the \skill{generate-language-dependency-conversion-guides} skill (\suppnote{3}) was invoked with the R source directory and the combined CSV as arguments. The skill identified 46 unique dependency names in the CSV and launched 46 instances of the \agent{generate-language-dependency-conversion-guide} sub-agent (\suppnote{2}) in a \textit{single parallel batch}. Parallel dispatch is appropriate here because the translation guide for each dependency is logically independent of all other guides; there is no ordering constraint, and parallelism reduces wall-clock time from $O(N)$ to $O(1)$ agent invocations. Each agent received its assigned dependency's CSV subset, read the corresponding source lines in \texttt{all.R} for contextual understanding, and optionally consulted the R online documentation for complex or non-obvious behaviors. The agent then produced a structured Markdown guide specifying the correct Python translation strategy with concrete code examples.
+
+The 46 resulting guides were saved to \texttt{language\_dependency\_analysis/conversion\_guides/}. The most consequential guides---those where an incorrect translation would produce a silent numerical error with no runtime exception---are described in the Methods. Although no manual correction of the guides was performed, their structured format makes targeted human review and correction straightforward, providing a control point that constrains the risk of errors propagating into Phase~4. This is a key advantage over an unguided single-pass LLM translation: the guides make every language-semantic decision explicit, auditable, and consistent.
+
+\subsection{Phase 4: Automated Function Conversion and Package Assembly}
+\label{sec:phase4}
+
+With the dependency map (Phase~1), build infrastructure (Phase~2), and translation guides (Phase~3) in place, Phase~4 executed the actual function conversion. Two challenges make this non-trivial despite the preparation.
+
+\begin{figure}[htbp]
+\centering
+\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Figure 4 placeholder]}\\\vspace{0.4em}\textit{Phase 4 conversion pipeline. Left panel: a dependency level diagram showing the three-level hierarchy of the 16 KernSmooth functions (Level~2: linbin, rlbin; Level~1: bkfe, blkest, cpblock, linbin2D, locpoly, sdiag, sstdiag; Level~0: .onAttach, .onUnload, bkde, bkde2D, dpih, dpik, dpill). Arrows show internal calls. A bottom-to-top arrow labelled ``Conversion order'' indicates that the \texttt{/convert-r-file-to-python} skill processes Level~2 first, then Level~1, then Level~0, sequentially. Right panel: the per-function agent invocation. A single \texttt{@convert-r-function-to-python} agent instance receives four inputs (R source fragment, JSON dependency map, 46 conversion guides, output folder) and writes one JSON artefact. The sequential arrow between function boxes in the left panel is annotated: ``Sequential: each agent reads prior outputs of internal callees.'' The final assembly step (skill: \texttt{/combine-python-functions-into-file}) merges 16 JSON artefacts into \texttt{\_\_init\_\_.py}.}\\\vspace{1.2em}\end{minipage}}
+\caption{\textbf{Phase~4: topologically ordered function conversion and package assembly.} Functions are converted in leaf-to-root order so that each conversion agent can inspect the Python calling convention of already-converted internal dependencies. The \skill{convert-r-file-to-python} skill derives the conversion order from the dependency-level CSV produced in Phase~1 and dispatches the \agent{convert-r-function-to-python} sub-agent sequentially. The \skill{combine-python-functions-into-file} skill then assembles the 16 resulting JSON artefacts into the final \texttt{\_\_init\_\_.py}, correcting import paths and deduplicating imports.}
+\label{fig:phase4}
+\end{figure}
+
+First, functions must be converted in dependency order: a callee's Python API must exist before the caller's conversion agent can write correct call expressions. Second, the Fortran foreign-function interface in Python (via f2py) differs fundamentally from R's \texttt{.Fortran()} in how it handles output arguments (see Methods), and this difference is not visible from the R source, requiring targeted awareness in conversion agents.
+
+The \skill{convert-r-file-to-python} skill (\suppnote{3}) was invoked with the R source file, the structural analysis JSON, the dependency-level CSV, the conversion guide folder, and the output folder as arguments (Fig.~\ref{fig:phase4}). The skill parsed the dependency-level CSV to derive a topological ordering of the 16 functions, from deepest leaves (Level~2) to roots (Level~0), and dispatched the \agent{convert-r-function-to-python} sub-agent (\suppnote{2}) \textit{sequentially} once per function in that order. Sequential dispatch here is not a performance limitation but a correctness requirement: each agent reads the JSON artefacts of the function's internal callees to understand their Python signatures and calling conventions, and those artefacts must already exist when the agent is invoked. Each agent received the R source fragment for its function, the function's JSON dependency map from the structural analysis, the folder of 46 conversion guides, and the output folder for the resulting JSON artefact. The agent produced a self-contained JSON encoding of the converted Python function, including imports, type annotations, and docstring. The 16 resulting JSON artefacts were written to \texttt{conversion\_results/R/all.R/}.
+
+Following conversion, the \skill{combine-python-functions-into-file} skill (\suppnote{3}) assembled the 16 JSON artefacts into the final \texttt{r2py\_kernsmooth/\_\_init\_\_.py}. Before writing, the skill scanned the \texttt{meson.build} and the existing module skeleton to verify the correct relative import path for the compiled Fortran extension, then corrected three categories of systematic errors present in the per-function JSON artefacts: absolute import paths were replaced with relative imports (\texttt{from~.~import~\_KernSmooth}); redundant cross-function imports were removed (functions sharing a module need not import each other); and duplicate third-party import statements were merged. The final import block was sorted in PEP~8 standard-library $\to$ third-party $\to$ local order. Syntax correctness was confirmed immediately by \texttt{ast.parse()}. After Phase~4, the package was in a runnable state with all 16 functions converted.
+
+\subsection{Phase 5: Code Quality Audit and Namespace Refinement}
+\label{sec:phase5}
+
+The automated conversion pipeline prioritises functional correctness. Phase~5 was a systematic audit and refactoring pass addressing three categories of concern not directly handled by the conversion agents: type annotation completeness, namespace hygiene, and residual code-quality defects from the porting process.
+
+This phase did not invoke a new skill; it was a manual review of the assembled \texttt{\_\_init\_\_.py} guided by comparisons against the R source. The audit identified and resolved: (i)~bare container-type annotations lacking element type parameters (corrected to fully parameterised forms, e.g.\ \texttt{np.ndarray[Any, np.dtype[np.float64]]}); (ii)~a silent crash bug in three public functions where a \texttt{None}-typed optional parameter was unconditionally passed to \texttt{np.asarray()}, producing a degenerate array that caused a \texttt{TypeError} at the subsequent \texttt{len()} call; (iii)~a 27-line bandwidth-discretization block duplicated identically across three functions, extracted into a private helper \texttt{\_discretize\_bandwidth()}; (iv)~an 8-line partial-string-match block duplicated across four call sites, extracted into \texttt{\_resolve\_choice()}; and (v)~dead code consisting of R lifecycle hooks (\texttt{.onAttach}/\texttt{.onUnload} transliterations) that are unreachable in Python's import machinery. Every error and warning message in the Python module was also verified against the corresponding \texttt{stop()} and \texttt{warning()} calls in the R source, and three discrepancies in message format or conditions were corrected. Details of the specific corrections are given in the Methods.
+
+\subsection{Phase 6: R Test Conversion and Validation Infrastructure}
+\label{sec:phase6}
+
+A validated test suite grounded in the R reference implementation is the primary mechanism for detecting semantic errors in the converted package. Phase~6 ported the two regression tests shipped with the R \pkg{KernSmooth} package into Python equivalents and upgraded them to assertion-based numerical comparisons using rpy2~\cite{gautier2008rpy2}, which calls the R runtime at test time from Python.
+
+The \skill{convert-r-tests-to-python} skill (\suppnote{3}) was invoked with the R test folder, the R package directory, the Python package directory, and the output test folder as arguments. The skill scanned the R test folder for \texttt{.R} scripts and dispatched the \agent{convert-r-test-to-python} sub-agent (\suppnote{2}) once per file, sequentially, producing an initial Python script for each. After the f2py compatibility issues described in the Methods were resolved, the skill was re-invoked and produced fully assertion-based \texttt{pytest} files.
+
+The resulting tests use rpy2 throughout: R packages are loaded once at module level with \texttt{importr()}; input data is passed as \texttt{ro.FloatVector} or \texttt{ro.IntVector}; results are extracted with \texttt{.rx2()} and converted to NumPy arrays; and numerical agreement is asserted with \texttt{numpy.testing.assert\_allclose} at explicitly specified tolerances (\texttt{rtol=1e-10} for grid coordinates, \texttt{rtol=1e-6} for density and regression estimates). This rpy2-based testing pattern---rather than hardcoded reference values---was adopted deliberately: hardcoded values require manual regeneration when the R reference changes and may introduce spurious failures due to platform-specific floating-point differences, whereas rpy2-based tests always compare against the current R implementation. All four tests passed after the f2py fixes.
+
+\subsection{Phase 7: Comprehensive Test Suite Construction and Bug Resolution}
+\label{sec:phase7}
+
+\begin{figure}[htbp]
+\centering
+\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Figure 5 placeholder]}\\\vspace{0.4em}\textit{Test suite statistics. Two panels. Left: a stacked horizontal bar chart with one bar per public function (\texttt{bkde}, \texttt{bkde2D}, \texttt{bkfe}, \texttt{dpih}, \texttt{dpik}, \texttt{dpill}, \texttt{locpoly}). Each bar is divided into three segments: positive tests (blue), negative tests (orange), and edge-case tests (green). The total count is annotated at the right end of each bar. Values from Table~1 (\texttt{bkde}: 57, \texttt{bkde2D}: 63, \texttt{bkfe}: 49, \texttt{dpih}: 71, \texttt{dpik}: 119, \texttt{dpill}: 83, \texttt{locpoly}: 74; total 516 generated + 2 from Phase 6 = 518). Right: a two-column comparison showing ``Initial pass rate'' vs.\ ``Final pass rate'' as horizontal bar segments (or two bars per function). Five functions initially pass all tests; only \texttt{dpill} has 62 initial failures, all resolved after three rounds of bug fixing (the iterative \texttt{/fix-bugs-found-in-tests} loop). Final pass rate: 518/518.}\\\vspace{1.2em}\end{minipage}}
+\caption{\textbf{Test suite coverage and resolution of initial failures.} 516 tests were generated by the \skill{generate-python-file-tests} skill (7 public functions $\times$ 3 categories: positive, negative, edge-case), supplemented by 4 tests ported in Phase~6, for a total of 518. All but 62 \texttt{dpill} tests passed on first run. Three distinct bugs were identified by the \skill{fix-bugs-found-in-tests} iterative loop and resolved in three sub-agent invocations; all 518 tests pass after resolution.}
+\label{fig:tests}
+\end{figure}
+
+At the conclusion of Phase~6, the test suite comprised four tests covering only three of the seven public functions. Phase~7 systematically built comprehensive positive, negative, and edge-case coverage for all seven public functions and employed an iterative automated bug-resolution loop to bring the full suite to zero failures.
+
+The \skill{generate-python-file-tests} skill (\suppnote{3}) was invoked with the Python module as its argument. The skill parsed \texttt{\_\_init\_\_.py} to enumerate all functions and identified the seven user-facing public functions by consulting the KernSmooth CRAN reference manual; the remaining internal utilities with no R documentation were excluded. The \agent{generate-python-function-tests} sub-agent (\suppnote{2}) was then dispatched \textit{sequentially} once per public function. Sequential dispatch is preferable here to avoid redundant rpy2 initialisation overhead and to allow later agents to avoid replicating edge cases already covered by earlier ones. Each agent parsed the function signature and docstring, fetched the corresponding R documentation page, and generated three test files: positive cases (\texttt{test\_\textit{fn}\_positive.py}), negative cases (\texttt{test\_\textit{fn}\_negative.py}), and edge cases (\texttt{test\_\textit{fn}\_edge.py}). All tests use rpy2 to obtain live R reference values. For negative tests, the agent applied a principled strategy for cases where R and Python raise errors with different messages or where one language raises while the other returns a non-finite result: such cases are documented by a \texttt{UserWarning} rather than treated as test failures, providing an honest record of behavioural divergences. 516 tests were generated across the seven functions (Table~1; Fig.~\ref{fig:tests}); 454 passed on the first run, with 62 failures concentrated entirely in \texttt{dpill}.
+
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Test suite composition and initial pass rates.} Tests were generated by the \skill{generate-python-file-tests} skill and cover all seven public functions of \pkg{r2py\_kernsmooth}. Positive tests cover all documented parameter combinations; negative tests cover all explicit error conditions; edge tests cover boundary inputs (empty arrays, single elements, NaN/Inf values, degenerate grid ranges). All failures were in \texttt{dpill} and were resolved by the \skill{fix-bugs-found-in-tests} iterative loop.}
+\label{tab:tests}
+\begin{tabular}{lrrrrl}
+\toprule
+Function & Positive & Negative & Edge & Total & Initial pass \\
+\midrule
+\texttt{bkde}    & 28 &  9 & 20 &  57 & 57 \\
+\texttt{bkde2D}  & 28 & 12 & 23 &  63 & 63 \\
+\texttt{bkfe}    & 24 &  9 & 16 &  49 & 49 \\
+\texttt{dpih}    & 32 & 15 & 24 &  71 & 71 \\
+\texttt{dpik}    & 52 & 23 & 44 & 119 & 119 \\
+\texttt{dpill}   & 44 & 17 & 22 &  83 & 21 \\
+\texttt{locpoly} & 38 & 11 & 23 &  74 & 74 \\
+\midrule
+\textbf{Total}   & \textbf{246} & \textbf{96} & \textbf{172} & \textbf{516} & \textbf{454} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The \skill{fix-bugs-found-in-tests} skill (\suppnote{3}) was invoked to resolve the 62 \texttt{dpill} failures. The skill follows an iterative protocol: it runs the full test suite with \texttt{pytest}, isolates the first failing test, dispatches the \agent{fix-bug-found-in-test} sub-agent (\suppnote{2}) with the failing test's traceback and the relevant source context, reinstalls the package if the fix modifies library code, and repeats until all tests pass. This iterative dispatch mode handles bugs that only become visible after prior bugs are fixed, which is precisely the case here: the three bugs in \texttt{dpill} formed a cascade where each prior bug masked the subsequent one (see Methods for details). Three sub-agent invocations were sufficient to resolve all failures. After the final package rebuild, running the complete suite with \texttt{python~-m~pytest~r2py\_kernsmooth/tests/~-q} produced 518~passed, 0~failed in 6.40~seconds under Python~3.14.4 / pytest~9.0.3. All seven public functions achieve numerical agreement with R to 6--10 significant figures across all positive and edge test cases.
+
+\section{Discussion}
+
+The methodology presented here demonstrates that AI-assisted translation of R statistical packages to Python can produce a numerically correct, well-tested, distributable package with broad cross-platform binary wheel coverage. The 518-test result establishes numerical agreement with the R reference at tolerances (\texttt{rtol}~=~$10^{-6}$ to $10^{-10}$) well within the numerical precision relevant to any statistical application. The framework is not specific to \pkg{KernSmooth}: the seven phases, the skill-agent architecture (Fig.~\ref{fig:orchestration}), and the rpy2-based validation strategy are applicable to any R package whose source structure is accessible. Several limitations of the current implementation, however, bound its immediate generalisability and motivate future extensions.
+
+\textbf{External dependency footprint.} \pkg{KernSmooth} has zero runtime dependencies on contributed CRAN packages, relying solely on five functions from R's built-in \texttt{stats} package. This minimal footprint means that the methodology, as applied here, needed to handle only the translation of R standard-library idioms---a finite and cataloguable set. Packages with substantial external CRAN dependencies present a more complex challenge. A package such as \texttt{glmnet} depends on \texttt{Matrix} (sparse linear algebra) and \texttt{foreach} (parallel iteration), each of which requires its own Python equivalent. The recursive application of the methodology---applying Phase~1 through Phase~7 to each CRAN dependency, bottom-up---is conceptually straightforward but operationally demanding: the search space of dependency-specific translation nuances grows, and the interaction between dependency translations must be managed carefully. The current framework does not maintain a cross-project persistent knowledge base of validated language-dependency translation decisions; building such a database, seeded by the conversion guides generated in each project, is a natural next step towards handling the long tail of package dependencies efficiently.
+
+\textbf{Fortran and C foreign-function interface convention.} \pkg{KernSmooth} calls its Fortran routines exclusively through R's \texttt{.Fortran()} and \texttt{.C()} interfaces, which pass arguments as simple C-compatible arrays by reference. This interface is mechanically straightforward to bridge via f2py: both the R and Python sides agree on the binary representation of the data, and the only translation work required is mapping R's named-list return convention to f2py's in-place output-argument convention. Many important R packages use the more complex \texttt{.Call()} interface instead. \texttt{.Call()} passes arguments as \textit{SEXP} objects---R's native C data structures, which encode R-specific type information (length, attributes, protection bits) that is not present in a plain C array---and can return arbitrary R objects including lists, environments, and closures. Converting a package that uses \texttt{.Call()} requires either (i)~reimplementing the C-level computation in Python or Cython, losing the correctness guarantee of the verbatim Fortran/C source, or (ii)~writing a thin SEXP-compatible C shim that bridges the \texttt{.Call()} interface to a Python-callable equivalent. A package such as \texttt{rpart}, which implements recursive partitioning entirely in C via \texttt{.Call()}, would require the latter approach. Developing a general methodology for \texttt{.Call()}-based packages is a significant open problem; it may require tool support for mechanically lowering SEXP-typed C code to a Python-accessible representation.
+
+\textbf{LLM consistency and correctness.} The methodology uses structured pre-processing (the Phase~3 conversion guides) and topological ordering (Phase~4 sequential dispatch) to reduce, but not eliminate, the risk of LLM inconsistency. The f2py return-value bug discovered at the end of Phase~4---where the conversion agent for \texttt{linbin} incorrectly subscripted the \texttt{None} return value of an f2py-wrapped subroutine, while the agent for \texttt{rlbin} correctly used in-place output semantics---demonstrates that independent agent invocations can diverge even when processing structurally similar code. The iterative Phase~7 bug resolution loop mitigates this risk at the test level, but it requires that the test suite exercise the buggy code paths. Silent numerical errors that do not manifest in any test case remain possible. Future work could strengthen the methodology by incorporating formal equivalence checking~\cite{bhatia2024} for individual converted functions, using the R source as the reference specification.
+
+\textbf{Scalability and cost.} The methodology as described involves 46 parallel agent invocations in Phase~3, 16 sequential invocations in Phase~4, 7 sequential invocations in Phase~7a, and a variable number of iterative invocations in Phase~7b. For \pkg{KernSmooth}, this is computationally modest. For a package with hundreds of functions and dozens of CRAN dependencies, the number of agent invocations grows proportionally, and the wall-clock time for Phase~4 (which is necessarily sequential) scales linearly with the function count. Strategies to mitigate this include batching multiple simple functions into a single agent invocation where their dependency relationships permit, and parallelising independent sub-trees of the dependency graph.
+
+\textbf{Generalisation and next steps.} The immediate next extensions of the framework are to packages that use \texttt{.Call()} (testing the FFI translation capability) and to packages with external CRAN dependencies (testing the recursive application). An automated Phase~2 skill that generates the \texttt{meson.build} and \texttt{pyproject.toml} from a structural analysis of the source package's \texttt{src/} directory would reduce the sole remaining manual phase. Longer term, the Phase~3 conversion guides could seed a shared, cross-package translation knowledge base, making each successive project cheaper to translate as the coverage of validated language-dependency guides grows.
+
+\printbibliography
+
+\section{Methods}
+
+\subsection{KernSmooth Package Architecture}
+
+\pkg{KernSmooth}~\cite{wandjones1995} (v.\,2.23-26, license: Unlimited) implements kernel density estimation (\texttt{bkde}, \texttt{bkde2D}), kernel functional estimation (\texttt{bkfe}), plug-in bandwidth selection (\texttt{dpih}, \texttt{dpik}, \texttt{dpill}), and local polynomial regression (\texttt{locpoly}). All R code resides in a single file, \texttt{KernSmooth/R/all.R}, defining 16 functions: 7 exported via \texttt{NAMESPACE} and 9 internal helpers. The internal call graph has three levels: Level~0 (7 entry points callable by the user), Level~1 (7 intermediate helpers called by Level~0 functions), and Level~2 (2 linear binning primitives called by Level~1). \texttt{linbin} (Level~2), which performs one-dimensional linear binning via the Fortran \texttt{linbin} subroutine, is the most central function, called by seven distinct callers. The computational pattern throughout the package is a two-phase strategy: (1)~bin raw data onto a regular grid using linear binning (which preserves the first moment within each bin interval, unlike histogram binning), and (2)~convolve the bin counts with a kernel weight vector, either via FFT or via Fortran local-polynomial routines. This reduces computational complexity from $O(n \cdot g)$ to $O(n + g \log g)$, where $n$ is the sample size and $g$ is the grid size~\cite{wand1994}.
+
+The package's \texttt{NAMESPACE} file declares \texttt{useDynLib(KernSmooth,~.registration~=~TRUE,~.fixes~=~"F\_")}, which registers all Fortran entry points at package load time and applies the \texttt{F\_} prefix to their R-level names. The package's Fortran source comprises 11 fixed-form Fortran~77 files in \texttt{KernSmooth/src/}, implementing the eight subroutines called via \texttt{.Fortran()}: \texttt{linbin}, \texttt{lbtwod}, \texttt{blkest}, \texttt{cp}, \texttt{locpol}, \texttt{rlbin}, \texttt{sdiag}, and \texttt{sstdg}. Three LINPACK routines (\texttt{dgedi}, \texttt{dgefa}, \texttt{dgesl}) are included for LU decomposition. See \suppnote{5} for the complete file listing and dependency map; \suppfig{1} shows the full function dependency graph.
+\subsection{Build System Design}
+
+The Python package \pkg{r2py\_kernsmooth} uses \texttt{meson-python} as its PEP~517 build backend, with the full build definition in \texttt{r2py\_kernsmooth/meson.build}. The f2py~\cite{peterson2009f2py} wrapper is generated by NumPy (v.\,2.4.3) as a Meson custom target: \texttt{python~-m~numpy.f2py~\$\{sources\}~-m~\_KernSmooth~--lower}. The \texttt{--lower} flag lowercases Fortran symbol names to match GFortran conventions. An initial build template incorrectly listed the generated wrapper file as \texttt{\_KernSmooth-f2pywrappers2.f90} (the Fortran~90 free-form variant); because all sources are Fortran~77 fixed-form, f2py generates \texttt{\_KernSmooth-f2pywrappers.f} (the fixed-form variant), and the \texttt{meson.build} \texttt{outputs} list was corrected accordingly.
+
+Two Fortran files were added from Netlib beyond the original \pkg{KernSmooth} sources: \texttt{dqrdc.f} and \texttt{dqrsl.f} (LINPACK QR decomposition, G.~W.~Stewart, 1978). These are required because \texttt{blkest.f} and \texttt{cp.f} call \texttt{dqrdc\_} and \texttt{dqrsl\_}, respectively, which R satisfies from its own internal LINPACK copy; OpenBLAS does not provide LINPACK QR routines. BLAS discovery in \texttt{meson.build} follows a five-stage fallback chain (pkg-config, then \texttt{find\_library} for \texttt{openblaso}, \texttt{openblas}, and \texttt{blas}, then a hardcoded HPC-node path) that ensures portability across Linux, macOS, and Windows while remaining functional on the development cluster. Details of the PyPI distribution configuration (cibuildwheel, GitHub Actions workflow, platform coverage) are given in \suppnote{5}.
+
+\subsection{f2py Interface Semantics and Compatibility}
+
+The most structurally significant difference between the R and Python Fortran FFI layers is in the handling of output arguments. R's \texttt{.Fortran()} always returns a named list of all arguments, including arrays modified in-place by the Fortran subroutine; the R idiom \texttt{.Fortran(F\_linbin,~\ldots)\$gcnts} extracts the modified output array from that list. An f2py-wrapped Fortran subroutine, by contrast, returns \texttt{None} unconditionally; output array arguments are modified in-place via C pointer, and the Python caller reads results by examining the pre-allocated arrays passed in. Scalar output arguments require special treatment: a Python \texttt{np.float64} scalar is immutable, so passing one does not allow Fortran to write back; a length-1 NumPy array (\texttt{np.zeros(1, dtype=np.float64)}) is mutable and passes a writable pointer. See \suppfig{2} for a schematic comparison of the two calling conventions.
+
+A second compatibility issue specific to NumPy~2.4.3 is the absorption of Fortran dimension scalars. When f2py processes a subroutine with parameters such as \texttt{ss(M,~ippp)}, it infers the dimensions \texttt{M} and \texttt{ippp} from the shapes of the passed arrays at call time, removing them from the required positional argument list and making them optional with defaults inferred from array shapes. The Phase~4 conversion agents were not aware of this behaviour and retained the dimension integers at their original Fortran-order positions, causing all subsequent arguments to be misaligned. For the most complex affected subroutine (\texttt{locpol}), this reduced the call from 19 to 16 positional arguments after the correction.
+
+A third compatibility issue affected the \texttt{blkest} subroutine's scalar output arguments (\texttt{sigsqe}, \texttt{th22e}, \texttt{th24e}), which f2py declared as \texttt{input float} (passed by value) rather than as writeable output arguments, because they appear as plain Fortran \texttt{DOUBLE PRECISION} scalars rather than as array arguments. The fix required generating a full f2py signature file (\texttt{r2py\_kernsmooth/src/\_KernSmooth.pyf}) from the Fortran sources and adding explicit \texttt{intent(out)} annotations to the three scalars in the \texttt{blkest} block. The \texttt{meson.build} custom target was updated to pass the \texttt{.pyf} file as the sole f2py input, causing f2py to honour the explicit intent declarations. After this fix, \texttt{blkest} returns a Python tuple of three floats rather than receiving pre-allocated length-1 arrays.
+
+\subsection{Key Language Translation Decisions}
+
+Of the 46 language dependencies catalogued in Phase~3, eight required translation decisions that would produce silent numerical errors if handled naively. These are described here; further nuances are given in \suppnote{4}.
+
+\textbf{FFT normalisation.} R's \texttt{fft(x,~inverse=TRUE)} returns the raw unnormalised inverse DFT (sum without division by $N$). NumPy's \texttt{np.fft.ifft} normalises by $1/N$ by default. The R source explicitly divides the inverse-FFT result by the grid size $P$ (or $P_1 \times P_2$ for 2D); these divisions must be omitted in Python.
+
+\textbf{Integer width.} R's Fortran \texttt{INTEGER} is 32-bit. Passing a \texttt{np.int64} array to a Fortran subroutine expecting 32-bit integers silently corrupts values on 64-bit systems. All integer arrays passed to Fortran were typed as \texttt{np.int32}.
+
+\textbf{Variance denominator.} R's \texttt{var(x)} applies Bessel's correction ($n-1$ denominator). NumPy's \texttt{np.var} defaults to the population variance ($n$ denominator). All occurrences of \texttt{sqrt(var(x))} in the R source were translated as \texttt{np.std(x, ddof=1)}.
+
+\textbf{Missing-argument detection.} R's \texttt{missing(param)} returns \texttt{TRUE} if the caller did not supply the argument. The Python equivalent uses a \texttt{None} sentinel default (\texttt{param=None}) with an \texttt{if param is None:} guard, ensuring that the default-computation logic executes only when no value is provided.
+
+\textbf{Negative-base fractional exponentiation.} Several plug-in bandwidth formulas involve odd roots of potentially negative quantities (e.g.\ $(-3\sqrt{2/\pi}/\hat{\psi}_6)^{1/7}$). R silently returns a real-valued result; Python's \texttt{**} operator raises \texttt{ValueError} for negative bases with non-integer exponents. The correct Python idiom is \texttt{math.copysign(abs(x)**(1/n), x)}.
+
+\textbf{Column-major memory order.} R's \texttt{matrix()} and all Fortran arrays use column-major (Fortran) storage. NumPy defaults to row-major (C) order. All 2D arrays passed to or received from Fortran subroutines were created or reshaped with \texttt{order='F'}.
+
+\textbf{Partial string matching.} R's \texttt{match.arg()} supports unambiguous prefix matching (e.g.\ \texttt{"ep"} matches \texttt{"epanechnikov"}). No Python standard-library equivalent exists. A private helper \texttt{\_resolve\_choice(val, choices)} performing exact-then-prefix matching was implemented and used at all four call sites.
+
+\textbf{R lazy default-argument evaluation.} R evaluates default argument expressions at the time of first use inside the function body, not at call time. In \texttt{dpill}, the default \texttt{range.x~=~range(x)} is not evaluated until after \texttt{x} has been sorted and trimmed; the effective range is therefore the trimmed range. Python's eager evaluation of defaults requires explicitly placing the \texttt{range\_x~=~(x[0],~x[-1])} assignment in the function body \emph{after} the trimming step. The Phase~4 conversion agent had placed it before, causing \texttt{dpill} to use the pre-trim range and produce bandwidth values that diverged from R for right-skewed inputs.
+
+\subsection{Test Validation Strategy}
+
+All 518 tests use rpy2~\cite{gautier2008rpy2} to obtain reference values from the live R \pkg{KernSmooth} package (v.\,2.23-26). R packages are loaded once at module level with \texttt{importr()}. Input vectors are passed as \texttt{ro.FloatVector} or \texttt{ro.IntVector}; named arguments are mapped using \texttt{rpy2}'s keyword convention. Results are extracted with \texttt{.rx2()} and converted to NumPy arrays via \texttt{np.array()}. Numerical agreement is asserted with \texttt{numpy.testing.assert\_allclose} at \texttt{rtol=1e-10} for grid coordinates and \texttt{rtol=1e-6} for density and regression estimates, reflecting the precision of the double-precision Fortran computations. Behavioural divergences (cases where R and Python raise different exceptions, or where one returns \texttt{NaN}/\texttt{Inf} while the other raises) are documented by \texttt{UserWarning} rather than assertion failure. For the \texttt{locpoly} tests, the Prestige dataset is extracted directly from R via \texttt{ro.r("Prestige\$income")} to guarantee exact row correspondence with the R reference. The complete per-function test content is described in \suppnote{7}.
+
+\section*{Declarations}
+
+\subsection*{Data and code availability}
+
+The Python package \pkg{r2py\_kernsmooth} and all project artefacts (structural analysis JSONs, language dependency CSVs, conversion guides, converted Python module, test suite) are available at \url{https://github.com/caiyufei8/python-KernSmooth}. The Python package is additionally available as a standalone repository at \url{https://github.com/caiyufei8/r2py\_kernsmooth}. The original R \pkg{KernSmooth} package (v.\,2.23-26) is available from CRAN under an Unlimited license.
+
+\subsection*{Author contributions}
+
+Y.C. designed the methodology, implemented all phases, wrote the code, and wrote the manuscript.
+\subsection*{Competing interests}
+
+The author declares no competing interests.
+
+\subsection*{Acknowledgements}
+
+The author thanks the HPC facility of [Institution] for providing computational resources. The AI-assisted development was performed using Claude Code (Anthropic).
+\end{document}

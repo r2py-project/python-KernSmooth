@@ -1,0 +1,286 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[top=1.1in,bottom=1.1in,left=1.1in,right=1.1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,array,longtable}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{listings}
+\definecolor{bgcode}{RGB}{248,248,248}
+\definecolor{fgborder}{RGB}{200,200,200}
+\lstdefinestyle{shell}{basicstyle=\ttfamily\small,backgroundcolor=\color{bgcode},frame=single,rulecolor=\color{fgborder},breaklines=true,columns=flexible,keepspaces=true,showstringspaces=false,xleftmargin=6pt,xrightmargin=6pt}
+\lstdefinestyle{python}{language=Python,basicstyle=\ttfamily\small,backgroundcolor=\color{bgcode},frame=single,rulecolor=\color{fgborder},breaklines=true,columns=flexible,keepspaces=true,showstringspaces=false,xleftmargin=6pt,xrightmargin=6pt,keywordstyle=\color{blue!70!black}\bfseries,stringstyle=\color{red!60!black},commentstyle=\color{gray}\itshape}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=green!50!black,urlcolor=blue!60!black]{hyperref}
+\usepackage[style=numeric,sorting=none,backend=biber,maxnames=3,minnames=1]{biblatex}
+\addbibresource{reference.bib}
+\usepackage{parskip}
+\setlength{\parindent}{0pt}
+\usepackage{enumitem}
+\setlist{noitemsep,topsep=4pt}
+\usepackage{fancyhdr}
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancyhead[L]{\small\itshape Supplementary Information}
+\fancyhead[R]{\small\itshape Cai --- AI-Assisted R-to-Python Package Conversion}
+\fancyfoot[C]{\small\thepage}
+\newcommand{\skill}[1]{\texttt{/#1}}
+\newcommand{\agent}[1]{\texttt{@#1}}
+\newcommand{\pkg}[1]{\texttt{#1}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thesection}{Note \arabic{section}}
+\begin{document}
+\begin{center}
+{\Large\bfseries Supplementary Information}\\[0.6em]
+{\large AI-Assisted Conversion of R Statistical Packages to Python:\\A Methodological Framework}\\[0.4em]
+{\normalsize Yufei Cai}
+\end{center}
+\tableofcontents
+\clearpage
+\section{Skill and Agent Architecture in Claude Code}
+\label{supp:architecture}
+The methodology is implemented within the Claude Code AI development environment (Anthropic). Claude Code exposes two complementary extension mechanisms: \textit{skills} (slash commands) and \textit{sub-agents}.
+A \textbf{skill} is a top-level slash command whose behavioural specification is stored as a structured Markdown file under \texttt{.claude/commands/}. The specification uses a YAML front matter block to declare a name and one-line description, followed by a natural-language body that describes, step by step, what the skill should do: which files to read, how to partition work across sub-agents, what dispatch mode to use, and how to persist the outputs. Skills are the entry points invoked interactively by the developer; they act as orchestrators that decompose a complex, multi-step task into per-item contexts and route those contexts to the appropriate sub-agents.
+A \textbf{sub-agent} is a specialised worker whose specification is stored as a Markdown file under \texttt{.claude/agents/}. Like skill specifications, agent specifications use YAML front matter for name and description. The body specifies, in structured natural language, the exact inputs the agent receives, the processing steps it should perform, and the output schema it must produce. Sub-agents are dispatched by skills and do not interact with other agents directly; they receive a self-contained context bundle (file contents, JSON artefacts, conversion guides) and write their output to a specified location.
+The three dispatch modes used in this methodology are:
+\begin{description}
+\item[Sequential dispatch] Each sub-agent invocation completes before the next begins. Used when later invocations depend on the outputs of earlier ones (Phases~1, 4, 6, and~7a).
+\item[Parallel dispatch] All sub-agent instances for a batch are launched simultaneously in a single batched call. Used when invocations are context-independent and reducing wall-clock time is the primary concern (Phase~3b: 46 conversion-guide agents launched simultaneously).
+\item[Iterative dispatch] A sub-agent is repeatedly invoked against a stopping criterion. Used in Phase~7b: the \skill{fix-bugs-found-in-tests} skill runs the test suite, dispatches \agent{fix-bug-found-in-test} on the first failing test, reinstalls the package, and repeats until zero failures remain.
+\end{description}
+The \skill{summarize-research-report} skill was invoked at the end of each phase to produce a structured phase summary saved to \texttt{docs/daily\_summaries/}. These summaries served as the primary source material for the technical report on which the main paper is based.
+\section{Sub-Agent Specifications}
+\label{supp:agents}
+Each sub-agent is defined by a Markdown file in \texttt{.claude/agents/}. The specifications below describe each agent's inputs, processing logic, and output format as encoded in those files.
+\subsection{\texttt{analyze-r-file-dependencies}}
+\label{supp:agent-analyze-r}
+\textbf{Phase invoked:} Phase~1.\\
+\textbf{Inputs:} A single \texttt{.R} source file.\\
+\textbf{Task:} Parse every user-defined function in the file. For each function, classify every call in its body into one of three mutually exclusive categories: (i)~\textit{language dependencies} (calls to R built-in or package-namespaced functions, identified by not being locally defined or by carrying a namespace prefix such as \texttt{stats::}); (ii)~\textit{internal dependencies} (calls to other functions defined within the same or companion R files); (iii)~\textit{external dependencies} (calls via \texttt{.Fortran()}, \texttt{.C()}, \texttt{.Call()}, or \texttt{.External()} to compiled native-code entry points, with the entry-point symbol name recorded). Each dependency list contains unique names only.\\
+\textbf{Output:} A JSON object keyed by function name. Each value is an object with three keys: \texttt{"language\_dependencies"}, \texttt{"internal\_dependencies"}, and \texttt{"external\_dependencies"}, each a JSON array of strings. The file is written to \texttt{structural\_analysis/\{R\_subfolder\}/\{filename\}.json}.\\
+\textbf{Key design decisions:} The agent is instructed to treat \texttt{.Fortran()} symbol names (which may carry an \texttt{F\_} prefix from the \texttt{useDynLib(.fixes)} convention) as external dependencies and to strip the prefix when recording the Fortran subroutine name, enabling direct cross-reference with the Fortran source files.
+\subsection{\texttt{extract-r-file-language-dependencies}}
+\label{supp:agent-extract-lang}
+\textbf{Phase invoked:} Phase~3 (first stage).\\
+\textbf{Inputs:} A single \texttt{.R} source file and the pre-computed structural analysis JSON for that file (produced by \agent{analyze-r-file-dependencies}).\\
+\textbf{Task:} Read the structural JSON to identify, for each function, its language dependencies (the set of R built-in or standard-library function names called). Then rescan the R source line by line, recording for each occurrence of each language dependency: (a)~the dependency name, (b)~the enclosing function name, (c)~the line number, and (d)~the complete call expression (spanning multiple lines if the call is multi-line, using a continuation-detection heuristic based on unmatched parentheses).\\
+\textbf{Output:} A 4-column CSV file with columns \texttt{language\_dependency}, \texttt{function\_name}, \texttt{line\_number}, \texttt{call\_body}, written to \texttt{language\_dependency\_analysis/\{R\_subfolder\}/\{filename\}.csv}. One row per call-site occurrence (not per unique dependency). The agent is also instructed to write a utility script \texttt{combine\_csvs.py} that merges per-file CSVs into a combined table sorted by \texttt{[language\_dependency, file\_path, function\_name, line\_number]}.
+\subsection{\texttt{generate-language-dependency-conversion-guide}}
+\label{supp:agent-conversion-guide}
+\textbf{Phase invoked:} Phase~3 (second stage, parallel batch of 46).\\
+\textbf{Inputs:} The name of a single R language dependency (e.g.\ \texttt{fft}), the CSV subset for that dependency (all call sites across all functions), and the R source file path for contextual reading.\\
+\textbf{Task:} (1)~Read the call-site lines in the R source for contextual understanding of argument types and surrounding logic. (2)~Consult the R online documentation (\url{https://www.rdocumentation.org}) for the dependency function if its behaviour is complex or non-obvious. (3)~Produce a structured Markdown guide specifying, for each usage pattern observed in the CSV, the correct Python translation strategy with concrete before-and-after code examples. The guide must address all variants observed in the call-site data and highlight any cases where a na\"{i}ve translation (e.g.\ using the apparent NumPy analogue) would produce silent numerical errors.\\
+\textbf{Output:} A Markdown file saved to \texttt{language\_dependency\_analysis/conversion\_guides/\{dependency\_name\}.md}. The guide has a YAML-like header specifying the dependency name and R signature, followed by sections for each observed usage pattern.
+\subsection{\texttt{convert-r-function-to-python}}
+\label{supp:agent-convert-fn}
+\textbf{Phase invoked:} Phase~4 (sequential, 16 invocations).\\
+\textbf{Inputs:} The R source fragment for a single function, the function's JSON dependency map (from the Phase~1 structural analysis), the folder of 46 language-dependency conversion guides, the output folder for the resulting JSON artefact, and (if the function has internal dependencies) the JSON artefacts of already-converted callees.\\
+\textbf{Task:} Translate the R function to Python. The agent must: (1)~apply the relevant conversion guides for every language dependency in the function; (2)~map internal R callee calls to the Python functions documented in the callees' existing JSON artefacts; (3)~translate Fortran FFI calls (\texttt{.Fortran(F\_xxx, ...)}) to f2py invocations using the in-place output-argument convention (pre-allocating output arrays and reading them after the call); (4)~produce complete type annotations using \texttt{np.ndarray[Any, np.dtype[np.float64]]} for array types; and (5)~write a NumPy/SciPy-style docstring documenting parameters and return values.\\
+\textbf{Output:} A JSON artefact with keys \texttt{"function\_name"}, \texttt{"imports"} (a list of import statement strings), \texttt{"python\_code"} (the complete function definition as a string), and \texttt{"notes"} (a list of translation decisions or caveats). Written to \texttt{conversion\_results/\{R\_subfolder\}/\{filename\}/\{function\_name\}.json}.
+\subsection{\texttt{convert-r-test-to-python}}
+\label{supp:agent-convert-test}
+\textbf{Phase invoked:} Phase~6 (sequential, one invocation per R test file).\\
+\textbf{Inputs:} An R test script, the R package directory (for reading the R source being tested), the Python package directory (for reading the Python implementations), and the output directory.\\
+\textbf{Task:} Translate the R test script to a Python \texttt{pytest} file that: (1)~replicates all function calls from the R script with the same inputs; (2)~uses rpy2 to call the R reference implementation with the same inputs and asserts numerical agreement using \texttt{numpy.testing.assert\_allclose} at explicit tolerances; (3)~follows the \texttt{pytest} convention of \texttt{def test\_\textit{name}()} functions in a file with a \texttt{test\_} prefix; and (4)~uses \texttt{ro.FloatVector}/\texttt{ro.IntVector} for inputs and \texttt{.rx2()} for result extraction. For tests involving external datasets (e.g.\ the Prestige dataset from the \texttt{carData} R package), the agent must source the data directly from R via rpy2 to guarantee exact row correspondence.\\
+\textbf{Output:} A \texttt{pytest}-compatible Python file written to the specified output directory.
+\subsection{\texttt{generate-python-function-tests}}
+\label{supp:agent-gen-tests}
+\textbf{Phase invoked:} Phase~7a (sequential, one invocation per public function).\\
+\textbf{Inputs:} The Python function definition (signature, type annotations, docstring), the R documentation page for the corresponding R function (fetched at agent run time from the KernSmooth CRAN reference manual), and the existing test files in the test folder (to avoid duplicating coverage already present).\\
+\textbf{Task:} Generate three \texttt{pytest} files: (1)~\textit{Positive tests} covering all documented parameter combinations, including cross-products of discrete parameters where relevant, integer-to-float input coercion, partial-name abbreviation (where applicable), and density/regression-output integrity checks (non-negativity, approximate integral to 1.0 for density estimators). (2)~\textit{Negative tests} covering all explicit error conditions identified in the function body and callee bodies, with assertions on both the exception type and, where the error message format is unambiguous, the message text. (3)~\textit{Edge tests} covering boundary inputs: empty arrays (where not excluded by the function's documented constraints), single-element arrays, NaN and Inf in input, degenerate grid ranges, very small and very large bandwidths, and scale- and location-invariance properties documented in the R manual. For cases where R and Python raise different exceptions, or where one raises while the other returns NaN/Inf, the agent applies a principled loose-pass strategy (issuing \texttt{UserWarning} with a description of the divergence rather than failing the test). All tests use rpy2 for live reference values.\\
+\textbf{Output:} Three \texttt{pytest} files: \texttt{test\_\textit{fn}\_positive.py}, \texttt{test\_\textit{fn}\_negative.py}, \texttt{test\_\textit{fn}\_edge.py}, written to \texttt{r2py\_kernsmooth/tests/}.
+\subsection{\texttt{fix-bug-found-in-test}}
+\label{supp:agent-fix-bug}
+\textbf{Phase invoked:} Phase~7b (iterative, one invocation per bug).\\
+\textbf{Inputs:} The full \texttt{pytest} traceback of the failing test, the relevant Python source files (\texttt{\_\_init\_\_.py} and, if applicable, \texttt{meson.build} and Fortran source files), and the corresponding R function implementation from \texttt{KernSmooth/R/all.R}.\\
+\textbf{Task:} Diagnose the root cause of the test failure by comparing the Python implementation against the R reference. Determine whether the failure is a bug in the Python code (requiring a fix) or an inherent language-level behavioural divergence (requiring a test annotation with \texttt{UserWarning}). If a fix is required, implement it in the minimum set of files necessary and verify that the fix does not break any currently passing tests. If the fix modifies build-system files (\texttt{meson.build}, \texttt{\_KernSmooth.pyf}), instruct the invoking skill to reinstall the package before retesting.\\
+\textbf{Output:} Modified source files and/or test files. The skill reads the agent's output and applies any indicated reinstall step before running the next test cycle.
+\subsection{\texttt{analyze-c-file-dependencies} (supplementary, not yet invoked)}
+\label{supp:agent-analyze-c}
+This agent is defined in the repository but was not invoked in the present project. It is the C/Fortran analogue of \agent{analyze-r-file-dependencies}: given a C or Fortran source file, it extracts all function definitions and classifies their calls into internal calls (other functions in the same file or project) and external calls (system library symbols, BLAS/LAPACK symbols, or calls back into R via the R API). For the \pkg{KernSmooth} project, the Fortran sources are treated as a black box (compiled and called via f2py without structural analysis), so this agent was not needed. For packages whose Fortran or C code has a more complex internal structure or calls back into R, invoking this agent on the \texttt{src/} directory would produce a cross-language dependency map complementary to the R-level map from Phase~1.
+\section{Skill Specifications}
+\label{supp:skills}
+Each skill is defined by a Markdown file in \texttt{.claude/commands/}. The specifications below describe each skill's invocation syntax, processing logic, and sub-agent orchestration strategy.
+\subsection{\texttt{/analyze-r-folder-dependencies}}
+\label{supp:skill-analyze-r}
+\textbf{Phase invoked:} Phase~1.\\
+\textbf{Invocation:} \texttt{/analyze-r-folder-dependencies \textit{R\_folder}}\\
+\textbf{Processing:} Recursively scans \textit{R\_folder} for files with \texttt{.R} or \texttt{.r} extensions. For each file found, dispatches \agent{analyze-r-file-dependencies} sequentially. Sequential dispatch is used because the agent for each file must correctly resolve internal dependencies, and knowing the set of all function names defined across all R files (required to distinguish internal from language dependencies) is easiest when files are processed one at a time with a growing registry of known function names. The output JSON files are written to \texttt{structural\_analysis/\{R\_folder\_name\}/}.\\
+\textbf{Post-processing:} After all files are processed, the skill synthesises the JSON outputs with the package's \texttt{DESCRIPTION}, \texttt{NAMESPACE}, and \texttt{.Rd} documentation files into a comprehensive architecture document saved to \texttt{docs/architecture-analysis.md}.
+\subsection{\texttt{/extract-r-folder-language-dependencies}}
+\label{supp:skill-extract-lang}
+\textbf{Phase invoked:} Phase~3 (first stage).\\
+\textbf{Invocation:} \texttt{/extract-r-folder-language-dependencies \textit{R\_folder} \textit{json\_folder}}\\
+\textbf{Processing:} Pairs each \texttt{.R} file in \textit{R\_folder} with its corresponding JSON in \textit{json\_folder} (matching by base filename). Dispatches \agent{extract-r-file-language-dependencies} sequentially, one per pair. After all agents complete, invokes the \texttt{combine\_csvs.py} utility script (written by the first agent invocation) to merge per-file CSVs into the combined table at \texttt{language\_dependency\_analysis/combined\_table.csv}.
+\subsection{\texttt{/generate-language-dependency-conversion-guides}}
+\label{supp:skill-gen-guides}
+\textbf{Phase invoked:} Phase~3 (second stage).\\
+\textbf{Invocation:} \texttt{/generate-language-dependency-conversion-guides \textit{R\_folder} \textit{combined\_csv}}\\
+\textbf{Processing:} Reads the combined CSV and extracts all unique values of the \texttt{language\_dependency} column (46 for \pkg{KernSmooth}). Launches exactly one \agent{generate-language-dependency-conversion-guide} instance per unique dependency in a \textit{single parallel batch}, passing each agent its dependency name, the filtered CSV rows for that dependency, and the R source path. Parallel dispatch is used because the guides are logically independent; no guide depends on the content of any other guide. The skill waits for all 46 agents to complete before proceeding.
+\subsection{\texttt{/convert-r-file-to-python}}
+\label{supp:skill-convert-file}
+\textbf{Phase invoked:} Phase~4 (first stage).\\
+\textbf{Invocation:} \texttt{/convert-r-file-to-python \textit{R\_file} \textit{json\_file} \textit{levels\_csv} \textit{guides\_folder} \textit{output\_folder}}\\
+\textbf{Processing:} Parses the dependency-level CSV (\textit{levels\_csv}) to extract all functions belonging to \textit{R\_file} and derive their topological conversion order (deepest leaves first, roots last). Dispatches \agent{convert-r-function-to-python} \textit{sequentially} once per function in that order. Each agent invocation writes its JSON artefact to \textit{output\_folder} before the next invocation begins. This guarantees that when the agent for function $f$ is invoked, the JSON artefacts of all internal callees of $f$ already exist and can be read to extract their Python signatures and return types.
+\subsection{\texttt{/combine-python-functions-into-file}}
+\label{supp:skill-combine}
+\textbf{Phase invoked:} Phase~4 (second stage).\\
+\textbf{Invocation:} \texttt{/combine-python-functions-into-file \textit{json\_folder} \textit{target\_py\_file}}\\
+\textbf{Processing:} Reads all JSON artefacts in \textit{json\_folder} in leaf-to-root order (same as conversion order). Extracts the \texttt{"imports"} and \texttt{"python\_code"} fields from each artefact. Corrects three systematic error categories: (1)~absolute import paths to relative imports; (2)~redundant cross-function imports (co-located functions need not import each other); (3)~duplicate third-party import statements (merged into canonical deduplicated forms). Assembles the final import block sorted in PEP~8 order. Writes the combined file to \textit{target\_py\_file} and confirms syntax validity via \texttt{ast.parse()}.\\
+\textbf{Public API:} Populates the \texttt{\_\_all\_\_} list from the union of public function names across all JSON artefacts (excluding underscore-prefixed functions).
+\subsection{\texttt{/convert-r-tests-to-python}}
+\label{supp:skill-convert-tests}
+\textbf{Phase invoked:} Phase~6.\\
+\textbf{Invocation:} \texttt{/convert-r-tests-to-python \textit{R\_test\_folder} \textit{R\_pkg\_folder} \textit{py\_pkg\_folder} \textit{output\_folder}}\\
+\textbf{Processing:} Scans \textit{R\_test\_folder} for \texttt{.R} scripts. Dispatches \agent{convert-r-test-to-python} sequentially once per script. Sequential dispatch is used to allow each agent to read the Python package structure established by prior processing. Renames output files to carry the \texttt{test\_} prefix required by \texttt{pytest} for automatic test discovery if the agent does not include it.
+\subsection{\texttt{/generate-python-file-tests}}
+\label{supp:skill-gen-tests}
+\textbf{Phase invoked:} Phase~7a.\\
+\textbf{Invocation:} \texttt{/generate-python-file-tests \textit{python\_file}}\\
+\textbf{Processing:} Parses \textit{python\_file} to enumerate all function definitions and identifies public functions by cross-referencing \texttt{\_\_all\_\_} and the KernSmooth CRAN reference manual. Excludes internal utility functions (those absent from the R documentation). Dispatches \agent{generate-python-function-tests} sequentially once per public function. Sequential dispatch allows each agent to check existing test files and avoid duplicating coverage.
+\subsection{\texttt{/fix-bugs-found-in-tests}}
+\label{supp:skill-fix-bugs}
+\textbf{Phase invoked:} Phase~7b.\\
+\textbf{Invocation:} \texttt{/fix-bugs-found-in-tests \textit{test\_folder} \textit{py\_pkg\_folder} \textit{R\_pkg\_folder}}\\
+\textbf{Processing:} Runs \texttt{python~-m~pytest~\textit{test\_folder}~-q}. If all tests pass, the skill exits. Otherwise, it isolates the first failing test, extracts the full traceback, assembles a context bundle (traceback, relevant Python source, relevant R source, Fortran source if applicable), and dispatches \agent{fix-bug-found-in-test} with that bundle. After the agent returns, if any modified file is part of the installed package (\texttt{\_\_init\_\_.py}, \texttt{meson.build}, \texttt{.pyf} files), the skill runs \texttt{pip install . --no-build-isolation --force-reinstall} before running the next test cycle. The loop repeats until zero failures remain or the agent reports that the failure is an inherent language-level divergence rather than a bug.
+\subsection{\texttt{/summarize-research-report}}
+\label{supp:skill-summarize}
+\textbf{Phases invoked:} End of each phase (utility).\\
+\textbf{Invocation:} \texttt{/summarize-research-report}\\
+\textbf{Processing:} Reads the conversation context accumulated during the current session and synthesises it into a structured Markdown summary of the phase's activities, key decisions, artefacts produced, bugs discovered and resolved, and open items. The summary is saved to \texttt{docs/daily\_summaries/} with a date-stamped filename. The summaries served as the primary source material for the technical report.
+\section{Language Dependency Translation Nuances}
+\label{supp:guides}
+Phase~3 produced 46 conversion guides covering all language dependencies in \texttt{KernSmooth/R/all.R}. The eight most consequential guides (those where an incorrect translation would produce a silent numerical error) are summarised in the Methods of the main paper. This note catalogues the complete set of dependencies, grouped by translation complexity.
+\subsection{Dependencies with Non-Trivial Numerical Semantics}
+These dependencies require careful translation to avoid silent numerical errors.
+\begin{description}
+\item[\texttt{fft}] R's \texttt{fft(x, inverse=TRUE)} is unnormalised (returns $\sum X_k e^{2\pi ikn/N}$ without dividing by $N$); NumPy's \texttt{np.fft.ifft} normalises by $1/N$. The R source explicitly divides by $P$ (or $P_1 P_2$ for 2D); these divisions must be omitted.
+\item[\texttt{var}] R's \texttt{var(x)} uses Bessel's correction ($n-1$); NumPy's \texttt{np.var(x)} does not (\texttt{ddof=0}). Use \texttt{np.std(x, ddof=1)} for all \texttt{sqrt(var(x))} occurrences.
+\item[\texttt{as.double}] R's pre-allocation idiom \texttt{as.double(rep(0, n))} maps to \texttt{np.zeros(n, dtype=np.float64)}.
+\item[\texttt{as.integer}] R's \texttt{as.integer(x)} on a vector maps to \texttt{np.asarray(x).astype(np.int32)}; the 32-bit constraint is critical for Fortran FFI correctness.
+\item[\texttt{sqrt}] Fractional exponentiation of possibly negative quantities (odd roots) requires \texttt{math.copysign(abs(x)**(1/n), x)} rather than Python's \texttt{x**(1/n)}.
+\item[\texttt{matrix}] R's \texttt{matrix(data, nrow, ncol)} fills column-by-column (Fortran order); use \texttt{np.reshape(data, (nrow, ncol), order='F')}.
+\item[\texttt{Re}] R's \texttt{Re(x)} on a complex vector maps directly to \texttt{np.real(x)}, but must be applied to the unnormalised inverse DFT result before or after removing the Python normalisation factor.
+\item[\texttt{dnorm}, \texttt{dbeta}] Both map directly to \texttt{scipy.stats.norm.pdf} and \texttt{scipy.stats.beta.pdf} respectively, with identical parameter conventions. No numerical discrepancy.
+\end{description}
+\subsection{Dependencies with Control-Flow or API Semantic Differences}
+\begin{description}
+\item[\texttt{missing}] R's \texttt{missing(param)} has no direct Python equivalent. Use a \texttt{None} sentinel default with an \texttt{if param is None:} guard.
+\item[\texttt{match.arg}] R's \texttt{match.arg(arg, choices)} supports unambiguous prefix matching. Implement as a private helper \texttt{\_resolve\_choice(val, choices)} performing exact match, then unique prefix match, then raising a \texttt{ValueError} with the R-equivalent message format \texttt{"'\textit{arg}' should be one of \ldots"}.
+\item[\texttt{switch}] R's string-key \texttt{switch(key, case1=expr1, \ldots)} maps to a Python \texttt{dict} lookup. For scalar computations, a plain \texttt{dict} of values is sufficient.
+\item[\texttt{stop}] R's \texttt{stop(msg)} maps to \texttt{raise ValueError(msg)}. The error message must be reproduced verbatim (without R's function-signature prefix, which R prepends automatically).
+\item[\texttt{warning}] R's \texttt{warning(msg)} maps to \texttt{warnings.warn(msg, UserWarning)}.
+\item[\texttt{which.min}, \texttt{which.max}] R's 1-indexed result maps to \texttt{np.argmin(x)} / \texttt{np.argmax(x)} (0-indexed); the index is used only for array subscripting, so no offset correction is needed in practice.
+\item[\texttt{quantile}] R's \texttt{quantile(x, 0.25)} and \texttt{quantile(x, 0.75)} with the default Type~7 interpolation method map to \texttt{np.quantile(x, 0.25, method='linear')}, which is NumPy's default. No discrepancy.
+\item[\texttt{length}] R's \texttt{length(x)} on a vector maps to \texttt{len(x)} for 1D NumPy arrays. For 0-d arrays (produced by \texttt{np.asarray} on a scalar), use \texttt{x.ndim == 0 or len(x) == 1} as the scalar-detection guard.
+\item[\texttt{range}] R's \texttt{range(x)} returns a length-2 vector \texttt{c(min(x), max(x))}; maps to the Python tuple \texttt{(x.min(), x.max())} or the keyword argument \texttt{range\_x=(x.min(), x.max())}.
+\item[\texttt{seq}] R's \texttt{seq(a, b, length=n)} maps to \texttt{np.linspace(a, b, n)}.
+\item[\texttt{library.dynam.unload}] R's package unload hook has no Python equivalent; CPython does not safely support unloading native extensions. The \texttt{.onUnload} body should be omitted entirely.
+\item[\texttt{packageStartupMessage}] Maps to \texttt{print(\ldots, file=sys.stderr)}, though both the \texttt{.onAttach} and \texttt{.onUnload} functions were ultimately removed as dead code in Phase~5.
+\end{description}
+\subsection{Dependencies with Direct Python Equivalents}
+The following 27 dependencies map directly to NumPy, SciPy, or Python built-ins with no semantic discrepancy: \texttt{abs} $\to$ \texttt{abs()} or \texttt{np.abs()}; \texttt{c} (vector concatenation) $\to$ \texttt{np.array([...])} or \texttt{np.concatenate}; \texttt{cumsum} $\to$ \texttt{np.cumsum}; \texttt{diff} $\to$ \texttt{np.diff}; \texttt{exp} $\to$ \texttt{np.exp}; \texttt{floor} $\to$ \texttt{np.floor}; \texttt{gamma} $\to$ \texttt{math.gamma}; \texttt{is.na} $\to$ \texttt{np.isnan}; \texttt{log} $\to$ \texttt{np.log}; \texttt{max} / \texttt{min} $\to$ \texttt{np.max} / \texttt{np.min}; \texttt{numeric} (zero-vector) $\to$ \texttt{np.zeros}; \texttt{pi} $\to$ \texttt{math.pi}; \texttt{prod} $\to$ \texttt{np.prod}; \texttt{rep} $\to$ \texttt{np.repeat} or \texttt{np.tile}; \texttt{round} $\to$ \texttt{np.round}; \texttt{sign} $\to$ \texttt{np.sign}; \texttt{sort} $\to$ \texttt{np.sort}; \texttt{sum} $\to$ \texttt{np.sum}; \texttt{trunc} $\to$ \texttt{np.trunc}; \texttt{any} $\to$ \texttt{np.any}; \texttt{all} $\to$ \texttt{np.all}; and standard R arithmetic operators mapping to NumPy element-wise equivalents.
+\section{Build System and Distribution Configuration}
+\label{supp:build}
+\subsection{Fortran Source Inventory}
+The thirteen Fortran~77 fixed-form files compiled into the \pkg{\_KernSmooth} extension are:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+File & Origin \\
+\midrule
+\texttt{src/blkest.f} & Original \pkg{KernSmooth} source \\
+\texttt{src/cp.f}     & Original \pkg{KernSmooth} source \\
+\texttt{src/dgedi.f}  & Original \pkg{KernSmooth} source (LINPACK LU) \\
+\texttt{src/dgefa.f}  & Original \pkg{KernSmooth} source (LINPACK LU) \\
+\texttt{src/dgesl.f}  & Original \pkg{KernSmooth} source (LINPACK LU) \\
+\texttt{src/linbin.f}   & Original \pkg{KernSmooth} source \\
+\texttt{src/linbin2D.f} & Original \pkg{KernSmooth} source \\
+\texttt{src/locpoly.f}  & Original \pkg{KernSmooth} source \\
+\texttt{src/rlbin.f}    & Original \pkg{KernSmooth} source \\
+\texttt{src/sdiag.f}    & Original \pkg{KernSmooth} source \\
+\texttt{src/sstdiag.f}  & Original \pkg{KernSmooth} source \\
+\texttt{src/dqrdc.f}  & Added from Netlib (LINPACK QR, G.~W.~Stewart, 1978) \\
+\texttt{src/dqrsl.f}  & Added from Netlib (LINPACK QR, G.~W.~Stewart, 1978) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\texttt{dqrdc.f} and \texttt{dqrsl.f} are required because \texttt{blkest.f} and \texttt{cp.f} call \texttt{dqrdc\_} and \texttt{dqrsl\_}, respectively. The original R installation satisfies these symbols from its own internal LINPACK copy; OpenBLAS does not provide LINPACK QR routines.
+\subsection{BLAS Discovery Chain}
+The BLAS discovery logic in \texttt{meson.build} follows a five-stage fallback chain designed to be portable across all target platforms while remaining functional on the HPC development cluster (Red Hat Enterprise Linux~9), where the unversioned symlink \texttt{libopenblaso.so} normally installed by \texttt{openblas-openmp-devel} is absent:
+\begin{enumerate}
+\item \texttt{dependency('blas', required: false)} --- queries \texttt{pkg-config}.
+\item \texttt{fc.find\_library('openblaso', required: false)} --- OpenBLAS OpenMP variant by name.
+\item \texttt{fc.find\_library('openblas', required: false)} --- standard OpenBLAS variant.
+\item \texttt{fc.find\_library('blas', required: false)} --- generic BLAS name.
+\item \texttt{fs.is\_file('/usr/lib64/libopenblaso.so.0')} hardcoded path with \texttt{declare\_dependency(link\_args: ['/usr/lib64/libopenblaso.so.0'])}.
+\end{enumerate}
+If all five stages fail, the build is terminated with a clear error message specifying the remediation steps for each platform.
+\subsection{CI/CD Platform Coverage}
+The \texttt{python-publish.yml} GitHub Actions workflow builds wheels for up to 35 platform/Python-version combinations per release, using \texttt{cibuildwheel} on five runners:
+\begin{itemize}
+\item \texttt{ubuntu-latest} (Linux x86\_64): manylinux and musllinux containers.
+\item \texttt{ubuntu-24.04-arm} (Linux aarch64): manylinux and musllinux containers, using a native ARM64 runner without QEMU.
+\item \texttt{macos-13} (macOS x86\_64, Intel).
+\item \texttt{macos-latest} (macOS arm64, Apple Silicon).
+\item \texttt{windows-latest} (Windows x86\_64, with MSYS2 MinGW64 toolchain).
+\end{itemize}
+Wheels are built for CPython~3.10 through 3.14. Windows arm64, Linux ppc64le/s390x, and free-threaded Python builds (cp313t, cp314t) are excluded; their rationale is discussed in the main paper's Methods. OIDC trusted publishing is used for PyPI authentication, eliminating the need for stored long-lived credentials.
+\section{f2py Compatibility Issues and Resolution}
+\label{supp:f2py}
+Three distinct incompatibilities between the Phase~4 conversion output and the f2py interface generated by NumPy~2.4.3 were discovered and resolved across Phases~4--7. They are catalogued here in discovery order.
+\subsection{Bug 1: f2py Subroutine Return Value (\textit{Phase~4})}
+R's \texttt{.Fortran()} returns a named list of all arguments; the R idiom \texttt{.Fortran(F\_linbin,~...)\$gcnts} extracts the modified output array from that list. The conversion agent for \texttt{linbin} generated \texttt{\_KernSmooth.linbin(...)[6]}, subscripting what it modelled as a list return. An f2py-wrapped Fortran subroutine always returns \texttt{None}; output arrays are modified in-place via C pointer. The fix removed all subscript operations on Fortran subroutine return values and replaced them with reading the pre-allocated output arrays after the call. Seven functions were patched: \texttt{linbin}, \texttt{linbin2D}, \texttt{blkest}, \texttt{cpblock}, \texttt{locpoly}, \texttt{sdiag}, and \texttt{sstdiag}. Scalar output arguments additionally required replacement of \texttt{np.float64(0.0)} placeholders with \texttt{np.zeros(1, dtype=np.float64)}.
+\subsection{Bug 2: f2py Absorbed Dimension Arguments (\textit{Phase~6})}
+NumPy~2.4.3's f2py absorbs Fortran dimension scalar parameters (integers whose sole role is to specify the length of an array argument) out of the required positional argument list, converting them into optional parameters with defaults inferred from array shapes. The Phase~4 code still injected these integers at their original Fortran-order positions, causing a systematic argument misalignment: every argument after each absorbed dimension was shifted by one position, producing shape-check failures or silently incorrect results. Additionally, 2D Fortran arrays must be passed as 2D NumPy arrays with \texttt{order='F'}; the prior code flattened them to 1D, which was valid in earlier f2py versions. Five subroutine call sites were corrected: \texttt{locpol} (3 absorbed arguments, 2D arrays added), \texttt{sdiag} (3 absorbed, 2D arrays), \texttt{sstdg} (3 absorbed, 2D arrays), \texttt{blkest} (2 absorbed), and \texttt{cp} (3 absorbed).
+\subsection{Bug 3: \texttt{blkest} Scalar Output Intent (\textit{Phase~7})}
+The three scalar output arguments of \texttt{blkest} (\texttt{sigsqe}, \texttt{th22e}, \texttt{th24e}) were declared by f2py as \texttt{input float} (passed by value) because they appear as plain Fortran \texttt{DOUBLE PRECISION} scalars without array syntax. The Fortran subroutine writes to them by direct assignment, but f2py passed scalar copies, so the writes never propagated back to Python. Consequently, \texttt{blkest} always returned zeros for all three outputs, causing \texttt{dpill} to divide by zero in an intermediate bandwidth computation, propagating NaN through the remainder of \texttt{dpill}. The fix comprised three coordinated changes: (1)~generating a full f2py signature file \texttt{r2py\_kernsmooth/src/\_KernSmooth.pyf} with explicit \texttt{intent(out)} annotations on the three scalars; (2)~updating \texttt{meson.build} to pass \texttt{\_KernSmooth.pyf} as the sole f2py input; and (3)~updating \texttt{blkest()} in \texttt{\_\_init\_\_.py} to unpack the three scalars as a return tuple from \texttt{\_KernSmooth.blkest()}.
+\section{Per-Function Test Coverage Details}
+\label{supp:tests}
+\subsection{Positive Test Coverage}
+Each public function's positive tests form a combinatorial grid over its discrete parameters. Highlights:
+\begin{description}
+\item[\texttt{bkde}] All 5 kernel types (\texttt{normal}, \texttt{box}, \texttt{epanechnikov}, \texttt{biweight}, \texttt{triweight}), both \texttt{canonical} modes, auto-computed and explicit bandwidth, varied \texttt{gridsize} and \texttt{range\_x}, \texttt{truncate} mode, integer input coercion, and partial kernel-name abbreviations (e.g.\ \texttt{"n"} matching \texttt{"normal"}).
+\item[\texttt{bkde2D}] Bivariate normal input, various \texttt{gridsize} combinations, asymmetric and scalar bandwidths, explicit \texttt{range\_x}, \texttt{truncate} mode, integer coercion, and density integration.
+\item[\texttt{bkfe}] All even derivative orders \texttt{drv} $\in \{0, 2, 4, 6, 8, 10\}$, varied sample sizes and distributions, and \texttt{binned} mode.
+\item[\texttt{dpih}] All three \texttt{scalest} options $\times$ all six \texttt{level} values (18 combinations) and an analytical formula check for \texttt{level=0}.
+\item[\texttt{dpik}] All 5 kernels $\times$ 6 levels (30 combinations) and all 3 \texttt{scalest} $\times$ 6 levels (18 combinations), plus \texttt{canonical} mode and partial-name abbreviations. Includes a kernel bandwidth ordering invariant for the non-canonical case.
+\item[\texttt{dpill}] Standard regression scenarios, various \texttt{blockmax}, \texttt{divisor}, \texttt{trim}, \texttt{proptrun}, and \texttt{gridsize} settings, and multiple regression function types.
+\item[\texttt{locpoly}] Regression with \texttt{drv} $\in \{0, 1, 2, 3\}$, scalar and vector bandwidth, \texttt{truncate} and \texttt{binned} modes, density mode (\texttt{y=None}), and the Prestige dataset canonical example from the KernSmooth reference manual.
+\end{description}
+\subsection{Negative Test Coverage}
+Negative tests cover all explicit error conditions processed in the function body and related helpers. Where both R and Python raise but with different message phrasing (R prepends the function-call context, Python does not), the test issues a \texttt{UserWarning} documenting the divergence. Where R raises inside a callee (\texttt{seq.default()}, \texttt{seq.int()}) at a lower stack level and Python propagates NaN via IEEE~754 arithmetic instead, the test verifies the Python NaN-return behaviour and issues a \texttt{UserWarning}.
+\subsection{Edge Test Coverage}
+Edge tests cover: $n=1$ (single observation) for all functions; $n=2$ (minimum for meaningful density estimation); constant data (all observations identical); NaN and Inf values in input; degenerate \texttt{range\_x} ($a = b$); very small bandwidth ($h = 10^{-8}$); very large bandwidth ($h = 10^{8}$); power-of-two \texttt{gridsize} regression guard (carried forward from Phase~6 for \texttt{bkde} and \texttt{bkfe}); scale-invariance and location-shift invariance (tested for \texttt{dpih} and \texttt{dpik} against live R reference values); and the NaN-equals-NaN edge case for \texttt{dpill} (both Python and R legitimately return NaN for ill-conditioned seeds, and the assertion uses \texttt{np.isnan(h1) and np.isnan(h2)} rather than \texttt{pytest.approx}).
+\subsection{Documented Behavioural Divergences}
+Five cases of inherent Python-vs-R divergence are documented in the test suite as \texttt{UserWarning} rather than treated as failures:
+\begin{enumerate}
+\item \texttt{bkde} with degenerate \texttt{range\_x} ($a = b$): R returns an array of NaN; Python raises \texttt{ZeroDivisionError}.
+\item \texttt{bkfe} with Inf in input: R raises inside \texttt{seq.default()}; Python propagates NaN via IEEE~754.
+\item \texttt{dpih} with \texttt{level=-1}: R returns \texttt{numeric(0)} (a zero-length vector, a valid R type); Python raises \texttt{UnboundLocalError} because no branch assigns the result variable for a negative level.
+\item \texttt{dpill} with \texttt{divisor=0}: R returns a valid result (integer division yields Inf at an intermediate step, which does not propagate as an error); Python raises \texttt{ZeroDivisionError}.
+\item \texttt{bkde2D} with Inf in input: R raises inside \texttt{seq.default()}; Python returns a partially non-finite result.
+\end{enumerate}
+\clearpage
+\section*{Supplementary Figures}
+\begin{figure}[H]
+\centering
+\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Supplementary Figure S1 placeholder]}\\\vspace{0.4em}\textit{KernSmooth function dependency graph. A directed acyclic graph with three horizontal layers. Level~2 (bottom): two nodes, \texttt{linbin} and \texttt{rlbin}, each shown with a dashed arrow leading to a Fortran subroutine icon (\texttt{F\_linbin} and \texttt{F\_rlbin} respectively). Level~1 (middle): seven nodes (\texttt{bkfe}, \texttt{blkest}, \texttt{cpblock}, \texttt{linbin2D}, \texttt{locpoly}, \texttt{sdiag}, \texttt{sstdiag}), each with dashed arrows to their respective Fortran subroutines and solid arrows up from Level~2 callees. Level~0 (top): seven nodes (\texttt{.onAttach}, \texttt{.onUnload}, \texttt{bkde}, \texttt{bkde2D}, \texttt{dpih}, \texttt{dpik}, \texttt{dpill}). Solid arrows from Level~0 to Level~1 nodes indicate internal calls. Exported functions (all Level~0 nodes and \texttt{bkfe}) are shown with a double border. The \texttt{linbin} node has seven incoming arrows from callers, highlighted with a thicker line to indicate its centrality. A legend distinguishes exported (double border), internal (single border), and Fortran entry point (rounded box) node styles.}\\\vspace{1.2em}\end{minipage}}
+\caption{\textbf{Supplementary Fig.~S1: KernSmooth three-level function dependency graph.} Level~0 nodes are user-callable entry points; Level~1 nodes are intermediate helpers; Level~2 nodes are the fundamental binning primitives. Dashed arrows indicate calls to compiled Fortran subroutines. \texttt{linbin} is the most central function, serving as the binning primitive for seven distinct callers spanning all three dependency levels.}
+\label{suppfig:depgraph}
+\end{figure}
+\begin{figure}[H]
+\centering
+\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Supplementary Figure S2 placeholder]}\\\vspace{0.4em}\textit{f2py calling convention comparison. Two parallel columns, labelled ``R (.Fortran interface)'' and ``Python (f2py interface)''. R column: pseudocode showing (1) \texttt{.Fortran("linbin", x=x, ..., gcnts=as.double(rep(0,M)), ...)}, (2) an arrow labelled ``returns named list of ALL arguments'', (3) \texttt{result\$gcnts} subscript to extract output. Python column: pseudocode showing (1) \texttt{gcnts = np.zeros(M, dtype=np.float64)}, (2) \texttt{\_KernSmooth.linbin(x, ..., gcnts, ...)}, (3) an arrow labelled ``returns None; gcnts modified in-place via C pointer'', (4) \texttt{gcnts} used directly. A second comparison row below shows the scalar output case: R sends \texttt{sigsqe=0.0} and receives \texttt{result\$sigsqe}; Python must send \texttt{sigsqe=np.zeros(1)} and read \texttt{sigsqe[0]}, or alternatively use \texttt{intent(out)} in the \texttt{.pyf} file to receive \texttt{sigsqe} as a return value. A note at the bottom highlights the absorbed-dimension issue: f2py removes dimension integers from the positional argument list, so \texttt{n} in \texttt{blkest(n, ...)} becomes optional.}\\\vspace{1.2em}\end{minipage}}
+\caption{\textbf{Supplementary Fig.~S2: Comparison of R \texttt{.Fortran()} and Python f2py calling conventions.} In R, \texttt{.Fortran()} returns a named list of all arguments, including output arrays that were modified in-place by the Fortran subroutine; the output is extracted by name. In Python, the f2py-wrapped subroutine returns \texttt{None}; output arrays must be pre-allocated and read after the call. Scalar outputs require either a length-1 array workaround or explicit \texttt{intent(out)} declarations in a \texttt{.pyf} signature file. Dimension scalar arguments are absorbed by f2py from the positional argument list in NumPy~2.4.3.}
+\label{suppfig:f2py}
+\end{figure}
+\printbibliography[title={Supplementary References}]
+\end{document}
