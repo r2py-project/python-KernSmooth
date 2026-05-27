@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  27 MAY 2026 16:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  27 MAY 2026 12:59
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex
-(/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex
+**/users/ycai9/Yufei/python-KernSmooth/docs/paper/supp.tex
+(/users/ycai9/Yufei/python-KernSmooth/docs/paper/supp.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-04-28>
 (/software/t/texlive/2026/texmf-dist/tex/latex/base/article.cls
@@ -291,7 +291,38 @@ Package caption Info: float package is loaded.
 Package caption Info: longtable package is loaded.
  (/software/t/texlive/2026/texmf-dist/tex/latex/caption/ltcaption.sty
 Package: ltcaption 2021/01/08 v1.4c longtable captions (AR)
-)) (/software/t/texlive/2026/texmf-dist/tex/latex/hyperref/hyperref.sty
+)) (/software/t/texlive/2026/texmf-dist/tex/latex/listings/listings.sty
+\lst@mode=\count314
+\lst@gtempboxa=\box65
+\lst@token=\toks32
+\lst@length=\count315
+\lst@currlwidth=\dimen195
+\lst@column=\count316
+\lst@pos=\count317
+\lst@lostspace=\dimen196
+\lst@width=\dimen197
+\lst@newlines=\count318
+\lst@lineno=\count319
+\lst@maxwidth=\dimen198
+ (/software/t/texlive/2026/texmf-dist/tex/latex/listings/lstpatch.sty
+File: lstpatch.sty 2025/11/14 1.11b (Carsten Heinz)
+) (/software/t/texlive/2026/texmf-dist/tex/latex/listings/lstmisc.sty
+File: lstmisc.sty 2025/11/14 1.11b (Carsten Heinz)
+\c@lstnumber=\count320
+\lst@skipnumbers=\count321
+\lst@framebox=\box66
+) (/software/t/texlive/2026/texmf-dist/tex/latex/listings/listings.cfg
+File: listings.cfg 2025/11/14 1.11b listings configuration
+))
+Package: listings 2025/11/14 1.11b (Carsten Heinz)
+
+==> First Aid for listings.sty no longer applied!
+    Expected:
+        2024/09/23 1.10c (Carsten Heinz)
+    but found:
+        2025/11/14 1.11b (Carsten Heinz)
+    so I'm assuming it got fixed.
+(/software/t/texlive/2026/texmf-dist/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2026-04-24 v7.01q Hypertext links for LaTeX
  (/software/t/texlive/2026/texmf-dist/tex/latex/kvsetkeys/kvsetkeys.sty
 Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
@@ -320,13 +351,13 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
  (/software/t/texlive/2026/texmf-dist/tex/latex/kvoptions/kvoptions.sty
 Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
 ))
-\c@section@level=\count314
+\c@section@level=\count322
 ) (/software/t/texlive/2026/texmf-dist/tex/generic/stringenc/stringenc.sty
 Package: stringenc 2019/11/29 v1.12 Convert strings between diff. encodings (HO)
 )
-\@linkdim=\dimen195
-\Hy@linkcounter=\count315
-\Hy@pagecounter=\count316
+\@linkdim=\dimen199
+\Hy@linkcounter=\count323
+\Hy@pagecounter=\count324
  (/software/t/texlive/2026/texmf-dist/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2026-04-24 v7.01q Hyperref: PDFDocEncoding definition (HO)
 Now handling font encoding PD1 ...
@@ -334,7 +365,7 @@ Now handling font encoding PD1 ...
 ) (/software/t/texlive/2026/texmf-dist/tex/generic/intcalc/intcalc.sty
 Package: intcalc 2019/12/15 v1.3 Expandable calculations with integers (HO)
 )
-\Hy@SavedSpaceFactor=\count317
+\Hy@SavedSpaceFactor=\count325
  (/software/t/texlive/2026/texmf-dist/tex/latex/hyperref/puenc.def
 File: puenc.def 2026-04-24 v7.01q Hyperref: PDF Unicode definition (HO)
 Now handling font encoding PU ...
@@ -348,21 +379,21 @@ Package hyperref Info: Plain pages OFF on input line 4214.
 Package hyperref Info: Backreferencing OFF on input line 4219.
 Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
 Package hyperref Info: Bookmarks ON on input line 4466.
-\c@Hy@tempcnt=\count318
+\c@Hy@tempcnt=\count326
  (/software/t/texlive/2026/texmf-dist/tex/latex/url/url.sty
 \Urlmuskip=\muskip18
 Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 4805.
-\XeTeXLinkMargin=\dimen196
+\XeTeXLinkMargin=\dimen256
  (/software/t/texlive/2026/texmf-dist/tex/generic/bitset/bitset.sty
 Package: bitset 2019/12/09 v1.3 Handle bit-vector datatype (HO)
  (/software/t/texlive/2026/texmf-dist/tex/generic/bigintcalc/bigintcalc.sty
 Package: bigintcalc 2019/12/15 v1.5 Expandable calculations on big integers (HO)
 ))
-\Fld@menulength=\count319
-\Field@Width=\dimen197
-\Fld@charsize=\dimen198
+\Fld@menulength=\count327
+\Field@Width=\dimen257
+\Fld@charsize=\dimen258
 Package hyperref Info: Hyper figures OFF on input line 6091.
 Package hyperref Info: Link nesting OFF on input line 6096.
 Package hyperref Info: Hyper index ON on input line 6099.
@@ -370,15 +401,15 @@ Package hyperref Info: backreferencing OFF on input line 6106.
 Package hyperref Info: Link coloring ON on input line 6109.
 Package hyperref Info: Link coloring with OCG OFF on input line 6116.
 Package hyperref Info: PDF/A mode OFF on input line 6121.
-\Hy@abspage=\count320
-\c@Item=\count321
-\c@Hfootnote=\count322
+\Hy@abspage=\count328
+\c@Item=\count329
+\c@Hfootnote=\count330
 )
 Package hyperref Info: Driver (autodetected): hpdftex.
  (/software/t/texlive/2026/texmf-dist/tex/latex/hyperref/hpdftex.def
 File: hpdftex.def 2026-04-24 v7.01q Hyperref driver for pdfTeX
-\Fld@listcount=\count323
-\c@bookmark@seq@number=\count324
+\Fld@listcount=\count331
+\c@bookmark@seq@number=\count332
  (/software/t/texlive/2026/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty
 Package: rerunfilecheck 2025-06-21 v1.11 Rerun checks for auxiliary files (HO)
  (/software/t/texlive/2026/texmf-dist/tex/generic/uniquecounter/uniquecounter.sty
@@ -391,55 +422,55 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 28
 Package: biblatex 2025/07/10 v3.21 programmable bibliographies (PK/MW)
  (/software/t/texlive/2026/texmf-dist/tex/latex/logreq/logreq.sty
 Package: logreq 2010/08/04 v1.0 xml request logger
-\lrq@indent=\count325
+\lrq@indent=\count333
  (/software/t/texlive/2026/texmf-dist/tex/latex/logreq/logreq.def
 File: logreq.def 2010/08/04 v1.0 logreq spec v1.0
 )) (/software/t/texlive/2026/texmf-dist/tex/latex/base/ifthen.sty
 Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
 )
-\c@tabx@nest=\count326
-\c@listtotal=\count327
-\c@listcount=\count328
-\c@liststart=\count329
-\c@liststop=\count330
-\c@citecount=\count331
-\c@citetotal=\count332
-\c@multicitecount=\count333
-\c@multicitetotal=\count334
-\c@instcount=\count335
-\c@maxnames=\count336
-\c@minnames=\count337
-\c@maxitems=\count338
-\c@minitems=\count339
-\c@citecounter=\count340
-\c@maxcitecounter=\count341
-\c@savedcitecounter=\count342
-\c@uniquelist=\count343
-\c@uniquename=\count344
-\c@refsection=\count345
-\c@refsegment=\count346
-\c@maxextratitle=\count347
-\c@maxextratitleyear=\count348
-\c@maxextraname=\count349
-\c@maxextradate=\count350
-\c@maxextraalpha=\count351
-\c@abbrvpenalty=\count352
-\c@highnamepenalty=\count353
-\c@lownamepenalty=\count354
-\c@maxparens=\count355
-\c@parenlevel=\count356
-\blx@tempcnta=\count357
-\blx@tempcntb=\count358
-\blx@tempcntc=\count359
-\c@blx@maxsection=\count360
-\blx@maxsegment@0=\count361
-\blx@notetype=\count362
-\blx@parenlevel@text=\count363
-\blx@parenlevel@foot=\count364
-\blx@sectionciteorder@0=\count365
-\blx@sectionciteorderinternal@0=\count366
-\blx@entrysetcounter=\count367
-\blx@biblioinstance=\count368
+\c@tabx@nest=\count334
+\c@listtotal=\count335
+\c@listcount=\count336
+\c@liststart=\count337
+\c@liststop=\count338
+\c@citecount=\count339
+\c@citetotal=\count340
+\c@multicitecount=\count341
+\c@multicitetotal=\count342
+\c@instcount=\count343
+\c@maxnames=\count344
+\c@minnames=\count345
+\c@maxitems=\count346
+\c@minitems=\count347
+\c@citecounter=\count348
+\c@maxcitecounter=\count349
+\c@savedcitecounter=\count350
+\c@uniquelist=\count351
+\c@uniquename=\count352
+\c@refsection=\count353
+\c@refsegment=\count354
+\c@maxextratitle=\count355
+\c@maxextratitleyear=\count356
+\c@maxextraname=\count357
+\c@maxextradate=\count358
+\c@maxextraalpha=\count359
+\c@abbrvpenalty=\count360
+\c@highnamepenalty=\count361
+\c@lownamepenalty=\count362
+\c@maxparens=\count363
+\c@parenlevel=\count364
+\blx@tempcnta=\count365
+\blx@tempcntb=\count366
+\blx@tempcntc=\count367
+\c@blx@maxsection=\count368
+\blx@maxsegment@0=\count369
+\blx@notetype=\count370
+\blx@parenlevel@text=\count371
+\blx@parenlevel@foot=\count372
+\blx@sectionciteorder@0=\count373
+\blx@sectionciteorderinternal@0=\count374
+\blx@entrysetcounter=\count375
+\blx@biblioinstance=\count376
 \labelnumberwidth=\skip62
 \labelalphawidth=\skip63
 \biblabelsep=\skip64
@@ -451,9 +482,9 @@ Package: ifthen 2024/03/16 v1.1e Standard LaTeX ifthen package (DPC)
 \blx@bcfin=\read2
 \blx@bcfout=\write3
 \blx@langwohyphens=\language91
-\c@mincomprange=\count369
-\c@maxcomprange=\count370
-\c@mincompwidth=\count371
+\c@mincomprange=\count377
+\c@maxcomprange=\count378
+\c@mincompwidth=\count379
 Package biblatex Info: Trying to load biblatex default data model...
 Package biblatex Info: ... file 'blx-dm.def' found.
  (/software/t/texlive/2026/texmf-dist/tex/latex/biblatex/blx-dm.def
@@ -463,74 +494,74 @@ Package biblatex Info: Trying to load biblatex style data model...
 Package biblatex Info: ... file 'numeric.dbx' not found.
 Package biblatex Info: Trying to load biblatex custom data model...
 Package biblatex Info: ... file 'biblatex-dm.cfg' not found.
-\c@afterword=\count372
-\c@savedafterword=\count373
-\c@annotator=\count374
-\c@savedannotator=\count375
-\c@author=\count376
-\c@savedauthor=\count377
-\c@bookauthor=\count378
-\c@savedbookauthor=\count379
-\c@commentator=\count380
-\c@savedcommentator=\count381
-\c@editor=\count382
-\c@savededitor=\count383
-\c@editora=\count384
-\c@savededitora=\count385
-\c@editorb=\count386
-\c@savededitorb=\count387
-\c@editorc=\count388
-\c@savededitorc=\count389
-\c@foreword=\count390
-\c@savedforeword=\count391
-\c@holder=\count392
-\c@savedholder=\count393
-\c@introduction=\count394
-\c@savedintroduction=\count395
-\c@namea=\count396
-\c@savednamea=\count397
-\c@nameb=\count398
-\c@savednameb=\count399
-\c@namec=\count400
-\c@savednamec=\count401
-\c@translator=\count402
-\c@savedtranslator=\count403
-\c@shortauthor=\count404
-\c@savedshortauthor=\count405
-\c@shorteditor=\count406
-\c@savedshorteditor=\count407
-\c@labelname=\count408
-\c@savedlabelname=\count409
-\c@institution=\count410
-\c@savedinstitution=\count411
-\c@lista=\count412
-\c@savedlista=\count413
-\c@listb=\count414
-\c@savedlistb=\count415
-\c@listc=\count416
-\c@savedlistc=\count417
-\c@listd=\count418
-\c@savedlistd=\count419
-\c@liste=\count420
-\c@savedliste=\count421
-\c@listf=\count422
-\c@savedlistf=\count423
-\c@location=\count424
-\c@savedlocation=\count425
-\c@organization=\count426
-\c@savedorganization=\count427
-\c@origlocation=\count428
-\c@savedoriglocation=\count429
-\c@origpublisher=\count430
-\c@savedorigpublisher=\count431
-\c@publisher=\count432
-\c@savedpublisher=\count433
-\c@language=\count434
-\c@savedlanguage=\count435
-\c@origlanguage=\count436
-\c@savedoriglanguage=\count437
-\c@pageref=\count438
-\c@savedpageref=\count439
+\c@afterword=\count380
+\c@savedafterword=\count381
+\c@annotator=\count382
+\c@savedannotator=\count383
+\c@author=\count384
+\c@savedauthor=\count385
+\c@bookauthor=\count386
+\c@savedbookauthor=\count387
+\c@commentator=\count388
+\c@savedcommentator=\count389
+\c@editor=\count390
+\c@savededitor=\count391
+\c@editora=\count392
+\c@savededitora=\count393
+\c@editorb=\count394
+\c@savededitorb=\count395
+\c@editorc=\count396
+\c@savededitorc=\count397
+\c@foreword=\count398
+\c@savedforeword=\count399
+\c@holder=\count400
+\c@savedholder=\count401
+\c@introduction=\count402
+\c@savedintroduction=\count403
+\c@namea=\count404
+\c@savednamea=\count405
+\c@nameb=\count406
+\c@savednameb=\count407
+\c@namec=\count408
+\c@savednamec=\count409
+\c@translator=\count410
+\c@savedtranslator=\count411
+\c@shortauthor=\count412
+\c@savedshortauthor=\count413
+\c@shorteditor=\count414
+\c@savedshorteditor=\count415
+\c@labelname=\count416
+\c@savedlabelname=\count417
+\c@institution=\count418
+\c@savedinstitution=\count419
+\c@lista=\count420
+\c@savedlista=\count421
+\c@listb=\count422
+\c@savedlistb=\count423
+\c@listc=\count424
+\c@savedlistc=\count425
+\c@listd=\count426
+\c@savedlistd=\count427
+\c@liste=\count428
+\c@savedliste=\count429
+\c@listf=\count430
+\c@savedlistf=\count431
+\c@location=\count432
+\c@savedlocation=\count433
+\c@organization=\count434
+\c@savedorganization=\count435
+\c@origlocation=\count436
+\c@savedoriglocation=\count437
+\c@origpublisher=\count438
+\c@savedorigpublisher=\count439
+\c@publisher=\count440
+\c@savedpublisher=\count441
+\c@language=\count442
+\c@savedlanguage=\count443
+\c@origlanguage=\count444
+\c@savedoriglanguage=\count445
+\c@pageref=\count446
+\c@savedpageref=\count447
 \shorthandwidth=\skip70
 \shortjournalwidth=\skip71
 \shortserieswidth=\skip72
@@ -554,19 +585,19 @@ Package biblatex Info: Trying to load generic definitions...
 Package biblatex Info: ... file 'biblatex.def' found.
  (/software/t/texlive/2026/texmf-dist/tex/latex/biblatex/biblatex.def
 File: biblatex.def 2025/07/10 v3.21 biblatex compatibility (PK/MW)
-\c@textcitecount=\count440
-\c@textcitetotal=\count441
-\c@textcitemaxnames=\count442
-\c@biburlbigbreakpenalty=\count443
-\c@biburlbreakpenalty=\count444
-\c@biburlnumpenalty=\count445
-\c@biburlucpenalty=\count446
-\c@biburllcpenalty=\count447
+\c@textcitecount=\count448
+\c@textcitetotal=\count449
+\c@textcitemaxnames=\count450
+\c@biburlbigbreakpenalty=\count451
+\c@biburlbreakpenalty=\count452
+\c@biburlnumpenalty=\count453
+\c@biburlucpenalty=\count454
+\c@biburllcpenalty=\count455
 \biburlbigskip=\muskip19
 \biburlnumskip=\muskip20
 \biburlucskip=\muskip21
 \biburllcskip=\muskip22
-\c@smartand=\count448
+\c@smartand=\count456
 )
 Package biblatex Info: Trying to load bibliography style 'numeric'...
 Package biblatex Info: ... file 'numeric.bbx' found.
@@ -576,8 +607,8 @@ Package biblatex Info: Trying to load bibliography style 'standard'...
 Package biblatex Info: ... file 'standard.bbx' found.
  (/software/t/texlive/2026/texmf-dist/tex/latex/biblatex/bbx/standard.bbx
 File: standard.bbx 2025/07/10 v3.21 biblatex bibliography style (PK/MW)
-\c@bbx:relatedcount=\count449
-\c@bbx:relatedtotal=\count450
+\c@bbx:relatedcount=\count457
+\c@bbx:relatedtotal=\count458
 ))
 Package biblatex Info: Trying to load citation style 'numeric'...
 Package biblatex Info: ... file 'numeric.cbx' found.
@@ -606,7 +637,7 @@ Package biblatex Info: Document encoding is UTF8 ....
 Package: expl3 2026-04-28 L3 programming layer (loader) 
  (/software/t/texlive/2026/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2026-02-18 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count451
+\l__color_backend_stack_int=\count459
 ))
 Package biblatex Info: ... and expl3
 (biblatex)             2026-04-28 L3 programming layer (loader) 
@@ -621,11 +652,11 @@ Package: parskip 2021-03-14 v2.0h non-zero parskip adjustments
 ) (/software/t/texlive/2026/texmf-dist/tex/latex/enumitem/enumitem.sty
 Package: enumitem 2025/02/06 v3.11 Customized lists
 \labelindent=\skip84
-\enit@outerparindent=\dimen199
-\enit@toks=\toks32
-\enit@inbox=\box65
-\enit@count@id=\count452
-\enitdp@description=\count453
+\enit@outerparindent=\dimen259
+\enit@toks=\toks33
+\enit@inbox=\box67
+\enit@count@id=\count460
+\enitdp@description=\count461
 ) (/software/t/texlive/2026/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
 Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 \f@nch@headwidth=\skip85
@@ -642,41 +673,41 @@ Package: fancyhdr 2025/02/07 v5.2 Extensive control of page headers and footers
 \f@nch@widthL=\skip96
 \f@nch@widthC=\skip97
 \f@nch@widthR=\skip98
-\@temptokenb=\toks33
+\@temptokenb=\toks34
 )
-\@quotelevel=\count454
-\@quotereset=\count455
-LaTeX Font Info:    Trying to load font information for T1+lmr on input line 34.
+\@quotelevel=\count462
+\@quotereset=\count463
+LaTeX Font Info:    Trying to load font information for T1+lmr on input line 39.
  (/software/t/texlive/2026/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) (./main.aux)
-\openout1 = `main.aux'.
+) (./supp.aux)
+\openout1 = `supp.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 34.
-LaTeX Font Info:    ... okay on input line 34.
-LaTeX Info: Redefining \microtypecontext on input line 34.
-Package microtype Info: Applying patch `item' on input line 34.
-Package microtype Info: Applying patch `toc' on input line 34.
-Package microtype Info: Applying patch `eqnum' on input line 34.
-Package microtype Info: Applying patch `footnote' on input line 34.
-Package microtype Info: Applying patch `verbatim' on input line 34.
-LaTeX Info: Redefining \microtypesetup on input line 34.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Info: Redefining \microtypecontext on input line 39.
+Package microtype Info: Applying patch `item' on input line 39.
+Package microtype Info: Applying patch `toc' on input line 39.
+Package microtype Info: Applying patch `eqnum' on input line 39.
+Package microtype Info: Applying patch `footnote' on input line 39.
+Package microtype Info: Applying patch `verbatim' on input line 39.
+LaTeX Info: Redefining \microtypesetup on input line 39.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using default protrusion set `alltext'.
@@ -726,17 +757,17 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman (
 
 (/software/t/texlive/2026/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count456
-\scratchdimen=\dimen256
-\scratchbox=\box66
-\nofMPsegments=\count457
-\nofMParguments=\count458
-\everyMPshowfont=\toks34
-\MPscratchCnt=\count459
-\MPscratchDim=\dimen257
-\MPnumerator=\count460
-\makeMPintoPDFobject=\count461
-\everyMPtoPDFconversion=\toks35
+\scratchcounter=\count464
+\scratchdimen=\dimen260
+\scratchbox=\box68
+\nofMPsegments=\count465
+\nofMParguments=\count466
+\everyMPshowfont=\toks35
+\MPscratchCnt=\count467
+\MPscratchDim=\dimen261
+\MPnumerator=\count468
+\makeMPintoPDFobject=\count469
+\everyMPtoPDFconversion=\toks36
 ) (/software/t/texlive/2026/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
@@ -745,11 +776,13 @@ File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: hyperref package is loaded.
+Package caption Info: listings package is loaded.
 Package caption Info: End \AtBeginDocument code.
-Package hyperref Info: Link coloring ON on input line 34.
- (./main.out) (./main.out)
+\c@lstlisting=\count470
+Package hyperref Info: Link coloring ON on input line 39.
+ (./supp.out) (./supp.out)
 \@outlinefile=\write4
-\openout4 = `main.out'.
+\openout4 = `supp.out'.
 
 Package biblatex Info: Trying to load language 'english'...
 Package biblatex Info: ... file 'english.lbx' found.
@@ -759,134 +792,409 @@ File: english.lbx 2025/07/10 v3.21 biblatex localization (PK/MW)
 Package biblatex Info: Input encoding 'utf8' detected.
 Package biblatex Info: Automatic encoding selection.
 (biblatex)             Assuming data encoding 'utf8'.
-\openout3 = `main.bcf'.
+\openout3 = `supp.bcf'.
 
 Package biblatex Info: Trying to load bibliographic data...
-Package biblatex Info: ... file 'main.bbl' found.
- (./main.bbl)
-Package biblatex Info: Reference section=0 on input line 34.
-Package biblatex Info: Reference segment=0 on input line 34.
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 45.
- (/software/t/texlive/2026/texmf-dist/tex/latex/lm/t1lmtt.fd
+Package biblatex Info: ... file 'supp.bbl' found.
+ (./supp.bbl)
+Package biblatex Info: Reference section=0 on input line 39.
+Package biblatex Info: Reference segment=0 on input line 39.
+ (./supp.toc
+Overfull \hbox (20.84023pt too wide) detected at line 1
+\T1/lmr/bx/n/12 Note 1 
+ []
+
+
+Overfull \hbox (20.84023pt too wide) detected at line 2
+\T1/lmr/bx/n/12 Note 2 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 3
+\T1/lmr/m/n/12 Note 2.1 
+ []
+
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 3.
+(/software/t/texlive/2026/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             `lmtt' (encoding: T1).
 (microtype)             For optimal results, create family-specific settings.
 (microtype)             See the microtype manual for details.
- [1
-
-{/software/t/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}]
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 59.
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 3.
  (/software/t/texlive/2026/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 59.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 3.
  (/software/t/texlive/2026/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 59.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 3.
  (/software/t/texlive/2026/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 59.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 3.
  (/software/t/texlive/2026/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 59.
+(Font)              <12> on input line 3.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 59.
+(Font)              <8> on input line 3.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 59.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 59.
+(Font)              <6> on input line 3.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 3.
  (/software/t/texlive/2026/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/software/t/texlive/2026/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 59.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 3.
  (/software/t/texlive/2026/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/software/t/texlive/2026/texmf-dist/tex/latex/microtype/mt-msb.cfg
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
-pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.62 
-      [1{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}] [2] [3] [4]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 100.
- (/software/t/texlive/2026/texmf-dist/tex/latex/lm/ts1lmr.fd
+Overfull \hbox (15.07469pt too wide) detected at line 4
+\T1/lmr/m/n/12 Note 2.2 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 5
+\T1/lmr/m/n/12 Note 2.3 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 6
+\T1/lmr/m/n/12 Note 2.4 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 7
+\T1/lmr/m/n/12 Note 2.5 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 8
+\T1/lmr/m/n/12 Note 2.6 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 9
+\T1/lmr/m/n/12 Note 2.7 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 10
+\T1/lmr/m/n/12 Note 2.8 
+ []
+
+
+Overfull \hbox (20.84023pt too wide) detected at line 11
+\T1/lmr/bx/n/12 Note 3 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 12
+\T1/lmr/m/n/12 Note 3.1 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 13
+\T1/lmr/m/n/12 Note 3.2 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 14
+\T1/lmr/m/n/12 Note 3.3 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 15
+\T1/lmr/m/n/12 Note 3.4 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 16
+\T1/lmr/m/n/12 Note 3.5 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 17
+\T1/lmr/m/n/12 Note 3.6 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 18
+\T1/lmr/m/n/12 Note 3.7 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 19
+\T1/lmr/m/n/12 Note 3.8 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 20
+\T1/lmr/m/n/12 Note 3.9 
+ []
+
+
+Overfull \hbox (20.84023pt too wide) detected at line 21
+\T1/lmr/bx/n/12 Note 4 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 22
+\T1/lmr/m/n/12 Note 4.1 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 23
+\T1/lmr/m/n/12 Note 4.2 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 24
+\T1/lmr/m/n/12 Note 4.3 
+ []
+
+
+Overfull \hbox (20.84023pt too wide) detected at line 25
+\T1/lmr/bx/n/12 Note 5 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 26
+\T1/lmr/m/n/12 Note 5.1 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 27
+\T1/lmr/m/n/12 Note 5.2 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 28
+\T1/lmr/m/n/12 Note 5.3 
+ []
+
+
+Overfull \hbox (20.84023pt too wide) detected at line 29
+\T1/lmr/bx/n/12 Note 6 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 30
+\T1/lmr/m/n/12 Note 6.1 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 31
+\T1/lmr/m/n/12 Note 6.2 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 32
+\T1/lmr/m/n/12 Note 6.3 
+ []
+
+
+Overfull \hbox (20.84023pt too wide) detected at line 33
+\T1/lmr/bx/n/12 Note 7 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 34
+\T1/lmr/m/n/12 Note 7.1 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 35
+\T1/lmr/m/n/12 Note 7.2 
+ []
+
+[1{/software/t/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}
+
+]
+Overfull \hbox (15.07469pt too wide) detected at line 36
+\T1/lmr/m/n/12 Note 7.3 
+ []
+
+
+Overfull \hbox (15.07469pt too wide) detected at line 37
+\T1/lmr/m/n/12 Note 7.4 
+ []
+
+)
+\tf@toc=\write5
+\openout5 = `supp.toc'.
+
+ [2]
+Overfull \hbox (3.55461pt too wide) in paragraph at lines 47--47
+[]\T1/lmr/bx/n/17.28 (-20) Skill and Agent Ar-chi-tec-ture in Claude Code 
+ []
+
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <14.4> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 62.
+
+Overfull \hbox (51.68909pt too wide) in paragraph at lines 64--69
+\T1/lmr/m/n/12 (-20) keys: \T1/lmtt/m/n/12 "language_dependencies"\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 "internal_dependencies"\T1/lmr/m/n/12 (-20) , and \T1/lmtt/m/n/12 "external_dependencies"\T1/lmr/m/n/12 (-20) ,
+ []
+
+
+Overfull \hbox (116.95401pt too wide) in paragraph at lines 64--69
+\T1/lmr/m/n/12 (-20) each a JSON ar-ray of strings. The file is writ-ten to \T1/lmtt/m/n/12 structural_analysis/{R_subfolder}/{filename}.json\T1/lmr/m/n/12 (-20) . 
+ []
+
+[3
+
+]
+Overfull \hbox (101.94464pt too wide) in paragraph at lines 71--75
+\T1/lmtt/m/n/12 line_number\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 call_body\T1/lmr/m/n/12 (-20) , writ-ten to \T1/lmtt/m/n/12 language_dependency_analysis/{R_subfolder}/{filename}.csv\T1/lmr/m/n/12 (-20) .
+ []
+
+
+Overfull \hbox (153.93301pt too wide) in paragraph at lines 77--81
+\T1/lmr/bx/n/12 (-20) Output: \T1/lmr/m/n/12 (-20) A Mark-down file saved to \T1/lmtt/m/n/12 language_dependency_analysis/conversion_guides/{dependency_name}.md\T1/lmr/m/n/12 (-20) .
+ []
+
+[4]
+Overfull \hbox (266.09737pt too wide) in paragraph at lines 83--87
+\T1/lmtt/m/n/12 "notes" \T1/lmr/m/n/12 (-20) (a list of trans-la-tion de-ci-sions or caveats). Writ-ten to \T1/lmtt/m/n/12 conversion_results/{R_subfolder}/{filename}/{function_name}.json\T1/lmr/m/n/12 (-20) . 
+ []
+
+
+Overfull \hbox (58.7126pt too wide) in paragraph at lines 95--99
+\T1/lmr/bx/n/12 (-20) Output: \T1/lmr/m/n/12 (-20) Three \T1/lmtt/m/n/12 pytest \T1/lmr/m/n/12 (-20) files: \T1/lmtt/m/n/12 test_\T1/lmtt/m/it/12 fn\T1/lmtt/m/n/12 _positive.py\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 test_\T1/lmtt/m/it/12 fn\T1/lmtt/m/n/12 _negative.py\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 test_\T1/lmtt/m/it/12 fn\T1/lmtt/m/n/12 _edge.py\T1/lmr/m/n/12 (-20) ,
+ []
+
+[5] [6]
+Overfull \hbox (7.36914pt too wide) in paragraph at lines 119--122
+\T1/lmr/bx/n/12 (-20) Invocation: \T1/lmtt/m/n/12 /extract-r-folder-language-dependencies \T1/lmtt/m/it/12 R_folder json_folder 
+ []
+
+
+Overfull \hbox (63.06915pt too wide) in paragraph at lines 124--127
+\T1/lmr/bx/n/12 (-20) Invocation: \T1/lmtt/m/n/12 /generate-language-dependency-conversion-guides \T1/lmtt/m/it/12 R_folder combined_csv 
+ []
+
+
+Overfull \hbox (54.21933pt too wide) in paragraph at lines 124--127
+\T1/lmr/bx/n/12 (-20) Processing: \T1/lmr/m/n/12 (-20) Reads the com-bined CSV and ex-tracts all unique val-ues of the \T1/lmtt/m/n/12 language_dependency
+ []
+
+
+Overfull \hbox (101.32057pt too wide) in paragraph at lines 124--127
+\T1/lmr/m/n/12 (-20) col-umn (46 for \T1/lmtt/m/n/12 KernSmooth\T1/lmr/m/n/12 (-20) ). Launches ex-actly one \T1/lmtt/m/n/12 @generate-language-dependency-conversion-guide
+ []
+
+[7]
+Overfull \hbox (55.0522pt too wide) in paragraph at lines 129--132
+\T1/lmr/bx/n/12 (-20) Invocation: \T1/lmtt/m/n/12 /convert-r-file-to-python \T1/lmtt/m/it/12 R_file json_file levels_csv guides_folder
+ []
+
+
+Overfull \hbox (20.46906pt too wide) in paragraph at lines 134--138
+\T1/lmr/bx/n/12 (-20) Invocation: \T1/lmtt/m/n/12 /combine-python-functions-into-file \T1/lmtt/m/it/12 json_folder target_py_file 
+ []
+
+
+Overfull \hbox (52.96887pt too wide) in paragraph at lines 140--143
+\T1/lmr/bx/n/12 (-20) Invocation: \T1/lmtt/m/n/12 /convert-r-tests-to-python \T1/lmtt/m/it/12 R_test_folder R_pkg_folder py_pkg_folder
+ []
+
+
+Overfull \hbox (20.30106pt too wide) in paragraph at lines 140--143
+\T1/lmr/bx/n/12 (-20) Processing: \T1/lmr/m/n/12 (-20) Scans \T1/lmr/m/it/12 (-20) R_test_folder \T1/lmr/m/n/12 (-20) for \T1/lmtt/m/n/12 .R \T1/lmr/m/n/12 (-20) scripts. Dis-patches \T1/lmtt/m/n/12 @convert-r-test-to-python
+ []
+
+[8{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}]
+Overfull \hbox (30.10222pt too wide) in paragraph at lines 150--153
+\T1/lmr/bx/n/12 (-20) Invocation: \T1/lmtt/m/n/12 /fix-bugs-found-in-tests \T1/lmtt/m/it/12 test_folder py_pkg_folder R_pkg_folder 
+ []
+
+
+Overfull \hbox (73.38019pt too wide) in paragraph at lines 150--153
+\T1/lmtt/m/n/12 meson.build\T1/lmr/m/n/12 (-20) , \T1/lmtt/m/n/12 .pyf \T1/lmr/m/n/12 (-20) files), the skill runs \T1/lmtt/m/n/12 pip install . --no-build-isolation --force-reinstall
+ []
+
+
+Overfull \hbox (52.02527pt too wide) in paragraph at lines 160--161
+\T1/lmr/m/n/12 (-20) Phase 3 pro-duced 46 con-ver-sion guides cov-er-ing all lan-guage de-pen-den-cies in \T1/lmtt/m/n/12 KernSmooth/R/all.R\T1/lmr/m/n/12 (-20) .
+ []
+
+LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 164.
+
+Overfull \hbox (17.08514pt too wide) in paragraph at lines 167--168
+[]\T1/lmr/m/n/12 (-20) R's \T1/lmtt/m/n/12 as.integer(x) \T1/lmr/m/n/12 (-20) on a vec-tor maps to \T1/lmtt/m/n/12 np.asarray(x).astype(np.int32)\T1/lmr/m/n/12 (-20) ;
+ []
+
+[9{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
+Overfull \hbox (14.66801pt too wide) in paragraph at lines 171--172
+[]\T1/lmr/m/n/12 (-20) Both map di-rectly to \T1/lmtt/m/n/12 scipy.stats.norm.pdf \T1/lmr/m/n/12 (-20) and \T1/lmtt/m/n/12 scipy.stats.beta.pdf
+ []
+
+
+Overfull \hbox (0.15848pt too wide) in paragraph at lines 183--184
+\T1/lmr/m/n/12 (-20) Python tu-ple \T1/lmtt/m/n/12 (x.min(), x.max()) \T1/lmr/m/n/12 (-20) or the key-word ar-gu-ment \T1/lmtt/m/n/12 range_x=(x.min(),
+ []
+
+[10] [11]
+Overfull \hbox (134.25876pt too wide) in paragraph at lines 223--224
+[]\T1/lmtt/m/n/12 fs.is_file('/usr/lib64/libopenblaso.so.0') \T1/lmr/m/n/12 (-20) hard-coded path with \T1/lmtt/m/n/12 declare_dependency(link_args:
+ []
+
+
+Overfull \hbox (40.02705pt too wide) in paragraph at lines 227--229
+\T1/lmr/m/n/12 (-20) The \T1/lmtt/m/n/12 python-publish.yml \T1/lmr/m/n/12 (-20) GitHub Ac-tions work-flow builds wheels for up to 35 platform/Python-
+ []
+
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 229.
+(/software/t/texlive/2026/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [5{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}] [6] [7]
-Overfull \hbox (82.73178pt too wide) in paragraph at lines 173--187
-[][] 
+)
+Overfull \hbox (70.06279pt too wide) in paragraph at lines 240--241
+\T1/lmr/m/n/12 (-20) R's \T1/lmtt/m/n/12 .Fortran() \T1/lmr/m/n/12 (-20) re-turns a named list of all ar-gu-ments; the R id-iom \T1/lmtt/m/n/12 .Fortran(F_linbin, ...)$gcnts
  []
 
 
-Overfull \hbox (89.5612pt too wide) in paragraph at lines 190--191
-\T1/lmr/m/n/12 (-20) tra-tion ar-chi-tec-ture (Fig. [][]2[][]), just like Phase 1. Firstly, the \T1/lmtt/m/n/12 /extract-r-folder-language-dependencies
+Overfull \hbox (16.25255pt too wide) in paragraph at lines 241--241
+[]\T1/lmr/bx/n/14.4 (-20) Bug 2: f2py Ab-sorbed Di-men-sion Ar-gu-ments (\T1/lmr/bx/it/14.4 (-20) Phase 6\T1/lmr/bx/n/14.4 (-20) ) 
  []
 
-[8] [9]
-Overfull \hbox (5.07092pt too wide) in paragraph at lines 216--217
-\T1/lmr/m/n/12 (-20) leaves (Level 2) to roots (Level 0), and dis-patched the \T1/lmtt/m/n/12 @convert-r-function-to-python
- []
+[12{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}] [13] [14]
 
+LaTeX Warning: Empty bibliography on input line 285.
 
-Overfull \hbox (21.15027pt too wide) in paragraph at lines 218--219
-\T1/lmr/m/n/12 (-20) tary Note 3) as-sem-bled the 16 JSON arte-facts into the fi-nal \T1/lmtt/m/n/12 r2py_kernsmooth/__init__.py\T1/lmr/m/n/12 (-20) .
- []
+[15
 
-[10] [11] [12{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [13] [14] [15]
-Package microtype Info: Character `029' is missing
-(microtype)             in font `T1/lmr/m/sc/12'.
-(microtype)             Ignoring protrusion settings for this character.
- [16]
-Overfull \hbox (111.0766pt too wide) in paragraph at lines 295--296
-[]\T1/lmr/m/n/12 (-20) The pack-age's \T1/lmtt/m/n/12 NAMESPACE \T1/lmr/m/n/12 (-20) file de-clares \T1/lmtt/m/n/12 useDynLib(KernSmooth, .registration = TRUE, .fixes = "F_")\T1/lmr/m/n/12 (-20) ,
- []
-
-[17]
-Overfull \hbox (229.68942pt too wide) in paragraph at lines 298--299
-\T1/lmr/m/n/12 (-20) wrap-per is gen-er-ated by NumPy (v.2.4.3) as a Me-son cus-tom tar-get: \T1/lmtt/m/n/12 python -m numpy.f2py ${sources} -m _KernSmooth --lower\T1/lmr/m/n/12 (-20) .
- []
-
-
-Overfull \hbox (77.0655pt too wide) in paragraph at lines 298--299
-\T1/lmr/m/n/12 (-20) ini-tial build tem-plate in-cor-rectly listed the gen-er-ated wrap-per file as \T1/lmtt/m/n/12 _KernSmooth-f2pywrappers2.f90
- []
-
-[18]
-Overfull \hbox (13.62805pt too wide) in paragraph at lines 322--323
-\T1/lmr/m/n/12 (-20) with non-integer ex-po-nents. The cor-rect Python id-iom is \T1/lmtt/m/n/12 math.copysign(abs(x)**(1/n),
- []
-
-[19{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [20] [21] (./main.aux)
+] [16] (./supp.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-04-28>
  ***********
-Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: CE195DD7C44611DA1F8941EA3272A267;4039.
-Package logreq Info: Writing requests to 'main.run.xml'.
-\openout1 = `main.run.xml'.
+Package rerunfilecheck Info: File `supp.out' has not changed.
+(rerunfilecheck)             Checksum: 0E4E861AD552D30798F7F1F762019A6A;8513.
+Package logreq Info: Writing requests to 'supp.run.xml'.
+\openout1 = `supp.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 23056 strings out of 467341
- 401895 string characters out of 5414848
- 1281470 words of memory out of 5000000
- 51621 multiletter control sequences out of 15000+600000
- 689654 words of font info for 168 fonts, out of 8000000 for 9000
+ 24144 strings out of 467341
+ 414883 string characters out of 5414848
+ 1308297 words of memory out of 5000000
+ 52714 multiletter control sequences out of 15000+600000
+ 684983 words of font info for 160 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,1923b,1496s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmcsc10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmex10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on main.pdf (22 pages, 326229 bytes).
+ 75i,13n,79p,1362b,803s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmbxi10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmex10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
+Output written on supp.pdf (16 pages, 321977 bytes).
 PDF statistics:
- 356 PDF objects out of 1000 (max. 8388607)
- 299 compressed objects within 3 object streams
- 73 named destinations out of 1000 (max. 500000)
- 33929 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 381 PDF objects out of 1000 (max. 8388607)
+ 327 compressed objects within 4 object streams
+ 68 named destinations out of 1000 (max. 500000)
+ 31017 words of extra memory for PDF output out of 35830 (max. 10000000)
 

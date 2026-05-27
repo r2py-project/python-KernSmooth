@@ -1,0 +1,37 @@
+\contentsline {section}{\numberline {Note 1}Skill and Agent Architecture in Claude Code}{3}{section.1}%
+\contentsline {section}{\numberline {Note 2}Sub-Agent Specifications}{3}{section.2}%
+\contentsline {subsection}{\numberline {Note 2.1}\texttt {analyze-r-file-dependencies}}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {Note 2.2}\texttt {extract-r-file-language-dependencies}}{4}{subsection.2.2}%
+\contentsline {subsection}{\numberline {Note 2.3}\texttt {generate-language-dependency-conversion-guide}}{4}{subsection.2.3}%
+\contentsline {subsection}{\numberline {Note 2.4}\texttt {convert-r-function-to-python}}{5}{subsection.2.4}%
+\contentsline {subsection}{\numberline {Note 2.5}\texttt {convert-r-test-to-python}}{5}{subsection.2.5}%
+\contentsline {subsection}{\numberline {Note 2.6}\texttt {generate-python-function-tests}}{6}{subsection.2.6}%
+\contentsline {subsection}{\numberline {Note 2.7}\texttt {fix-bug-found-in-test}}{6}{subsection.2.7}%
+\contentsline {subsection}{\numberline {Note 2.8}\texttt {analyze-c-file-dependencies} (supplementary, not yet invoked)}{6}{subsection.2.8}%
+\contentsline {section}{\numberline {Note 3}Skill Specifications}{7}{section.3}%
+\contentsline {subsection}{\numberline {Note 3.1}\texttt {/analyze-r-folder-dependencies}}{7}{subsection.3.1}%
+\contentsline {subsection}{\numberline {Note 3.2}\texttt {/extract-r-folder-language-dependencies}}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {Note 3.3}\texttt {/generate-language-dependency-conversion-guides}}{7}{subsection.3.3}%
+\contentsline {subsection}{\numberline {Note 3.4}\texttt {/convert-r-file-to-python}}{8}{subsection.3.4}%
+\contentsline {subsection}{\numberline {Note 3.5}\texttt {/combine-python-functions-into-file}}{8}{subsection.3.5}%
+\contentsline {subsection}{\numberline {Note 3.6}\texttt {/convert-r-tests-to-python}}{8}{subsection.3.6}%
+\contentsline {subsection}{\numberline {Note 3.7}\texttt {/generate-python-file-tests}}{8}{subsection.3.7}%
+\contentsline {subsection}{\numberline {Note 3.8}\texttt {/fix-bugs-found-in-tests}}{9}{subsection.3.8}%
+\contentsline {subsection}{\numberline {Note 3.9}\texttt {/summarize-research-report}}{9}{subsection.3.9}%
+\contentsline {section}{\numberline {Note 4}Language Dependency Translation Nuances}{9}{section.4}%
+\contentsline {subsection}{\numberline {Note 4.1}Dependencies with Non-Trivial Numerical Semantics}{9}{subsection.4.1}%
+\contentsline {subsection}{\numberline {Note 4.2}Dependencies with Control-Flow or API Semantic Differences}{10}{subsection.4.2}%
+\contentsline {subsection}{\numberline {Note 4.3}Dependencies with Direct Python Equivalents}{11}{subsection.4.3}%
+\contentsline {section}{\numberline {Note 5}Build System and Distribution Configuration}{11}{section.5}%
+\contentsline {subsection}{\numberline {Note 5.1}Fortran Source Inventory}{11}{subsection.5.1}%
+\contentsline {subsection}{\numberline {Note 5.2}BLAS Discovery Chain}{11}{subsection.5.2}%
+\contentsline {subsection}{\numberline {Note 5.3}CI/CD Platform Coverage}{12}{subsection.5.3}%
+\contentsline {section}{\numberline {Note 6}f2py Compatibility Issues and Resolution}{12}{section.6}%
+\contentsline {subsection}{\numberline {Note 6.1}Bug 1: f2py Subroutine Return Value (\textit {Phase~4})}{12}{subsection.6.1}%
+\contentsline {subsection}{\numberline {Note 6.2}Bug 2: f2py Absorbed Dimension Arguments (\textit {Phase~6})}{13}{subsection.6.2}%
+\contentsline {subsection}{\numberline {Note 6.3}Bug 3: \texttt {blkest} Scalar Output Intent (\textit {Phase~7})}{13}{subsection.6.3}%
+\contentsline {section}{\numberline {Note 7}Per-Function Test Coverage Details}{13}{section.7}%
+\contentsline {subsection}{\numberline {Note 7.1}Positive Test Coverage}{13}{subsection.7.1}%
+\contentsline {subsection}{\numberline {Note 7.2}Negative Test Coverage}{14}{subsection.7.2}%
+\contentsline {subsection}{\numberline {Note 7.3}Edge Test Coverage}{14}{subsection.7.3}%
+\contentsline {subsection}{\numberline {Note 7.4}Documented Behavioural Divergences}{14}{subsection.7.4}%
