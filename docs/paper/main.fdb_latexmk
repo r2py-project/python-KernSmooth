@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 1779911295.2765 "main.bcf" "main.bbl" "main" 1779912881.18432 0
-  "main.bcf" 1779912880.95902 109720 71e21addd52d47024a59159193ed6454 "pdflatex"
+["biber main"] 1779911295.2765 "main.bcf" "main.bbl" "main" 1779999930.6259 0
+  "main.bcf" 1779999930.44499 109720 71e21addd52d47024a59159193ed6454 "pdflatex"
   "reference.bib" 1779822473.06406 6130 0611a83695d53ee824e63809c37ab5b4 ""
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1779912878.6924 "/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex" "main.pdf" "main" 1779912881.18568 0
+["pdflatex"] 1779999927.74386 "/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex" "main.pdf" "main" 1779999930.62732 0
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -25,7 +25,6 @@
   "/software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmr10.tfm" 1254269338 12056 7e13df7fe4cbce21b072ba7c4f4deb6e ""
   "/software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmr12.tfm" 1254269338 12092 7b1546e2d096cfd5dcbd4049b0b1ec2e ""
   "/software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmr17.tfm" 1254269338 12156 ca1ae6a3c8564e89597f1f993fba1608 ""
-  "/software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmri10.tfm" 1254269338 17148 9556e1b5f936b77a796f68d2d559ba99 ""
   "/software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmri12.tfm" 1254269338 17144 271aaf9ebb339934b04110dc5211fba4 ""
   "/software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmtt12.tfm" 1254269338 1368 6a60e6a5e029141041d64d339b87e533 ""
   "/software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmtti10.tfm" 1254269338 1372 0dcee1a56926aed3dd9ded91b7563563 ""
@@ -48,7 +47,6 @@
   "/software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr10.pfb" 1255129361 119235 f35b44530a1d90eb90fe15d9cba67ea0 ""
   "/software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr12.pfb" 1255129361 113634 f99c44d58bae0863375faf0e1d74d612 ""
   "/software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr8.pfb" 1255129361 122174 a7a08406857c9530a0320a2517f60370 ""
-  "/software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri10.pfb" 1255129361 112593 fda2373ba4420af33949610de4c28fe8 ""
   "/software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri12.pfb" 1255129361 109265 32320cb6133d4d76bf83e27b5eb4009b ""
   "/software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy10.pfb" 1254269338 27863 09ce3735688ffde955e72da27c95b61a ""
   "/software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy8.pfb" 1254269338 27802 5c876bb2c4040caaf035d60bd74a86bd ""
@@ -150,11 +148,11 @@
   "/software/t/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1779135676 5573040 5cf6d45dfd30c1d1bff9454f98c8864b ""
   "/software/t/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1779135902 3651062 d235d35aa376642b6b5d5cddcacab078 ""
   "/software/t/texlive/2026/texmf.cnf" 1779135640.18643 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
-  "/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex" 1779912878.05455 63306 8323ef9c98c1cb854c5377dc23ea1afd ""
-  "main.aux" 1779912880.95102 17038 54eafd3e0607e51316a06ddb964b8580 "pdflatex"
+  "/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex" 1779999926.95302 71595 1a1854dff4a47f5578c4f0d4e3e132f5 ""
+  "main.aux" 1779999930.43799 19854 64078e8def4018c812069851bb116db5 "pdflatex"
   "main.bbl" 1779911297.10266 28568 f02b903b8b97c8b723949118a8d93b07 "biber main"
-  "main.out" 1779912880.95502 4039 ce195dd7c44611da1f8941ea3272a267 "pdflatex"
-  "main.run.xml" 1779912880.96202 2304 880e1ea175f9575c442e604e33247d98 "pdflatex"
+  "main.out" 1779999930.44199 4039 ce195dd7c44611da1f8941ea3272a267 "pdflatex"
+  "main.run.xml" 1779999930.44798 2304 880e1ea175f9575c442e604e33247d98 "pdflatex"
   (generated)
   "main.aux"
   "main.bcf"

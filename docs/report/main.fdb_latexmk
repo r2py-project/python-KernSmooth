@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1779809522.27852 "/users/ycai9/Yufei/python-KernSmooth/docs/report/main.tex" "main.pdf" "main" 1779809525.61481 0
+["pdflatex"] 1779998423.87991 "/users/ycai9/Yufei/python-KernSmooth/docs/report/main.tex" "main.pdf" "main" 1779998427.55648 0
   "../../.claude/agents/analyze-c-file-dependencies.md" 1778607225.6926 3113 27bec7b604c14d8a4b6878dd9dc8bae0 ""
   "../../.claude/agents/analyze-r-file-dependencies.md" 1778607225.70758 2848 98903cb425f31ea184d96dcc048dd76c ""
   "../../.claude/agents/convert-r-function-to-python.md" 1779210111.4322 3493 9ed527ef2284bd88c0d0dc2d0d2455ad ""
@@ -149,10 +149,10 @@
   "/software/t/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1779135676 5573040 5cf6d45dfd30c1d1bff9454f98c8864b ""
   "/software/t/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1779135902 3651062 d235d35aa376642b6b5d5cddcacab078 ""
   "/software/t/texlive/2026/texmf.cnf" 1779135640.18643 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
-  "/users/ycai9/Yufei/python-KernSmooth/docs/report/main.tex" 1779809521.67984 110256 555a4384dc950cdc796fb664c960ce50 ""
-  "main.aux" 1779809525.38882 22777 847af627c14be6792552de2d61b00bb6 "pdflatex"
-  "main.out" 1779809525.39382 24810 cb62f2e51b690217ac54475ce9188b5f "pdflatex"
-  "main.toc" 1779809525.39582 11649 ba93c2eae518debeb45e2bee081b1449 "pdflatex"
+  "/users/ycai9/Yufei/python-KernSmooth/docs/report/main.tex" 1779998423.14089 110274 792daa624daa8805c66b61248fd19fc8 ""
+  "main.aux" 1779998427.30488 22777 847af627c14be6792552de2d61b00bb6 "pdflatex"
+  "main.out" 1779998427.30987 24810 cb62f2e51b690217ac54475ce9188b5f "pdflatex"
+  "main.toc" 1779998427.31287 11649 ba93c2eae518debeb45e2bee081b1449 "pdflatex"
   (generated)
   "main.aux"
   "main.log"
