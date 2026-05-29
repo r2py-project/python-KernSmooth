@@ -1,11 +1,11 @@
 # Fdb version 4
-["biber supp"] 1779901162.02403 "supp.bcf" "supp.bbl" "supp" 1779901168.0507 0
-  "supp.bcf" 1779901167.8375 107746 a0983805a63dc395b7627a7a05dd3b75 "pdflatex"
+["biber supp"] 1780078144.13651 "supp.bcf" "supp.bbl" "supp" 1780078892.40958 0
+  "supp.bcf" 1780078892.20523 107746 a0983805a63dc395b7627a7a05dd3b75 "pdflatex"
   (generated)
   "supp.bbl"
   "supp.blg"
   (rewritten before read)
-["pdflatex"] 1779901165.86887 "/users/ycai9/Yufei/python-KernSmooth/docs/paper/supp.tex" "supp.pdf" "supp" 1779901168.05189 0
+["pdflatex"] 1780078890.08862 "/users/ycai9/Yufei/python-KernSmooth/docs/paper/supp.tex" "supp.pdf" "supp" 1780078892.41076 0
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -147,6 +147,7 @@
   "/software/t/texlive/2026/texmf-dist/tex/latex/parskip/parskip.sty" 1615762720 4288 94714aa7f535440f33181fec52a31963 ""
   "/software/t/texlive/2026/texmf-dist/tex/latex/refcount/refcount.sty" 1576624809 9878 9e94e8fa600d95f9c7731bb21dfb67a4 ""
   "/software/t/texlive/2026/texmf-dist/tex/latex/rerunfilecheck/rerunfilecheck.sty" 1750533675 9684 a33a14b82ce60d6e77cb9be689d79ee6 ""
+  "/software/t/texlive/2026/texmf-dist/tex/latex/tocloft/tocloft.sty" 1578692495 36103 3e78d14f0f4b1a30560fea5e04de805d ""
   "/software/t/texlive/2026/texmf-dist/tex/latex/tools/array.sty" 1761946296 15651 9d7c62df82cb29a555c00550babfe364 ""
   "/software/t/texlive/2026/texmf-dist/tex/latex/tools/longtable.sty" 1761946296 16014 dfa4b4d4e04a78a3f05a90c19711737a ""
   "/software/t/texlive/2026/texmf-dist/tex/latex/url/url.sty" 1388531844 12796 8edb7d69a20b857904dd0ea757c14ec9 ""
@@ -155,12 +156,12 @@
   "/software/t/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1779135676 5573040 5cf6d45dfd30c1d1bff9454f98c8864b ""
   "/software/t/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1779135902 3651062 d235d35aa376642b6b5d5cddcacab078 ""
   "/software/t/texlive/2026/texmf.cnf" 1779135640.18643 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
-  "/users/ycai9/Yufei/python-KernSmooth/docs/paper/supp.tex" 1779823188.25797 44874 5e059643bea3861346483382c73dc453 ""
-  "supp.aux" 1779901167.8325 10909 3e0fa6adc3cca8b58fff7885eb4f2205 "pdflatex"
-  "supp.bbl" 1779901163.65154 466 76d65a242ec496c9b4361af646ff12cb "biber supp"
-  "supp.out" 1779901167.8345 8513 0e4e861ad552d30798f7f1f762019a6a "pdflatex"
-  "supp.run.xml" 1779901167.8405 2304 f4b5fbc650f5171cc74238d97536c834 "pdflatex"
-  "supp.toc" 1779901167.8415 4027 6ae53ac78cf3b7b217e2ba3031b87b22 "pdflatex"
+  "/users/ycai9/Yufei/python-KernSmooth/docs/paper/supp.tex" 1780078889.40926 45209 2d8f4590c560e934be434f34d5404f6e ""
+  "supp.aux" 1780078892.19923 11003 1f7b5240d0f72f86f46848e2fa818f89 "pdflatex"
+  "supp.bbl" 1780078145.71965 466 76d65a242ec496c9b4361af646ff12cb "biber supp"
+  "supp.out" 1780078892.20223 8513 0e4e861ad552d30798f7f1f762019a6a "pdflatex"
+  "supp.run.xml" 1780078892.20823 2304 f4b5fbc650f5171cc74238d97536c834 "pdflatex"
+  "supp.toc" 1780078892.20823 4057 8594376db5c165be051fad2051d05ddf "pdflatex"
   (generated)
   "supp.aux"
   "supp.bcf"

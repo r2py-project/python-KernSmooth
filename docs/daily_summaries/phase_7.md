@@ -37,7 +37,7 @@
 
 ### 1. Abstract
 
-The `/generate-python-file-tests` skill was invoked to create comprehensive `pytest` suites for all public-facing functions in `r2py_kernsmooth/r2py_kernsmooth/__init__.py`. The R package's CRAN reference manual was fetched to identify the seven exported public interfaces (`bkde`, `bkde2D`, `bkfe`, `dpih`, `dpik`, `dpill`, `locpoly`), filtering out the seven internal helpers (`blkest`, `cpblock`, `linbin`, `linbin2D`, `rlbin`, `sdiag`, `sstdiag`) present in `__all__` but absent from the R documentation. Sequential invocation of the `generate-python-function-tests` sub-agent produced 516 tests across 21 files. During the `dpill` generation pass, the sub-agent discovered a pre-existing bug in the `blkest` Fortran/f2py interface that caused 60 of 83 `dpill` tests to fail.
+The `/generate-python-file-tests` skill was invoked to create comprehensive `pytest` suites for all public-facing functions in `r2py_kernsmooth/r2py_kernsmooth/__init__.py`. The R package's CRAN reference manual was fetched to identify the seven exported public interfaces (`bkde`, `bkde2D`, `bkfe`, `dpih`, `dpik`, `dpill`, `locpoly`), filtering out the seven internal helpers (`blkest`, `cpblock`, `linbin`, `linbin2D`, `rlbin`, `sdiag`, `sstdiag`) present in `__all__` but absent from the R documentation. Sequential invocation of the `generate-python-function-tests` sub-agent produced 514 tests across 21 files. During the `dpill` generation pass, the sub-agent discovered a pre-existing bug in the `blkest` Fortran/f2py interface that caused 60 of 83 `dpill` tests to fail.
 
 ---
 
@@ -88,13 +88,13 @@ The `generate-python-function-tests` sub-agent was invoked sequentially for each
 - *Negative* (23 tests, `test_dpik_negative.py`): `level` out of range; unrecognised/ambiguous kernel; unrecognised `scalest`; constant data per `scalest`; zero-IQR data; n=1; Inf/-Inf/NaN; empty array; degenerate `range_x`; `level=6` across all 5 kernels (parametrised).
 - *Edge* (44 tests, `test_dpik_edge.py`): Scale invariance `dpik(c*x) == c * dpik(x)` verified against R including small c=0.001; location shift invariance; large/small magnitude data; all-negative data; `canonical=True` kernel-independence; gridsize extremes; (kernel, level) and (kernel, canonical) parametrised spot-checks.
 
-**`dpill` — 83 tests written; 21 pass initially, 60 fail (bug discovered):**
+**`dpill` — 83 tests written; 21 pass initially, 62 fail (bug discovered):**
 
-- *Positive* (44 tests, `test_dpill_positive.py`) and *Edge* (23 tests, `test_dpill_edge.py`): Standard regression scenarios, various `blockmax`/`divisor`/`trim`/`proptrun`/`gridsize`; scale and shift invariance; reproducibility; various regression functions (linear, quadratic, sine, cosine, exponential decay).
+- *Positive* (38 tests, `test_dpill_positive.py`) and *Edge* (28 tests, `test_dpill_edge.py`): Standard regression scenarios, various `blockmax`/`divisor`/`trim`/`proptrun`/`gridsize`; scale and shift invariance; reproducibility; various regression functions (linear, quadratic, sine, cosine, exponential decay).
 - *Negative* (17 tests, `test_dpill_negative.py`): n=1, empty arrays, mismatched lengths, constant x, Inf/NaN, degenerate `range_x`, `trim=0.5`, `gridsize=0/1`. All 17 pass immediately (both Python and R raise for all these inputs).
 - **Bug discovered:** 60 positive and edge tests fail with `ValueError: cannot convert float NaN to integer` inside `_discretize_bandwidth`. Root cause identified by the sub-agent: `blkest`'s Fortran scalar outputs `sigsqe`, `th22e`, `th24e` were being declared as `input float` in the f2py interface, so the Fortran-computed values were never returned to Python. `blkest` always returned zeros, causing `gamseh = sigsqQ / (abs(th24Q) * n)` to divide by zero, propagating NaN as the `bandwidth` argument into `locpoly`.
 
-**`locpoly` — 74 tests (all pass; existing `test_locpoly.py` reviewed and supplemented):**
+**`locpoly` — 72 tests (all pass; existing `test_locpoly.py` reviewed and supplemented):**
 
 - *Positive* (38 tests, `test_locpoly_positive.py`): Regression mode with `drv` ∈ {0, 1, 2, 3}; default/explicit `degree`; scalar and vector bandwidth; `truncate=True/False`; `binned=True`; `bwdisc` variation; `range_x`, `gridsize`; negative x; constant/linear y; n=1000; integer coercion; Prestige dataset canonical example. Density mode (`y=None`): standard normal, uniform, `drv=1`, custom `range_x`, 5% range extension.
 - *Negative* (11 tests, `test_locpoly_negative.py`): Negative/zero/very-negative bandwidth (regression and density); bandwidth vector with non-positive entry; wrong-length bandwidth vector; bandwidth too small (Lvec==0); missing bandwidth (both raise, message differs).
@@ -113,9 +113,9 @@ The `generate-python-function-tests` sub-agent was invoked sequentially for each
 | `bkfe` | 24 | 9 | 16 | 49 | 49 |
 | `dpih` | 32 | 15 | 24 | 71 | 71 |
 | `dpik` | 52 | 23 | 44 | 119 | 119 |
-| `dpill` | 44 | 17 | 22 | 83 | 21 |
-| `locpoly` | 38 | 11 | 23 | 74 | 74 (2 pre-existing pass) |
-| **Total** | **246** | **96** | **172** | **516** | **454** |
+| `dpill` | 38 | 17 | 28 | 83 | 21 |
+| `locpoly` | 38 | 11 | 23 | 72 | 72 |
+| **Total** | **240** | **96** | **178** | **514** | **452** |
 
 #### 3.2 `blkest` f2py Bug Pre-identified by Test Generation
 

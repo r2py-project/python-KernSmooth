@@ -1251,10 +1251,10 @@ Function & Positive & Negative & Edge & Total & Initial pass \\
 \texttt{bkfe}    & 24 &  9 & 16 &  49 & 49 \\
 \texttt{dpih}    & 32 & 15 & 24 &  71 & 71 \\
 \texttt{dpik}    & 52 & 23 & 44 & 119 & 119 \\
-\texttt{dpill}   & 44 & 17 & 22 &  83 & 21 \\
-\texttt{locpoly} & 38 & 11 & 23 &  74 & 74 \\
+\texttt{dpill}   & 38 & 17 & 28 &  83 & 21 \\
+\texttt{locpoly} & 38 & 11 & 23 &  72 & 72 \\
 \midrule
-\textbf{Total}   & \textbf{246} & \textbf{96} & \textbf{172} & \textbf{516} & \textbf{454} \\
+\textbf{Total}   & \textbf{240} & \textbf{96} & \textbf{178} & \textbf{514} & \textbf{452} \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1344,7 +1344,7 @@ After all three bugs were fixed and the package rebuilt, the complete test suite
 python -m pytest r2py_kernsmooth/tests/ -q
 \end{lstlisting}
 
-Result: \textbf{518~passed, 0~skipped, 0~failed} in 6.40~seconds under Python~3.14.4 / pytest~9.0.3. The suite covers all 7~public functions across 21~test files, with 246~positive tests, 96~negative tests, and 172~edge-case tests, all asserting live numerical agreement or similar exception handling against R~\texttt{KernSmooth}~2.23 via \texttt{rpy2}.
+Result: \textbf{518~passed, 0~skipped, 0~failed} in 6.40~seconds under Python~3.14.4 / pytest~9.0.3. The suite covers all 7~public functions across 21~test files, with 240~positive tests, 96~negative tests, and 178~edge-case tests, all asserting live numerical agreement or similar exception handling against R~\texttt{KernSmooth}~2.23 via \texttt{rpy2}.
 
 % =============================================================================
 % Bibliography
