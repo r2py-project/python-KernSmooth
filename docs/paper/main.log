@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  29 MAY 2026 14:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  1 JUN 2026 16:27
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -815,63 +815,69 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has b
 <to be read again> 
                    \relax 
 l.62 
-      [1{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}] [2] [3] [4]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 100.
+      [1{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}] [2]
+<figures/overview.pdf, id=128, 2902.845pt x 1242.56212pt>
+File: figures/overview.pdf Graphic file (type pdf)
+<use figures/overview.pdf>
+Package pdftex.def Info: figures/overview.pdf  used on input line 78.
+(pdftex.def)             Requested size: 438.513pt x 187.70348pt.
+ [3] [4 <./figures/overview.pdf>]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 101.
  (/software/t/texlive/2026/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-Underfull \hbox (badness 10000) in paragraph at lines 120--120
+Underfull \hbox (badness 10000) in paragraph at lines 121--121
 []\T1/lmr/m/n/12 (+20) Figure 3: |Ex-am-ple of the JSON arte-fact pro-duced by the
  []
 
 [5{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}] [6] [7]
-Overfull \hbox (82.73178pt too wide) in paragraph at lines 177--191
+Overfull \hbox (82.73178pt too wide) in paragraph at lines 178--192
 [][] 
  []
 
 
-Overfull \hbox (17.56644pt too wide) in paragraph at lines 194--195
+Overfull \hbox (17.56644pt too wide) in paragraph at lines 195--196
 \T1/lmr/m/n/12 (-20) chi-tec-ture (Fig. [][]2[][]), as in Phase 1. First, the \T1/lmtt/m/n/12 /extract-r-folder-language-dependencies
  []
 
 [8] [9] [10]
-Overfull \hbox (518.59146pt too wide) in paragraph at lines 242--242
+Overfull \hbox (518.59146pt too wide) in paragraph at lines 243--243
 []  \T1/lmtt/m/n/12 "function_prototype": "def rlbin(X: np.ndarray[np.float64], Y: np.ndarray[np.float64], gpoints: np.ndarray[np.float64], truncate: bool = True) -> dict:",[] 
  []
 
 
-Overfull \hbox (463.02344pt too wide) in paragraph at lines 242--242
+Overfull \hbox (463.02344pt too wide) in paragraph at lines 243--243
 []    \T1/lmtt/m/n/12 "    _KernSmooth.rlbin(np.asarray(X, dtype=np.float64), np.asarray(Y, dtype=np.float64), np.int32(n), a, b, np.int32(M), trun, xcnts, ycnts)",[] 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 243--243
+Underfull \hbox (badness 10000) in paragraph at lines 244--244
 []\T1/lmr/m/n/12 (+20) Figure 6: |Ex-am-ple of the JSON arte-fact pro-duced by the
  []
 
-[11] [12] [13{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [14] [15]
-Overfull \hbox (10.267pt too wide) in paragraph at lines 313--314
+[11] [12] [13] [14{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}] [15] [16]
+Overfull \hbox (10.267pt too wide) in paragraph at lines 314--315
 []\T1/lmr/m/n/12 (-20) The de-tected fail-ures are then ad-dressed sys-tem-at-i-cally. The \T1/lmtt/m/n/12 /fix-bugs-found-in-tests
  []
 
-[16] [17] [18]
+[17] [18] [19]
 Package microtype Info: Character `029' is missing
 (microtype)             in font `T1/lmr/m/sc/12'.
 (microtype)             Ignoring protrusion settings for this character.
- [19]
-Overfull \hbox (111.0766pt too wide) in paragraph at lines 337--338
+ [20]
+Overfull \hbox (111.0766pt too wide) in paragraph at lines 338--339
 []\T1/lmr/m/n/12 (-20) The pack-age's \T1/lmtt/m/n/12 NAMESPACE \T1/lmr/m/n/12 (-20) file de-clares \T1/lmtt/m/n/12 useDynLib(KernSmooth, .registration = TRUE, .fixes = "F_")\T1/lmr/m/n/12 (-20) ,
  []
 
-[20]
+[21]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 345.
- [21]
-Overfull \hbox (13.62805pt too wide) in paragraph at lines 365--366
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 346.
+ [22]
+Overfull \hbox (13.62805pt too wide) in paragraph at lines 366--367
 \T1/lmr/m/n/12 (-20) with non-integer ex-po-nents. The cor-rect Python id-iom is \T1/lmtt/m/n/12 math.copysign(abs(x)**(1/n),
  []
 
-[22{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [23] (./main.aux)
+[23{/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}] [24] (./main.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-04-28>
@@ -883,18 +889,18 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 23066 strings out of 467341
- 402048 string characters out of 5414848
- 1284765 words of memory out of 5000000
- 51626 multiletter control sequences out of 15000+600000
+ 23074 strings out of 467341
+ 402267 string characters out of 5414848
+ 1287061 words of memory out of 5000000
+ 51633 multiletter control sequences out of 15000+600000
  689972 words of font info for 169 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 75i,12n,79p,1967b,1489s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,1967b,1491s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmcsc10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmex10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on main.pdf (24 pages, 361148 bytes).
+Output written on main.pdf (25 pages, 804193 bytes).
 PDF statistics:
- 378 PDF objects out of 1000 (max. 8388607)
- 316 compressed objects within 4 object streams
- 77 named destinations out of 1000 (max. 500000)
- 34441 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 486 PDF objects out of 1000 (max. 8388607)
+ 336 compressed objects within 4 object streams
+ 78 named destinations out of 1000 (max. 500000)
+ 34446 words of extra memory for PDF output out of 35830 (max. 10000000)
 

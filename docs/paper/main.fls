@@ -270,6 +270,11 @@ INPUT /software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc
 INPUT /software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc
 INPUT /software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmbx12.tfm
 INPUT /software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmbx12.tfm
+INPUT ./figures/overview.pdf
+INPUT ./figures/overview.pdf
+INPUT ./figures/overview.pdf
+INPUT ./figures/overview.pdf
+INPUT ./figures/overview.pdf
 INPUT /software/t/texlive/2026/texmf-dist/tex/latex/lm/ts1lmr.fd
 INPUT /software/t/texlive/2026/texmf-dist/tex/latex/lm/ts1lmr.fd
 INPUT /software/t/texlive/2026/texmf-dist/tex/latex/lm/ts1lmr.fd
