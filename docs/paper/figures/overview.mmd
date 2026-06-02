@@ -1,0 +1,45 @@
+---
+config:
+  flowchart: {}
+  layout: fixed
+---
+flowchart LR
+ subgraph Legend["Legend"]
+    direction TB
+        L1["Skill Box"]
+        L2["Manual Step"]
+        L3(["Sub-agent Icon"])
+  end
+    Legend ~~~ P1["<b>Phase 1</b><br>Static Structural Analysis<br>Skill:<br>/analyze-r-folder-dependencies"]
+    P1 -. Dispatch: Sequential .-> A1(["@analyze-r-file-dependencies"])
+    P3["<b>Phase 3</b><br>Language Dependency Cataloguing<br>Skills:<br>/extract-r-folder-language-dependencies<br>/generate-language-dependency-conversion-guides"] -. Dispatch: Sequential & Parallel .-> A3(["@extract-r-file-language-dependencies<br>@generate-language-dependency-conversion-guide"])
+    P4["<b>Phase 4</b><br>Automated Function Conversion<br>Skill:<br>/convert-r-file-to-python"] -. Dispatch: Sequential .-> A4(["@convert-r-function-to-python"])
+    P6["<b>Phase 6</b><br>R Test Porting<br>Skill:<br>/convert-r-tests-to-python"] -. Dispatch: Sequential .-> A6(["@convert-r-test-to-python"])
+    P7["<b>Phase 7</b><br>Test Suite &amp; Bug Resolution<br>Skills:<br>/generate-python-file-tests<br>/fix-bugs-found-in-tests"] -. Dispatch: Sequential & Iterative .-> A7(["@generate-python-function-tests<br>@fix-bug-found-in-test"])
+    P1 -- "Structural analysis JSON & Dependency-level CSV" --> P3
+    P1 -.-> P2["<b>Phase 2</b><br>Python Build Infrastructure<br><i>Manual design</i>"]
+    P2 -.-> P3
+    P3 -- Markdown conversion guides --> P4
+    P4 -- Converted Python module --> P5["<b>Phase 5</b><br>Code Quality Auditing<br><i>Manual design</i>"]
+    P5 --> P6
+    P6 -- Test files --> P7
+
+     L1:::skillBox
+     L2:::manualBox
+     L3:::agentIcon
+     P1:::skillBox
+     A1:::agentIcon
+     P3:::skillBox
+     A3:::agentIcon
+     P4:::skillBox
+     A4:::agentIcon
+     P6:::skillBox
+     A6:::agentIcon
+     P7:::skillBox
+     A7:::agentIcon
+     P2:::manualBox
+     P5:::manualBox
+    classDef default font-size:16px,font-family:Helvetica
+    classDef skillBox fill:#D4E6F1,stroke:#2874A6,stroke-width:2px,color:#000000,rx:5,ry:5
+    classDef manualBox fill:#E5E7E9,stroke:#7B7D7D,stroke-width:2px,color:#000000,rx:5,ry:5
+    classDef agentIcon fill:#F9E79F,stroke:#B7950B,stroke-width:2px,color:#000000,rx:15,ry:15,font-weight:bold

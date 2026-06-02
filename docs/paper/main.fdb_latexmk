@@ -1,12 +1,12 @@
 # Fdb version 4
-["biber main"] 1779911295.2765 "main.bcf" "main.bbl" "main" 1780345623.57702 0
-  "main.bcf" 1780345623.33899 109720 71e21addd52d47024a59159193ed6454 "pdflatex"
+["biber main"] 1779911295.2765 "main.bcf" "main.bbl" "main" 1780431145.7641 0
+  "main.bcf" 1780431145.51688 109720 71e21addd52d47024a59159193ed6454 "pdflatex"
   "reference.bib" 1779822473.06406 6130 0611a83695d53ee824e63809c37ab5b4 ""
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1780345620.99161 "/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex" "main.pdf" "main" 1780345623.57819 0
+["pdflatex"] 1780431143.14552 "/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex" "main.pdf" "main" 1780431145.7653 0
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc" 1254269338 2375 baa924870cfb487815765f9094cf3728 ""
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc" 1202520719 3486 c7eadf5dcc57b3b2d11736679f6636ba ""
   "/software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc" 1202520719 2405 5dcf2c1b967ee25cc46c58cd52244aed ""
@@ -152,12 +152,13 @@
   "/software/t/texlive/2026/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1779135676 5573040 5cf6d45dfd30c1d1bff9454f98c8864b ""
   "/software/t/texlive/2026/texmf-var/web2c/pdftex/pdflatex.fmt" 1779135902 3651062 d235d35aa376642b6b5d5cddcacab078 ""
   "/software/t/texlive/2026/texmf.cnf" 1779135640.18643 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
-  "/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex" 1780345617.65904 72588 2e558ce8747293a6cb95a0f0570ccb11 ""
-  "figures/overview.pdf" 1780345558.97088 460236 157d849f7425c6918d303b4c4f91e97c ""
-  "main.aux" 1780345623.33099 20515 16bd3e5944c846bb81a9b8eb6a801228 "pdflatex"
+  "/users/ycai9/Yufei/python-KernSmooth/docs/paper/main.tex" 1780420644.29496 70641 eb01b43686d091facac0d4292f403836 ""
+  "figures/orchestration.pdf" 1780431141.89515 45789 a13e694cf40832d59d045327064a476e ""
+  "figures/overview.pdf" 1780420031.83891 771554 fa9e909f0c4b676823bfa71366caab22 ""
+  "main.aux" 1780431145.50988 20517 3511fed2711541a86b9236420b787119 "pdflatex"
   "main.bbl" 1779911297.10266 28568 f02b903b8b97c8b723949118a8d93b07 "biber main"
-  "main.out" 1780345623.33499 4039 ce195dd7c44611da1f8941ea3272a267 "pdflatex"
-  "main.run.xml" 1780345623.34199 2304 880e1ea175f9575c442e604e33247d98 "pdflatex"
+  "main.out" 1780431145.51388 4039 ce195dd7c44611da1f8941ea3272a267 "pdflatex"
+  "main.run.xml" 1780431145.51988 2304 880e1ea175f9575c442e604e33247d98 "pdflatex"
   (generated)
   "main.aux"
   "main.bcf"

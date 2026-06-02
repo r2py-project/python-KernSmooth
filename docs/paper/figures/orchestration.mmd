@@ -1,0 +1,85 @@
+%%{init: {"themeVariables": {"fontSize": "20px", "fontFamily": "Helvetica"}}}%%
+flowchart TB
+ subgraph Inputs["Multiple Input Files in Parallel"]
+        I1[/"R / Python Source <br/> Files / Fragments"/]
+        I2[/"JSON / CSV <br/> Dependency Maps"/]
+        I3[/"Markdown <br/> Conversion Guides"/]
+  end
+ subgraph Level1["Level 1: Top-Level Orchestration"]
+    direction TB
+        Inputs
+        S{{"Skill (/ Command) <br/> Applies Context-Construction Logic"}}
+        B("Per-Item Context Bundle")
+  end
+ subgraph Seq["Sequential Dispatch"]
+    direction TB
+        SA("Single Agent Instance <br/> (Topological Order)")
+        SO[/"Output Artefact"/]
+  end
+ subgraph Par["Parallel Dispatch"]
+    direction TB
+        PO1[/"Output Artefact 1"/]
+        PA1("Agent Instance 1")
+        PO2[/"Output Artefact 2"/]
+        PA2("Agent Instance 2")
+        PON[/"Output Artefact N"/]
+        PAN("Agent Instance N")
+  end
+ subgraph Iter["Iterative Dispatch"]
+    direction TB
+        T("Run Tests")
+        FA("Fix-Agent Instance")
+        RI["Reinstall Package"]
+        P((("All Pass")))
+  end
+ subgraph Level2["Level 2: Sub-Agent Dispatch Modes"]
+    direction TB
+        Seq
+        Par
+        Iter
+  end
+    I1 --> S
+    I2 --> S
+    I3 --> S
+    S --> B
+    SA -- Writes --> SO
+    SO -. Next Item .-> SA
+    PA1 -- Writes --> PO1
+    PA2 -- Writes --> PO2
+    PAN -- Writes --> PON
+    T -- First Failure --> FA
+    FA --> RI
+    RI -- Repeat --> T
+    T -- All Pass --> P
+    B -. Phases 1, 4, 6, 7a .- SA
+    B -. Phase 3b .- PA2
+    B -. Phase 7b .- T
+    Seq ~~~ Par
+    PO2 ~~~ T
+
+     I1:::input
+     I2:::input
+     I3:::input
+     S:::skill
+     B:::bundle
+     SA:::agent
+     SO:::artefact
+     PA1:::agent
+     PO1:::artefact
+     PA2:::agent
+     PO2:::artefact
+     PAN:::agent
+     PON:::artefact
+     T:::action
+     FA:::fixAgent
+     RI:::artefact
+     P:::pass
+     
+    classDef input fill:#77AADD,stroke:#333,stroke-width:1px,color:#000
+    classDef agent fill:#99DDFF,stroke:#333,stroke-width:1px,color:#000
+    classDef pass fill:#44BB99,stroke:#333,stroke-width:2px,color:#000
+    classDef bundle fill:#BBCC33,stroke:#333,stroke-width:1px,color:#000
+    classDef action fill:#EEDD88,stroke:#333,stroke-width:1px,color:#000
+    classDef skill fill:#EE8866,stroke:#333,stroke-width:2px,color:#000,font-weight:bold
+    classDef fixAgent fill:#FFAABB,stroke:#333,stroke-width:1px,color:#000
+    classDef artefact fill:#DDDDDD,stroke:#333,stroke-width:1px,color:#000
