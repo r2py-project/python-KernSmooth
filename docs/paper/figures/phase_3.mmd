@@ -1,0 +1,37 @@
+flowchart LR
+    %% Styling based on provided color palette
+    classDef skill fill:#77AADD,stroke:#333,stroke-width:2px,color:#000
+    classDef agent fill:#EEDD88,stroke:#333,stroke-width:2px,color:#000
+    classDef process fill:#44BB99,stroke:#333,stroke-width:2px,color:#000
+    classDef data fill:#DDDDDD,stroke:#333,stroke-width:2px,color:#000
+    classDef annotation fill:#FFAABB,stroke:#333,stroke-width:2px,color:#000,stroke-dasharray: 5 5
+
+    subgraph Stage1 [Stage 1: Extraction]
+        direction TB
+        S1["Skill:<br/>/extract-r-folder-language-dependencies"]:::skill
+        A1(["Agent:<br/>@extract-r-file-language-dependencies"]):::agent
+        D1[/"4-Column CSV<br/>(Per File)"/]:::data
+        P1["Utility Script<br/>(Merges & Sorts)"]:::process
+        D2[/"Combined CSV<br/>(370 Rows)"/]:::data
+
+        S1 -- "Sequential Dispatch<br/>(Per R File)" --> A1
+        A1 -- "Produces" --> D1
+        D1 --> P1
+        P1 --> D2
+    end
+
+    subgraph Stage2 [Stage 2: Guide Generation]
+        direction TB
+        S2["Skill:<br/>/generate-language-dependency-conversion-guides"]:::skill
+        P2["Group Rows by Dependency<br/>(46 Unique)"]:::process
+        A2(["46 Agents:<br/>@generate-language-dependency-conversion-guide"]):::agent
+        D3[/"Markdown Conversion Guides<br/>(conversion_guides/)"/]:::data
+        N1["Annotation:<br/>Parallel dispatch; agents<br/>are context-independent."]:::annotation
+
+        S2 --> P2
+        P2 -- "Parallel Dispatch<br/>(Simultaneous Batch)" --> A2
+        A2 -- "Reads subset & R source,<br/>writes guide" --> D3
+        A2 -.- N1
+    end
+
+    D2 -- "Reads Table" --> S2

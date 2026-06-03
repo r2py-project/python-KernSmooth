@@ -1,0 +1,83 @@
+flowchart TB
+    subgraph LeftPanel ["Left Panel: Dependency Hierarchy"]
+        direction BT
+
+        subgraph L2 ["Level 2 (Leaves)"]
+            direction LR
+            linbin[linbin]
+            rlbin[rlbin]
+        end
+
+        subgraph L1 ["Level 1 (Intermediate)"]
+            direction LR
+            bkfe[bkfe]
+            blkest[blkest]
+            cpblock[cpblock]
+            linbin2D[linbin2D]
+            locpoly[locpoly]
+            sdiag[sdiag]
+            sstdiag[sstdiag]
+        end
+
+        subgraph L0 ["Level 0 (Roots)"]
+            direction LR
+            onAttach[.onAttach]
+            onUnload[.onUnload]
+            bkde[bkde]
+            bkde2D[bkde2D]
+            dpih[dpih]
+            dpik[dpik]
+            dpill[dpill]
+        end
+
+        %% Conversion Flow Arrow
+        L2 -->|Conversion order<br/>Sequential: each agent reads prior outputs of internal callees| L1
+        L1 --> L0
+
+        %% Internal Dependencies (Dashed lines to avoid cluttering the solid conversion order)
+        bkde -.-> linbin
+        bkde2D -.-> linbin2D
+        dpih -.-> bkfe & linbin
+        dpik -.-> bkfe & linbin
+        dpill -.-> blkest & cpblock & locpoly & rlbin & sdiag & sstdiag
+        bkfe -.-> linbin
+        locpoly -.-> linbin & rlbin
+        sdiag -.-> linbin
+        sstdiag -.-> linbin
+    end
+
+    subgraph RightPanel ["Right Panel: Agent Invocation & Assembly"]
+        direction TB
+        
+        Inputs["Inputs:<br/>1. R source fragment<br/>2. JSON dependency map<br/>3. 46 conversion guides<br/>4. Output folder"]
+        
+        agent("@convert-r-function-to-python")
+        json_out[/"1 JSON artefact"/]
+        
+        combine("/combine-python-functions-into-file")
+        init_py["__init__.py"]
+
+        Inputs --> agent
+        agent --> json_out
+        json_out -- "x16" --> combine
+        combine --> init_py
+    end
+
+    LeftPanel ~~~ RightPanel
+
+    %% Strict Application of the Provided Color Palette
+    classDef l0 fill:#99DDFF,stroke:#77AADD,stroke-width:2px,color:#000
+    classDef l1 fill:#EEDD88,stroke:#AAAA00,stroke-width:2px,color:#000
+    classDef l2 fill:#FFAABB,stroke:#EE8866,stroke-width:2px,color:#000
+    classDef inputs fill:#DDDDDD,stroke:#333,stroke-width:1px,color:#000
+    classDef agnt fill:#44BB99,stroke:#333,stroke-width:2px,color:#000
+    classDef skll fill:#BBCC33,stroke:#333,stroke-width:2px,color:#000
+    classDef artf fill:#DDDDDD,stroke:#333,stroke-width:1px,color:#000
+
+    class onAttach,onUnload,bkde,bkde2D,dpih,dpik,dpill l0
+    class bkfe,blkest,cpblock,linbin2D,locpoly,sdiag,sstdiag l1
+    class linbin,rlbin l2
+    class Inputs inputs
+    class agent agnt
+    class combine skll
+    class json_out,init_py artf

@@ -130,11 +130,11 @@ Because \pkg{KernSmooth} consolidates all R code into a single file (\texttt{Ker
 function & level & parents & children \\ \hline
 .onAttach & 0 (leaf) &  &  \\ \hline
 .onUnload & 0 (leaf) &  &  \\ \hline
-bkde & 0 & linbin &  \\ \hline
-bkde2D & 0 & linbin2D &  \\ \hline
-dpih & 0 & bkfe; linbin &  \\ \hline
-dpik & 0 & bkfe; linbin &  \\ \hline
-dpill & 0 & blkest; cpblock; locpoly; rlbin; sdiag; sstdiag &  \\ \hline
+bkde & 0 &  & linbin \\ \hline
+bkde2D & 0 &  & linbin2D \\ \hline
+dpih & 0 &  & bkfe; linbin \\ \hline
+dpik & 0 &  & bkfe; linbin \\ \hline
+dpill & 0 &  & blkest; cpblock; locpoly; rlbin; sdiag; sstdiag \\ \hline
 bkfe & 1 & dpih; dpik & linbin \\ \hline
 blkest & 1 (leaf) & dpill &  \\ \hline
 cpblock & 1 (leaf) & dpill &  \\ \hline
@@ -168,7 +168,7 @@ As a consequence, Phase~3 systematically catalogues every R standard-library cal
 
 \begin{figure}[htbp]
 \centering
-\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Figure 3 placeholder]}\\\vspace{0.4em}\textit{Phase 3 pipeline. A two-stage diagram. Stage 1 (left): the \texttt{/extract-r-folder-language-dependencies} skill dispatches the \texttt{@extract-r-file-language-dependencies} agent sequentially per R file, producing a 4-column CSV (language\_dependency, function\_name, line\_number, call\_body) with 370 rows. A utility script merges per-file CSVs into a combined table and sorts rows by dependency name, making entries for the same dependency contiguous. Stage 2 (right): the \texttt{/generate-language-dependency-conversion-guides} skill reads the combined CSV, groups rows by dependency name to find 46 unique dependencies, and dispatches 46 instances of the \texttt{@generate-language-dependency-conversion-guide} agent simultaneously in a single parallel batch. Each agent reads its CSV subset and the corresponding R source lines, optionally consults online R documentation, and writes a Markdown conversion guide to \texttt{language\_dependency\_analysis/conversion\_guides/}. Arrows indicate data flow. An annotation highlights the key design choice: ``Parallel dispatch; agents are context-independent.''}\\\vspace{1.2em}\end{minipage}}
+\includegraphics[width=\textwidth]{figures/phase_3.pdf}
 \caption{\textbf{Phase~3: language dependency extraction and parallel conversion guide generation.} The first stage extracts the complete call-site table (370 rows, 4 columns) from the R source via sequential agent dispatch. The second stage launches 46 sub-agent instances simultaneously---one per unique language dependency---each producing a Markdown guide specifying the exact Python translation strategy with code examples. Parallel dispatch is appropriate because the guide for each dependency is context-independent of all other guides.}
 \label{fig:phase3}
 \end{figure}
@@ -214,7 +214,7 @@ Two challenges make the conversion step non-trivial despite all the preparation 
 
 \begin{figure}[htbp]
 \centering
-\fbox{\begin{minipage}{0.92\linewidth}\centering\vspace{1.2em}\textbf{[Figure 4 placeholder]}\\\vspace{0.4em}\textit{Phase 4 conversion pipeline. Left panel: a dependency level diagram showing the three-level hierarchy of the 16 KernSmooth functions (Level~2: linbin, rlbin; Level~1: bkfe, blkest, cpblock, linbin2D, locpoly, sdiag, sstdiag; Level~0: .onAttach, .onUnload, bkde, bkde2D, dpih, dpik, dpill). Arrows show internal calls. A bottom-to-top arrow labelled ``Conversion order'' indicates that the \texttt{/convert-r-file-to-python} skill processes Level~2 first, then Level~1, then Level~0, sequentially. Right panel: the per-function agent invocation. A single \texttt{@convert-r-function-to-python} agent instance receives four inputs (R source fragment, JSON dependency map, 46 conversion guides, output folder) and writes one JSON artefact. The sequential arrow between function boxes in the left panel is annotated: ``Sequential: each agent reads prior outputs of internal callees.'' The final assembly step (skill: \texttt{/combine-python-functions-into-file}) merges 16 JSON artefacts into \texttt{\_\_init\_\_.py}.}\\\vspace{1.2em}\end{minipage}}
+\includegraphics[width=\textwidth]{figures/phase_4.pdf}
 \caption{\textbf{Phase~4: topologically ordered function conversion and package assembly.} Functions are converted in leaf-to-root order so that each conversion agent can inspect the Python calling convention of already-converted internal dependencies. The \skill{convert-r-file-to-python} skill derives the conversion order from the dependency-level CSV produced in Phase~1 and dispatches the \agent{convert-r-function-to-python} sub-agent sequentially. The \skill{combine-python-functions-into-file} skill then assembles the 16 resulting JSON artefacts into the final \texttt{\_\_init\_\_.py}, correcting import paths and deduplicating imports.}
 \label{fig:phase4}
 \end{figure}
