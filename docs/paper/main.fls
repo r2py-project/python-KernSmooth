@@ -297,6 +297,11 @@ INPUT ./figures/phase_4.pdf
 INPUT ./figures/phase_4.pdf
 INPUT /software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc
 INPUT /software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmtti10.tfm
+INPUT ./figures/test_suite.pdf
+INPUT ./figures/test_suite.pdf
+INPUT ./figures/test_suite.pdf
+INPUT ./figures/test_suite.pdf
+INPUT ./figures/test_suite.pdf
 INPUT /software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmcsc10.tfm
 INPUT /software/t/texlive/2026/texmf-dist/fonts/tfm/public/lm/ec-lmtk10.tfm
 INPUT /software/t/texlive/2026/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc
