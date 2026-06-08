@@ -7,3 +7,6 @@ conda activate r-to-python
 conda install -c conda-forge meson-python numpy pandas scipy scikit-learn matplotlib r-kernsmooth -y
 conda install -c conda-forge r-cardata -y
 conda install -c conda-forge rpy2 -y
+conda install -c conda-forge radian -y
+R
+install.packages("vscDebugger", repos = c("https://manuelhentschel.r-universe.dev", "https://cloud.r-project.org"))
