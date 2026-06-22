@@ -33,6 +33,7 @@ Your task is to generate a comprehensive conversion guide for the specified `lan
 - **Prioritize Vectorization:** Because R inherently vectorizes operations, you must default to evaluating `numpy`, `scipy`, or `pandas` as the primary Python equivalents.
 - Choose the library that best matches R's vectorized nature. For example, if translating R's `exp`, strongly prefer `numpy.exp()` over the standard library `math.exp()` unless the context explicitly proves only a scalar is being processed.
 - Carefully map R arguments to Python kwargs (e.g., translating R's `seq(..., length.out=Q)` to Python's `np.linspace()`).
+- You are free to search online documentation for the chosen Python libraries to ensure you are using the most efficient and idiomatic functions.
 
 ## Output Format Schema
 
