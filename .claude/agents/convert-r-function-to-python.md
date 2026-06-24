@@ -41,7 +41,7 @@ Output strictly valid JSON to `{function_name}.json` in the output folder. **Do 
     "import numpy as np",
     "from _KernSmooth import sdiag"
   ],
-  "function_prototype": "def converted_function(param1: int, param2: np.ndarray[np.float64]) -> np.ndarray[np.float64]:",
+  "function_prototype": "def converted_function(param1: int, param2: np.ndarray[Any, np.dtype[np.float64]) -> np.ndarray[Any, np.dtype[np.float64]:",
   "function_body": [
     "    # Function body goes here",
     "    pass"
