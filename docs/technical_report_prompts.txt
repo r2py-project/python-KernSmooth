@@ -1,5 +1,5 @@
-Please read through the daily summaries stored in `docs/daily_summaries/` carefully and then write an unfinished technical report of this unfinished project, which is to convert the popular R package `KernSmooth` into Python. Save the technical report in `docs/report/main.tex`. You need to follow the following important notes:
-1. The technical report needs to be extendable, which means you do not have to write any conclusions or summaries in the end. You may have to work on it later when other things are done.
+Please read through the daily summaries stored in `docs/daily_summaries/` carefully and then write an unfinished technical report of this unfinished project, which is to convert the popular R package `rpart` into Python. Save the technical report in `docs/report/main.tex`. You need to follow the following important notes:
+1. The technical report needs to be extendable, which means you do not have to write any conclusions or summaries at the end. You may have to work on it later when other things are done.
 2. The report needs to be organized by phases. Assign each phase a brief subtitle.
 3. Use the `session` concept only when necessary. The report is meant to be read by humans.
 4. The report needs to be as detailed as possible. You may also need to review our previous sessions for more informations which are omitted from the daily summaries.
