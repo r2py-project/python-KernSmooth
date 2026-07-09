@@ -106,7 +106,7 @@
 \contentsline {subsubsection}{\texttt {analyze-r-folder-dependencies}}{49}{section*.22}%
 \contentsline {subsection}{\numberline {B.2}Skills Used in Phase~3}{50}{subsection.1.B.2}%
 \contentsline {subsubsection}{\texttt {extract-r-folder-language-dependencies}}{50}{section*.24}%
-\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guides}}{50}{section*.26}%
+\contentsline {subsubsection}{\texttt {generate-language-dependency-conversion-guides}}{51}{section*.26}%
 \contentsline {subsection}{\numberline {B.3}Skills Used in Phase~4}{51}{subsection.1.B.3}%
 \contentsline {subsubsection}{\texttt {convert-r-file-to-python}}{51}{section*.28}%
 \contentsline {subsubsection}{\texttt {combine-python-functions-into-file}}{52}{section*.30}%
@@ -115,5 +115,5 @@
 \contentsline {subsection}{\numberline {B.5}Skills Used in Phase~7}{54}{subsection.1.B.5}%
 \contentsline {subsubsection}{\texttt {generate-python-file-tests}}{54}{section*.34}%
 \contentsline {subsubsection}{\texttt {fix-bugs-found-in-tests}}{55}{section*.36}%
-\contentsline {subsection}{\numberline {B.6}Workflow Utility}{55}{subsection.1.B.6}%
-\contentsline {subsubsection}{\texttt {summarize-research-report}}{55}{section*.38}%
+\contentsline {subsection}{\numberline {B.6}Workflow Utility}{56}{subsection.1.B.6}%
+\contentsline {subsubsection}{\texttt {summarize-research-report}}{56}{section*.38}%
