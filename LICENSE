@@ -1,0 +1,29 @@
+Unlimited License
+
+This repository's original contents — including the Python package
+r2py_kernsmooth, the dependency-analysis tooling, the conversion
+pipeline configuration, and the accompanying documentation — are
+distributed under an "Unlimited" license: they may be used, copied,
+modified, and redistributed, in source or binary form, with or
+without modification, for any purpose, with no restrictions other
+than those imposed by applicable law.
+
+This project ports the R package KernSmooth to Python. The
+KernSmooth/ subdirectory contains an unmodified copy of the original
+R package (v. 2.23-26), which retains its own upstream license and
+attribution; see KernSmooth/DESCRIPTION and KernSmooth/LICENCE.note.
+By agreement with Dr Matt Wand (1998-06-22), the KernSmooth R port may
+be used and distributed freely, and KernSmooth is released on CRAN
+under these same "Unlimited" terms, which this repository's original
+content adopts for consistency. The r2py_kernsmooth/ subdirectory
+additionally carries its own LICENSE and NOTICE files, since it is
+also distributed independently as a standalone Python package.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
