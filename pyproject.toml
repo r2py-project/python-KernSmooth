@@ -5,8 +5,39 @@ requires = ["meson-python", "meson", "ninja", "numpy"]
 [project]
 name = "r2py_kernsmooth"
 version = "0.1.0"
+description = "Python port of the R package KernSmooth: binned kernel density estimation, local polynomial regression, and plug-in bandwidth selection."
+readme = "README.md"
+license = { text = "Unlimited" }
+license-files = ["LICENSE", "NOTICE"]
+authors = [
+    { name = "Yufei Cai", email = "ycai9@nd.edu" },
+    { name = "Jun Li", email = "jun.li@nd.edu" },
+]
 requires-python = ">=3.10"
 dependencies = ["numpy", "scipy"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: Freely Distributable",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Fortran",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/caiyufei8/r2py_kernsmooth"
 
 [tool.cibuildwheel]
 build = "cp310-* cp311-* cp312-* cp313-* cp314-*"
