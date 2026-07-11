@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  4 JUN 2026 12:50
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026) (preloaded format=pdflatex 2026.5.18)  11 JUL 2026 16:14
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -924,7 +924,7 @@ Here is how much of TeX's memory you used:
  1141 hyphenation exceptions out of 8191
  75i,13n,79p,1967b,1492s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmcsc10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmex10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmr8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmri12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtt12.pfb></software/t/texlive/2026/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on main.pdf (26 pages, 488500 bytes).
+Output written on main.pdf (26 pages, 488413 bytes).
 PDF statistics:
  482 PDF objects out of 1000 (max. 8388607)
  361 compressed objects within 4 object streams
