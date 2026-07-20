@@ -680,7 +680,7 @@ The \texttt{/extract-r-folder-language-dependencies} skill (Appendix~\ref{app:co
 
 The skill dispatches the \texttt{@extract-r-file-language-dependencies} sub-agent (Appendix~\ref{app:agents}, \S\ref{appentry:extract-r-file-language-dependencies}) on each R file together with its pre-computed structural-analysis JSON. The sub-agent reads the structural JSON to identify the language dependencies of each function, then rescans the R source line by line to record, for every individual call site: the dependency name, the enclosing function name, the line number, and the complete call expression (including multi-line calls).
 
-The result was written to \texttt{language\_dependency\_analysis/R/all.csv}: a 370-row, 4-column CSV (\texttt{language\_dependency}, \texttt{function\_name}, \texttt{line\_number}, \texttt{call\_body}) covering all 16 functions in \texttt{all.R}.
+The result was written to \texttt{language\_dependency\_analysis/R/all.csv}: a 509-row, 4-column CSV (\texttt{language\_dependency}, \texttt{function\_name}, \texttt{line\_number}, \texttt{call\_body}) covering all 16 functions in \texttt{all.R}.
 
 A utility script \texttt{language\_dependency\_analysis/combine\_csvs.py} was also written to:
 \begin{itemize}
