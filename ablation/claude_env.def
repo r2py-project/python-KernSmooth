@@ -1,0 +1,43 @@
+Bootstrap: docker
+From: node:22-slim
+
+%post
+    set -e
+    npm install -g @anthropic-ai/claude-code
+    claude --version
+
+%environment
+    # ~/.conda/envs/r-to-python lives under $HOME, which this cluster's
+    # apptainer.conf binds automatically (`mount home = yes`), so the env's
+    # own bin/ is reachable without needing the host conda installation
+    # (that lives under /software, which is NOT auto-bound).
+    export CONDA_DEFAULT_ENV=r-to-python
+    export CONDA_PREFIX="$HOME/.conda/envs/r-to-python"
+    export PATH="$HOME/.conda/envs/r-to-python/bin:$PATH"
+
+%test
+    claude --version
+
+%help
+    Headless Claude Code CLI for the r2py ablation SGE jobs, with the
+    r-to-python conda env active on PATH by default.
+
+    Build (no admin/subuid setup needed on this cluster -- verified: builds
+    fall back to a root-mapped namespace automatically):
+        apptainer build --fakeroot claude_env.img claude_env.def
+
+    Run:
+        apptainer exec --bind /groups claude_env.img \
+            claude -p "<prompt>" --dangerously-skip-permissions
+
+    Notes:
+      - $HOME is bound automatically; anything under ~ (the conda env,
+        ~/.claude config, etc.) is visible with no extra flags.
+      - /groups is NOT auto-bound on this cluster (mount hostfs = no,
+        no bind path entry) -- verified empirically -- so it must be
+        passed via --bind explicitly, as above, for the container to see
+        this repository.
+      - If something inside a job needs the real `conda` command (not just
+        the r-to-python env's own binaries on PATH), also bind /software,
+        e.g. --bind /groups,/software, since conda's base install lives
+        there rather than under $HOME.
