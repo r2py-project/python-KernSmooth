@@ -1,0 +1,10 @@
+{
+  "imports": [],
+  "function_prototype": "def on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # Python's import system does not support safely unloading compiled",
+    "    # extension modules (no equivalent of R's library.dynam.unload),",
+    "    # so this hook is a no-op stub preserving the original intent.",
+    "    pass"
+  ]
+}

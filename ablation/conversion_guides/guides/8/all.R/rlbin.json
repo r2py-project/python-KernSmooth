@@ -1,0 +1,34 @@
+{
+  "imports": [
+    "import numpy as np",
+    "from typing import Any",
+    "from . import _KernSmooth"
+  ],
+  "function_prototype": "def rlbin(X: np.ndarray[Any, np.dtype[np.float64]], Y: np.ndarray[Any, np.dtype[np.float64]], gpoints: np.ndarray[Any, np.dtype[np.float64]], truncate: bool = True) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:",
+  "function_body": [
+    "    n = len(X)",
+    "    M = len(gpoints)",
+    "    trun = 1 if truncate else 0",
+    "    a = gpoints[0]",
+    "    b = gpoints[-1]",
+    "",
+    "    # Allocate the output buffers -- equivalent to R's double(M), double(M)",
+    "    xcounts = np.zeros(M, dtype=np.float64)",
+    "    ycounts = np.zeros(M, dtype=np.float64)",
+    "",
+    "    # .Fortran(F_rlbin, ...) -- writes into xcounts and ycounts by reference",
+    "    _KernSmooth.rlbin(",
+    "        np.asarray(X, dtype=np.float64),",
+    "        np.asarray(Y, dtype=np.float64),",
+    "        n,",
+    "        float(a),",
+    "        float(b),",
+    "        M,",
+    "        trun,",
+    "        xcounts,",
+    "        ycounts,",
+    "    )",
+    "",
+    "    return {\"xcounts\": xcounts, \"ycounts\": ycounts}"
+  ]
+}

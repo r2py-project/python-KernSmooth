@@ -1,0 +1,40 @@
+{
+  "imports": [
+    "from typing import Any",
+    "import numpy as np"
+  ],
+  "function_prototype": "def linbin(X: np.ndarray[Any, np.dtype[np.float64]], gpoints: np.ndarray[Any, np.dtype[np.float64]], truncate: bool = True) -> np.ndarray[Any, np.dtype[np.float64]]:",
+  "function_body": [
+    "    X = np.asarray(X, dtype=np.float64)",
+    "    gpoints = np.asarray(gpoints, dtype=np.float64)",
+    "    n = len(X)",
+    "    M = len(gpoints)",
+    "    trun = 1 if truncate else 0",
+    "    a = gpoints[0]",
+    "    b = gpoints[M - 1]",
+    "",
+    "    # Equivalent of Fortran subroutine linbin: linear binning of the data",
+    "    # in X onto the equally spaced grid defined by [a, b] with M points.",
+    "    gcnts = np.zeros(M, dtype=np.float64)",
+    "    delta = (b - a) / (M - 1)",
+    "",
+    "    for i in range(n):",
+    "        lxi = ((X[i] - a) / delta) + 1",
+    "",
+    "        # Find integer part of \"lxi\" (truncation toward zero, as Fortran int())",
+    "        li = int(lxi)",
+    "",
+    "        rem = lxi - li",
+    "        if li >= 1 and li < M:",
+    "            gcnts[li - 1] = gcnts[li - 1] + (1 - rem)",
+    "            gcnts[li] = gcnts[li] + rem",
+    "",
+    "        if li < 1 and trun == 0:",
+    "            gcnts[0] = gcnts[0] + 1",
+    "",
+    "        if li >= M and trun == 0:",
+    "            gcnts[M - 1] = gcnts[M - 1] + 1",
+    "",
+    "    return gcnts"
+  ]
+}

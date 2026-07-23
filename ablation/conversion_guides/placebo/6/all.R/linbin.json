@@ -1,0 +1,43 @@
+{
+  "imports": [
+    "from typing import Any",
+    "import numpy as np"
+  ],
+  "function_prototype": "def linbin(X: np.ndarray[Any, np.dtype[np.float64]], gpoints: np.ndarray[Any, np.dtype[np.float64]], truncate: bool = True) -> np.ndarray[Any, np.dtype[np.float64]]:",
+  "function_body": [
+    "    # For application of linear binning to a univariate data set.",
+    "    # This reimplements the Fortran routine F_linbin natively, since no",
+    "    # compiled _KernSmooth.linbin() binding is available.",
+    "    X = np.asarray(X, dtype=np.float64)",
+    "    gpoints = np.asarray(gpoints, dtype=np.float64)",
+    "    n = X.shape[0]",
+    "    M = gpoints.shape[0]",
+    "    trun = 1 if truncate else 0",
+    "    a = gpoints[0]",
+    "    b = gpoints[M - 1]",
+    "",
+    "    gcnts = np.zeros(M, dtype=np.float64)",
+    "    if n == 0:",
+    "        return gcnts",
+    "",
+    "    delta = (b - a) / (M - 1)",
+    "    lxi = ((X - a) / delta) + 1",
+    "",
+    "    # Fortran's int() truncates toward zero, matching NumPy's float-to-int",
+    "    # array cast; this is not the same as floor() for negative values.",
+    "    li = lxi.astype(np.int64)",
+    "    rem = lxi - li",
+    "",
+    "    in_range = (li >= 1) & (li < M)",
+    "    li_in = li[in_range]",
+    "    rem_in = rem[in_range]",
+    "    np.add.at(gcnts, li_in - 1, 1 - rem_in)",
+    "    np.add.at(gcnts, li_in, rem_in)",
+    "",
+    "    if trun == 0:",
+    "        gcnts[0] += np.count_nonzero(li < 1)",
+    "        gcnts[M - 1] += np.count_nonzero(li >= M)",
+    "",
+    "    return gcnts"
+  ]
+}

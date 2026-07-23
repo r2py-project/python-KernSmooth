@@ -1,0 +1,33 @@
+{
+  "imports": [
+    "import numpy as np",
+    "from typing import Any"
+  ],
+  "function_prototype": "def linbin(X: np.ndarray[Any, np.dtype[np.float64]], gpoints: np.ndarray[Any, np.dtype[np.float64]], truncate: bool = True) -> np.ndarray[Any, np.dtype[np.float64]]:",
+  "function_body": [
+    "    n = len(X)",
+    "    M = len(gpoints)",
+    "    trun = 1 if truncate else 0",
+    "    a = float(gpoints[0])",
+    "    b = float(gpoints[M - 1])",
+    "",
+    "    gcounts = np.zeros(M, dtype=np.float64)",
+    "    delta = (b - a) / (M - 1)",
+    "",
+    "    for i in range(n):",
+    "        # 1-based grid position, matching the Fortran F_linbin routine",
+    "        lxi = ((X[i] - a) / delta) + 1",
+    "        # Integer part of \"lxi\" (Fortran INT truncates toward zero, same as Python int())",
+    "        li = int(lxi)",
+    "        rem = lxi - li",
+    "        if li >= 1 and li < M:",
+    "            gcounts[li - 1] += (1 - rem)",
+    "            gcounts[li] += rem",
+    "        elif li < 1 and trun == 0:",
+    "            gcounts[0] += 1",
+    "        elif li >= M and trun == 0:",
+    "            gcounts[M - 1] += 1",
+    "",
+    "    return gcounts"
+  ]
+}

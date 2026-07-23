@@ -1,0 +1,17 @@
+{
+  "imports": [
+    "import sys"
+  ],
+  "function_prototype": "def on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # R's library.dynam.unload(\"KernSmooth\", libpath) unloads the package's",
+    "    # compiled native library from the current session. Python has no direct,",
+    "    # safe equivalent for forcibly unloading a C/Fortran extension module at",
+    "    # runtime, so we mirror the intent by removing the native extension module",
+    "    # from sys.modules if it has been imported, so that a subsequent import",
+    "    # will reload it.",
+    "    module_name = \"_KernSmooth\"",
+    "    if module_name in sys.modules:",
+    "        del sys.modules[module_name]"
+  ]
+}

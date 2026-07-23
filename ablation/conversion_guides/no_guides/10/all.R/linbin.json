@@ -1,0 +1,38 @@
+{
+  "imports": [
+    "import numpy as np",
+    "from typing import Any"
+  ],
+  "function_prototype": "def linbin(X: np.ndarray[Any, np.dtype[np.float64]], gpoints: np.ndarray[Any, np.dtype[np.float64]], truncate: bool = True) -> np.ndarray[Any, np.dtype[np.float64]]:",
+  "function_body": [
+    "    n = len(X)",
+    "    M = len(gpoints)",
+    "    trun = 1 if truncate else 0",
+    "",
+    "    a = float(gpoints[0])",
+    "    b = float(gpoints[M - 1])",
+    "",
+    "    gcnts = np.zeros(M, dtype=np.float64)",
+    "    delta = (b - a) / (M - 1)",
+    "",
+    "    for i in range(n):",
+    "        xi = float(X[i])",
+    "        lxi = ((xi - a) / delta) + 1",
+    "",
+    "        # Find integer part of \"lxi\" (truncation toward zero, as in Fortran's int())",
+    "        li = int(lxi)",
+    "",
+    "        rem = lxi - li",
+    "        if li >= 1 and li < M:",
+    "            gcnts[li - 1] = gcnts[li - 1] + (1 - rem)",
+    "            gcnts[li] = gcnts[li] + rem",
+    "",
+    "        if li < 1 and trun == 0:",
+    "            gcnts[0] = gcnts[0] + 1",
+    "",
+    "        if li >= M and trun == 0:",
+    "            gcnts[M - 1] = gcnts[M - 1] + 1",
+    "",
+    "    return gcnts"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "imports": [],
+  "function_prototype": "def on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # In the R package, `.onUnload` calls `library.dynam.unload(\"KernSmooth\", libpath)`",
+    "    # to unload the compiled Fortran/C shared library backing the package when it is",
+    "    # detached/unloaded. This Python port does not load a separate compiled dynamic",
+    "    # library that needs explicit unloading (any compiled extension module is managed",
+    "    # by Python's own import system), so there is no equivalent teardown action to",
+    "    # perform here. This function is kept as a no-op stub purely for API parity with",
+    "    # the original R package hook.",
+    "    return None"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "imports": [],
+  "function_prototype": "def on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # R's .onUnload hook calls library.dynam.unload(\"KernSmooth\", libpath) to",
+    "    # explicitly detach the package's compiled shared library from the R session.",
+    "    #",
+    "    # Python's import system has no safe, supported way to unload a compiled",
+    "    # C/Fortran extension module (e.g. _KernSmooth) once it has been imported:",
+    "    # CPython does not guarantee that dlclose()-ing an extension is safe while",
+    "    # live references to its symbols may still exist. Consequently there is no",
+    "    # meaningful Python equivalent of library.dynam.unload, and this function is",
+    "    # kept only as a no-op placeholder mirroring the R package-unload hook.",
+    "    pass"
+  ]
+}

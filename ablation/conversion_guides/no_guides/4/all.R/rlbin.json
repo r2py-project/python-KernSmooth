@@ -1,0 +1,21 @@
+{
+  "imports": [
+    "import numpy as np",
+    "from typing import Any",
+    "from . import _KernSmooth"
+  ],
+  "function_prototype": "def rlbin(X: np.ndarray[Any, np.dtype[np.float64]], Y: np.ndarray[Any, np.dtype[np.float64]], gpoints: np.ndarray[Any, np.dtype[np.float64]], truncate: bool = True) -> dict[str, np.ndarray[Any, np.dtype[np.float64]]]:",
+  "function_body": [
+    "    n = len(X)",
+    "    M = len(gpoints)",
+    "    trun = 1 if truncate else 0",
+    "    a = gpoints[0]",
+    "    b = gpoints[M - 1]",
+    "    X_arr = np.asarray(X, dtype=np.float64)",
+    "    Y_arr = np.asarray(Y, dtype=np.float64)",
+    "    xcounts = np.zeros(M, dtype=np.float64)",
+    "    ycounts = np.zeros(M, dtype=np.float64)",
+    "    _KernSmooth.rlbin(X_arr, Y_arr, n, a, b, M, trun, xcounts, ycounts)",
+    "    return {\"xcounts\": xcounts, \"ycounts\": ycounts}"
+  ]
+}

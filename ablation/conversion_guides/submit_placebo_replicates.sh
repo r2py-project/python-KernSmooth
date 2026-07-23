@@ -1,18 +1,18 @@
 #!/bin/bash
-#$ -N ablation_guides
+#$ -N ablation_placebo
 #$ -t 1-10
 #$ -cwd
 #$ -j y
-#$ -o ablation/logs/guides_$TASK_ID.log
+#$ -o ablation/logs/placebo_$TASK_ID.log
 #$ -q long
 
-# Condition G (guides), primary tier, R=10 replicates.
+# Condition P (placebo guides), primary tier, R=10 replicates.
 # One SGE array task per replicate; SGE_TASK_ID supplies the index (1..10),
 # so no manual substitution of the command's trailing index is needed.
 #
 # Submit with:
 #   mkdir -p ablation/logs
-#   qsub ablation/conversion_guides/submit_guides_replicates.sh
+#   qsub ablation/conversion_guides/submit_placebo_replicates.sh
 #
 # --dangerously-skip-permissions is required for a headless/array job: there is
 # no terminal attached to approve tool calls, so the run must be pre-authorized
@@ -39,7 +39,7 @@ set -euo pipefail
 
 REPLICATE="${SGE_TASK_ID}"
 REPO_ROOT="/groups/jli9/Yufei/python-KernSmooth"
-OUT_DIR="${REPO_ROOT}/ablation/conversion_guides/guides/${REPLICATE}"
+OUT_DIR="${REPO_ROOT}/ablation/conversion_guides/placebo/${REPLICATE}"
 IMAGE="${REPO_ROOT}/ablation/claude_env.img"
 
 cd "${REPO_ROOT}"
@@ -48,12 +48,12 @@ mkdir -p "${OUT_DIR}"
 BINDS=(
   --bind "${REPO_ROOT}/KernSmooth:${REPO_ROOT}/KernSmooth:ro"
   --bind "${REPO_ROOT}/structural_analysis:${REPO_ROOT}/structural_analysis:ro"
-  --bind "${REPO_ROOT}/language_dependency_analysis/conversion_guides:${REPO_ROOT}/language_dependency_analysis/conversion_guides:ro"
+  --bind "${REPO_ROOT}/ablation/conversion_guides/placebo_conversion_guides:${REPO_ROOT}/ablation/conversion_guides/placebo_conversion_guides:ro"
   --bind "${REPO_ROOT}/.claude:${REPO_ROOT}/.claude:ro"
   --bind "${OUT_DIR}:${OUT_DIR}"
 )
 
 apptainer exec --no-mount cwd --pwd "${REPO_ROOT}" "${BINDS[@]}" "${IMAGE}" \
-  claude -p "/convert-r-file-to-python KernSmooth/R/all.R structural_analysis/R/all.json structural_analysis/dependency_levels.csv language_dependency_analysis/conversion_guides/ ${OUT_DIR}" \
+  claude -p "/convert-r-file-to-python KernSmooth/R/all.R structural_analysis/R/all.json structural_analysis/dependency_levels.csv ablation/conversion_guides/placebo_conversion_guides/ ${OUT_DIR}" \
   --model claude-sonnet-5 \
   --dangerously-skip-permissions

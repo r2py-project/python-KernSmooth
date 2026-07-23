@@ -1,0 +1,13 @@
+{
+  "imports": [],
+  "function_prototype": "def _on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # R's .onUnload package hook calls library.dynam.unload() to unload the",
+    "    # compiled shared library ('KernSmooth') from the R session when the",
+    "    # package is detached. The Python port of this package is a pure",
+    "    # NumPy implementation with no compiled/dynamically loaded extension",
+    "    # module to unload, so this hook is retained only for structural",
+    "    # parity with the original R package and performs no action.",
+    "    return None"
+  ]
+}

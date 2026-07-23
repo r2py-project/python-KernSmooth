@@ -1,0 +1,17 @@
+{
+  "imports": [
+    "import logging"
+  ],
+  "function_prototype": "def _on_attach() -> None:",
+  "function_body": [
+    "    # R's .onAttach() is invoked automatically by the R runtime when the",
+    "    # package is loaded via library()/require(); packageStartupMessage()",
+    "    # writes an informational, suppressible message to stderr. Python has",
+    "    # no equivalent load hook, so this is exposed as a plain function that",
+    "    # the package's __init__.py can call on import to reproduce the same",
+    "    # behavior, using the logging module as the idiomatic counterpart to",
+    "    # packageStartupMessage (informational, stream-based, suppressible).",
+    "    logger = logging.getLogger(\"KernSmooth\")",
+    "    logger.info(\"KernSmooth 2.23 loaded\\nCopyright M. P. Wand 1997-2009\")"
+  ]
+}

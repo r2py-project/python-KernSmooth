@@ -1,0 +1,14 @@
+{
+  "imports": [
+    "import sys"
+  ],
+  "function_prototype": "def on_attach(libname: str, pkgname: str) -> None:",
+  "function_body": [
+    "    # Equivalent of R's packageStartupMessage(): emit a startup message",
+    "    # to stderr, mirroring the behaviour of R's condition-based message",
+    "    # system (which packageStartupMessage relies on) so that the",
+    "    # notice does not interfere with stdout output.",
+    "    startup_message = \"KernSmooth 2.23 loaded\\nCopyright M. P. Wand 1997-2009\"",
+    "    print(startup_message, file=sys.stderr)"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "imports": [],
+  "function_prototype": "def _on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # R's .onUnload hook calls library.dynam.unload(\"KernSmooth\", libpath) to",
+    "    # explicitly unload the compiled shared library when the package is detached.",
+    "    #",
+    "    # CPython provides no safe, stable API to unload a native/compiled extension",
+    "    # module (there is no equivalent of R's dyn.unload() for extension modules);",
+    "    # the import system manages the extension's lifetime automatically for the",
+    "    # lifetime of the interpreter. Therefore this hook intentionally performs no",
+    "    # action -- omitting the unload call is the correct behavior, not a gap.",
+    "    pass"
+  ]
+}
