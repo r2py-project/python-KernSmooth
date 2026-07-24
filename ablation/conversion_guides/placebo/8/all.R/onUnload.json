@@ -1,0 +1,21 @@
+{
+  "imports": [],
+  "function_prototype": "def on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # R's .onUnload(libpath) is a package-lifecycle hook that R invokes",
+    "    # automatically when the KernSmooth package is detached/unloaded; its",
+    "    # sole purpose is to call library.dynam.unload(\"KernSmooth\", libpath) to",
+    "    # release the compiled Fortran/C shared library that was loaded via",
+    "    # library.dynam() in .onLoad.",
+    "    #",
+    "    # This Python port reimplements the former Fortran routines directly in",
+    "    # pure Python/NumPy rather than loading a compiled shared library through",
+    "    # an FFI layer, so there is no dynamic library handle to release here.",
+    "    # Python's own module import/unload lifecycle (module objects garbage",
+    "    # collected, no dlopen handle to close) makes this hook unnecessary.",
+    "    #",
+    "    # The function is retained only as a structural placeholder mirroring",
+    "    # the original R API; it intentionally performs no action.",
+    "    return None"
+  ]
+}

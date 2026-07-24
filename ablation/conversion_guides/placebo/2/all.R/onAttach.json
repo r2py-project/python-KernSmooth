@@ -1,0 +1,9 @@
+{
+  "imports": [],
+  "function_prototype": "def on_attach(libname: str, pkgname: str) -> None:",
+  "function_body": [
+    "    # R's .onAttach package-load hook has no direct Python equivalent;",
+    "    # translated here as a simple function that prints the startup message.",
+    "    print(\"KernSmooth 2.23 loaded\\nCopyright M. P. Wand 1997-2009\")"
+  ]
+}

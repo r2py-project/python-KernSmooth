@@ -1,0 +1,23 @@
+{
+  "imports": [
+    "import numpy as np",
+    "from typing import Any",
+    "from . import _KernSmooth"
+  ],
+  "function_prototype": "def linbin2D(X: np.ndarray[Any, np.dtype[np.float64]], gpoints1: np.ndarray[Any, np.dtype[np.float64]], gpoints2: np.ndarray[Any, np.dtype[np.float64]]) -> np.ndarray[Any, np.dtype[np.float64]]:",
+  "function_body": [
+    "    n = X.shape[0]",
+    "    X_stacked = np.concatenate([X[:, 0], X[:, 1]]).astype(np.float64)",
+    "    M1 = len(gpoints1)",
+    "    M2 = len(gpoints2)",
+    "    a1 = gpoints1[0]",
+    "    a2 = gpoints2[0]",
+    "    b1 = gpoints1[M1 - 1]",
+    "    b2 = gpoints2[M2 - 1]",
+    "    gcounts = np.zeros(M1 * M2, dtype=np.float64)",
+    "    _KernSmooth.lbtwod(X_stacked, n, a1, a2, b1, b2, M1, M2, gcounts)",
+    "    # R's matrix(out, M1, M2) fills column-major (Fortran order); reshape",
+    "    # accordingly to preserve R's semantics.",
+    "    return gcounts.reshape((M1, M2), order=\"F\")"
+  ]
+}

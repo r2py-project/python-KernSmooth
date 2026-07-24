@@ -1,3 +1,11 @@
 Loading CRC_default/1.1
 Loading CRC_default/1.1
 Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
+All 16 functions from `KernSmooth/R/all.R` have been converted to Python and validated as well-formed JSON in `ablation/conversion_guides/guides/9/all.R/`, processed in dependency order (leaves→roots): `linbin, rlbin, blkest, cpblock, linbin2D, bkfe, locpoly, sdiag, sstdiag, bkde, bkde2D, dpih, dpik, dpill, .onAttach, .onUnload`.
+
+Two issues surfaced during review and were fixed directly rather than left for later:
+- **cpblock.json**: the sub-agent translated `order(Cpvec)[1L]` (a 1-based block *count* consumed downstream by `blkest`) as a 0-based `np.argmin` index — an off-by-one that would have silently corrupted `dpill`. Added `+ 1`.
+- **bkde.json**: added a stray `from .linbin import linbin` import, inconsistent with every other file's convention (sibling functions are called with no import since they land in one combined module later). Removed it.
+
+Everything else — the tricky reversed-index slicing in `bkde2D`, the R lazy-evaluation subtlety in `dpill`'s `range.x = range(x)` default, and FFT normalization differences between R and NumPy — checked out correctly on inspection.
+Loading CRC_default/1.1

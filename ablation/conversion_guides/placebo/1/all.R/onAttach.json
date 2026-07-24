@@ -1,0 +1,12 @@
+{
+  "imports": [],
+  "function_prototype": "def on_attach(libname: str, pkgname: str) -> None:",
+  "function_body": [
+    "    # Equivalent of R's .onAttach package lifecycle hook, which is invoked",
+    "    # automatically when the package is loaded (e.g. via `library()`).",
+    "    # Python has no direct analogue of this hook, so it is exposed as a",
+    "    # plain function with the same signature that can be called manually",
+    "    # or from an `__init__.py` if desired.",
+    "    print(\"KernSmooth 2.23 loaded\\nCopyright M. P. Wand 1997-2009\")"
+  ]
+}

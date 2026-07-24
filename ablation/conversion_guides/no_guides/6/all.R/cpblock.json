@@ -55,10 +55,9 @@
     "    # finest, least-biased partition) as the reference variance",
     "    # estimate, exactly as in the Fortran code:",
     "    #     Cp(i) = (n - qq*Nmax) * RSS(i) / RSS(Nmax) + 2*qq*i - n",
-    "    Cpvals = np.zeros(Nmax)
-    for i in range(1, Nmax + 1):
-        Cpvals[i - 1] = (n - qq * Nmax) * RSS[i - 1] / RSS[Nmax - 1] + 2 * qq * i - n
-",
+    "    Cpvals = np.zeros(Nmax)",
+    "    for i in range(1, Nmax + 1):",
+    "        Cpvals[i - 1] = (n - qq * Nmax) * RSS[i - 1] / RSS[Nmax - 1] + 2 * qq * i - n",
     "",
     "    # order(Cpvec)[1L] returns the (1-based) index of the smallest",
     "    # C_p value; np.argmin returns the index of the first occurrence",

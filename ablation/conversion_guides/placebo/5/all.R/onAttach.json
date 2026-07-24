@@ -1,0 +1,13 @@
+{
+  "imports": [
+    "import warnings"
+  ],
+  "function_prototype": "def on_attach(libname: str, pkgname: str) -> None:",
+  "function_body": [
+    "    # Equivalent of R's packageStartupMessage(): emit the package startup",
+    "    # message. `libname` and `pkgname` are kept in the signature for",
+    "    # interface parity with the original R \".onAttach\" hook, even though",
+    "    # they are unused in the body, matching the original R behavior.",
+    "    warnings.warn(\"KernSmooth 2.23 loaded\\nCopyright M. P. Wand 1997-2009\")"
+  ]
+}

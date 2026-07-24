@@ -1,0 +1,11 @@
+{
+  "imports": [],
+  "function_prototype": "def onUnload(libpath: str) -> None:",
+  "function_body": [
+    "    # In R, this unloads the compiled Fortran/C shared object via",
+    "    # library.dynam.unload(). This pure-Python/NumPy port reimplements all",
+    "    # of KernSmooth's Fortran routines directly (no .Fortran() calls remain",
+    "    # and no compiled extension is loaded), so there is nothing to unload.",
+    "    pass"
+  ]
+}

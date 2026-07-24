@@ -1,0 +1,15 @@
+{
+  "imports": [
+    "import sys"
+  ],
+  "function_prototype": "def on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # R's .onUnload package-unload hook (library.dynam.unload) has no direct",
+    "    # Python equivalent; translated here as a function that performs the",
+    "    # analogous action of unloading the compiled native extension module",
+    "    # (the compiled counterpart of the \"KernSmooth\" shared library) by",
+    "    # removing it from the module cache so a subsequent import reloads it.",
+    "    module_name = \"_KernSmooth\"",
+    "    sys.modules.pop(module_name, None)"
+  ]
+}

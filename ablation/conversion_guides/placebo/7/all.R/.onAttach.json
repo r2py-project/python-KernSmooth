@@ -1,0 +1,9 @@
+{
+  "imports": [
+    "import sys"
+  ],
+  "function_prototype": "def _on_attach(libname: str, pkgname: str) -> None:",
+  "function_body": [
+    "    print(\"KernSmooth 2.23 loaded\\nCopyright M. P. Wand 1997-2009\", file=sys.stderr)"
+  ]
+}

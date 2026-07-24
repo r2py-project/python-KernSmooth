@@ -1,0 +1,17 @@
+{
+  "imports": [],
+  "function_prototype": "def _on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # In the original R package, .onUnload is a package-unload hook that",
+    "    # calls library.dynam.unload(\"KernSmooth\", libpath) to unload the",
+    "    # compiled Fortran shared library (DLL/.so) associated with the package",
+    "    # when its namespace is unloaded.",
+    "    #",
+    "    # This Python translation of KernSmooth reimplements the Fortran",
+    "    # routines natively in Python/NumPy rather than loading a compiled",
+    "    # extension module, so there is no shared library to unload and no",
+    "    # equivalent unload mechanism is required. This function is kept as a",
+    "    # no-op stub purely for structural parity with the original R source.",
+    "    return None"
+  ]
+}

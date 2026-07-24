@@ -1,0 +1,38 @@
+{
+  "imports": [
+    "import numpy as np",
+    "from typing import Any",
+    "from . import _KernSmooth"
+  ],
+  "function_prototype": "def linbin2D(X: np.ndarray[Any, np.dtype[np.float64]], gpoints1: np.ndarray[Any, np.dtype[np.float64]], gpoints2: np.ndarray[Any, np.dtype[np.float64]]) -> np.ndarray[Any, np.dtype[np.float64]]:",
+  "function_body": [
+    "    n = X.shape[0]",
+    "    # X <- c(X[, 1L], X[, 2L]) -- column-major concatenation of the two columns",
+    "    Xflat = np.concatenate([X[:, 0], X[:, 1]]).astype(np.float64)",
+    "    M1 = len(gpoints1)",
+    "    M2 = len(gpoints2)",
+    "    a1 = gpoints1[0]",
+    "    a2 = gpoints2[0]",
+    "    b1 = gpoints1[M1 - 1]",
+    "    b2 = gpoints2[M2 - 1]",
+    "",
+    "    # Allocate the output buffer -- equivalent to R's double(M1*M2)",
+    "    gcnts = np.zeros(M1 * M2, dtype=np.float64)",
+    "",
+    "    # .Fortran(F_lbtwod, ...) -- writes into gcnts by reference",
+    "    _KernSmooth.lbtwod(",
+    "        Xflat,",
+    "        n,",
+    "        float(a1),",
+    "        float(a2),",
+    "        float(b1),",
+    "        float(b2),",
+    "        M1,",
+    "        M2,",
+    "        gcnts,",
+    "    )",
+    "",
+    "    # matrix(out[[9L]], M1, M2) fills column-major -- reshape with order='F'",
+    "    return gcnts.reshape(M1, M2, order='F')"
+  ]
+}

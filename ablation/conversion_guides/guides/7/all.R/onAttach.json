@@ -1,0 +1,13 @@
+{
+  "imports": [
+    "import sys"
+  ],
+  "function_prototype": "def on_attach(libname: str, pkgname: str) -> None:",
+  "function_body": [
+    "    # Mirrors R's .onAttach package hook, which calls packageStartupMessage().",
+    "    # packageStartupMessage() writes an informational message to stderr, so we",
+    "    # replicate that here with print(..., file=sys.stderr).",
+    "    print(\"KernSmooth 2.23 loaded\\nCopyright M. P. Wand 1997-2009\", file=sys.stderr)",
+    "    return None"
+  ]
+}

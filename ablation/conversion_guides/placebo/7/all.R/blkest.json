@@ -1,0 +1,35 @@
+{
+  "imports": [
+    "from typing import Any",
+    "import numpy as np",
+    "from . import _KernSmooth"
+  ],
+  "function_prototype": "def blkest(x: np.ndarray[Any, np.dtype[np.float64]], y: np.ndarray[Any, np.dtype[np.float64]], Nval: int, q: int) -> dict[str, float]:",
+  "function_body": [
+    "    n = len(x)",
+    "",
+    "    # Sort the (x, y) data with respect to the x's.",
+    "    x_arr = np.asarray(x, dtype=np.float64)",
+    "    y_arr = np.asarray(y, dtype=np.float64)",
+    "    order = np.argsort(x_arr, kind=\"stable\")",
+    "    x_sorted = x_arr[order]",
+    "    y_sorted = y_arr[order]",
+    "",
+    "    # Set up arrays for FORTRAN programme \"blkest\"",
+    "    qq = q + 1",
+    "    xj = np.zeros(n, dtype=np.float64)",
+    "    yj = np.zeros(n, dtype=np.float64)",
+    "    coef = np.zeros(qq, dtype=np.float64)",
+    "    Xmat = np.zeros((n, qq), dtype=np.float64)",
+    "    wk = np.zeros(n, dtype=np.float64)",
+    "    qraux = np.zeros(qq, dtype=np.float64)",
+    "    sigsqe = np.zeros(1, dtype=np.float64)",
+    "    th22e = np.zeros(1, dtype=np.float64)",
+    "    th24e = np.zeros(1, dtype=np.float64)",
+    "",
+    "    _KernSmooth.blkest(x_sorted, y_sorted, n, q, qq, Nval, xj, yj,",
+    "                        coef, Xmat, wk, qraux, sigsqe, th22e, th24e)",
+    "",
+    "    return {\"sigsqe\": float(sigsqe[0]), \"th22e\": float(th22e[0]), \"th24e\": float(th24e[0])}"
+  ]
+}

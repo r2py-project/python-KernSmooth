@@ -1,3 +1,10 @@
 Loading CRC_default/1.1
 Loading CRC_default/1.1
 Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
+All 16 R functions from `KernSmooth/R/all.R` have been converted to Python, processed in dependency order (leaves→roots): `linbin`, `rlbin`, `blkest`, `cpblock`, `linbin2D`, `bkfe`, `locpoly`, `sdiag`, `sstdiag`, `bkde`, `bkde2D`, `dpih`, `dpik`, `dpill`, `.onAttach`, `.onUnload`. Each JSON is written to `ablation/conversion_guides/guides/8/all.R/`.
+
+Highlights:
+- `bkfe`, `bkde`, and `bkde2D` were numerically validated against R itself (R + `KernSmooth` package were available in the environment), including the tricky FFT wrap-around indexing in `bkde2D`, all matching to floating-point precision.
+- `dpill`, the top-level root, correctly chains all six internal dependencies with careful handling of R's lazy default-argument evaluation (`range.x = range(x)` uses post-trim `x`) and 1-based→0-based slice translation.
+- Fixed a minor inconsistency: the `.onUnload` conversion was written as `onUnload.json` (missing leading dot) — renamed to `.onUnload.json` to match the `.onAttach.json` convention.
+Loading CRC_default/1.1

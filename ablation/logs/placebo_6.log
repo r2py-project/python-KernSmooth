@@ -1,3 +1,11 @@
 Loading CRC_default/1.1
 Loading CRC_default/1.1
 Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
+All 16 functions from `KernSmooth/R/all.R` have been converted to Python and written as JSON files to `/groups/jli9/Yufei/python-KernSmooth/ablation/conversion_guides/placebo/6/all.R/`, in dependency order (leaves → roots): linbin, rlbin, blkest, cpblock, linbin2D, bkfe, locpoly, sdiag, sstdiag, bkde, bkde2D, dpih, dpik, dpill, onAttach, onUnload.
+
+Notable points:
+- Fortran externals (`F_linbin`, `F_rlbin`, `F_blkest`, `F_cp`, `F_lbtwod`, `F_locpol`, `F_sdiag`, `F_sstdg`) had no compiled bindings available, so each was reimplemented natively in NumPy by reading the corresponding `.f` source in `KernSmooth/src/`.
+- `bkfe`/`bkde`/`bkde2D` needed careful handling of R's unnormalized `fft(..., inverse=TRUE)` semantics vs. NumPy's normalized `ifft`.
+- Several conversions were numerically validated against R (where an R interpreter was available) or via hand-checked test cases; `sdiag` was validated only against the Fortran source since no R interpreter was available in that run — worth a spot-check if precision matters downstream.
+- `.onAttach`/`.onUnload` became stub translations (print-to-stderr and no-op, respectively) since they're R packaging hooks with no Python equivalent.
+Loading CRC_default/1.1

@@ -1,0 +1,29 @@
+{
+  "imports": [
+    "from typing import Any, NamedTuple",
+    "import numpy as np",
+    "from . import _KernSmooth"
+  ],
+  "function_prototype": "def rlbin(X: np.ndarray[Any, np.dtype[np.float64]], Y: np.ndarray[Any, np.dtype[np.float64]], gpoints: np.ndarray[Any, np.dtype[np.float64]], truncate: bool = True) -> \"RlbinResult\":",
+  "function_body": [
+    "    n = len(X)",
+    "    M = len(gpoints)",
+    "    trun = 1 if truncate else 0",
+    "    a = float(gpoints[0])",
+    "    b = float(gpoints[M - 1])",
+    "",
+    "    x_arr = np.asarray(X, dtype=np.float64)",
+    "    y_arr = np.asarray(Y, dtype=np.float64)",
+    "    xcounts = np.zeros(M, dtype=np.float64)",
+    "    ycounts = np.zeros(M, dtype=np.float64)",
+    "",
+    "    _KernSmooth.rlbin(x_arr, y_arr, n, a, b, M, trun, xcounts, ycounts)",
+    "",
+    "    return RlbinResult(xcounts=xcounts, ycounts=ycounts)",
+    "",
+    "",
+    "class RlbinResult(NamedTuple):",
+    "    xcounts: np.ndarray[Any, np.dtype[np.float64]]",
+    "    ycounts: np.ndarray[Any, np.dtype[np.float64]]"
+  ]
+}

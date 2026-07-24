@@ -1,0 +1,17 @@
+{
+  "imports": [],
+  "function_prototype": "def _on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # R's .onUnload(libpath) hook calls library.dynam.unload(\"KernSmooth\", libpath)",
+    "    # to unload the package's compiled Fortran/C shared library (DLL/.so) when",
+    "    # the package is detached/unloaded.",
+    "    #",
+    "    # This pure-Python port reimplements all former Fortran routines natively",
+    "    # in Python/NumPy (see linbin, rlbin, linbin2D, blkest, cpblock) rather than",
+    "    # calling into a compiled shared library via R's .Fortran()/.Call() FFI.",
+    "    # Consequently there is no dynamic library handle to release, and this hook",
+    "    # has no meaningful equivalent action here. It is retained as a no-op stub",
+    "    # only for structural parity with the original R package's onUnload hook.",
+    "    return None"
+  ]
+}

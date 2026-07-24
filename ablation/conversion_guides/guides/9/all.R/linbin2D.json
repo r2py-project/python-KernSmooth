@@ -1,0 +1,32 @@
+{
+  "imports": [
+    "from typing import Any",
+    "import numpy as np",
+    "from . import _KernSmooth"
+  ],
+  "function_prototype": "def linbin2D(X: np.ndarray[Any, np.dtype[np.float64]], gpoints1: np.ndarray[Any, np.dtype[np.float64]], gpoints2: np.ndarray[Any, np.dtype[np.float64]]) -> np.ndarray[Any, np.dtype[np.float64]]:",
+  "function_body": [
+    "    n = X.shape[0]",
+    "    X_flat = np.concatenate([X[:, 0], X[:, 1]])",
+    "    M1 = len(gpoints1)",
+    "    M2 = len(gpoints2)",
+    "    a1 = gpoints1[0]",
+    "    a2 = gpoints2[0]",
+    "    b1 = gpoints1[M1 - 1]",
+    "    b2 = gpoints2[M2 - 1]",
+    "",
+    "    X_d = np.asarray(X_flat, dtype=np.float64)",
+    "    n_i = np.int32(n)",
+    "    a1_d = np.float64(a1)",
+    "    a2_d = np.float64(a2)",
+    "    b1_d = np.float64(b1)",
+    "    b2_d = np.float64(b2)",
+    "    M1_i = np.int32(M1)",
+    "    M2_i = np.int32(M2)",
+    "    gcounts = np.zeros(M1 * M2, dtype=np.float64)",
+    "",
+    "    _KernSmooth.lbtwod(X_d, n_i, a1_d, a2_d, b1_d, b2_d, M1_i, M2_i, gcounts)",
+    "",
+    "    return gcounts.reshape((M1, M2), order=\"F\")"
+  ]
+}

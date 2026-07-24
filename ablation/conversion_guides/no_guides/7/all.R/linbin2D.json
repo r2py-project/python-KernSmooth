@@ -1,0 +1,21 @@
+{
+  "imports": [
+    "from typing import Any",
+    "import numpy as np",
+    "from . import _KernSmooth"
+  ],
+  "function_prototype": "def linbin2D(X: np.ndarray[Any, np.dtype[np.float64]], gpoints1: np.ndarray[Any, np.dtype[np.float64]], gpoints2: np.ndarray[Any, np.dtype[np.float64]]) -> np.ndarray[Any, np.dtype[np.float64]]:",
+  "function_body": [
+    "    n = X.shape[0]",
+    "    x_vec = np.concatenate((np.asarray(X[:, 0], dtype=np.float64), np.asarray(X[:, 1], dtype=np.float64)))",
+    "    M1 = len(gpoints1)",
+    "    M2 = len(gpoints2)",
+    "    a1 = float(gpoints1[0])",
+    "    a2 = float(gpoints2[0])",
+    "    b1 = float(gpoints1[M1 - 1])",
+    "    b2 = float(gpoints2[M2 - 1])",
+    "    out9 = np.zeros(M1 * M2, dtype=np.float64)",
+    "    _KernSmooth.lbtwod(x_vec, n, a1, a2, b1, b2, M1, M2, out9)",
+    "    return out9.reshape((M1, M2), order='F')"
+  ]
+}

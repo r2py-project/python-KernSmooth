@@ -1,0 +1,12 @@
+{
+  "imports": [],
+  "function_prototype": "def _on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # Python does not provide a direct analogue to R's library.dynam.unload,",
+    "    # which explicitly unloads a package's compiled shared library from the",
+    "    # running process. Python's C extension modules are not unloaded this",
+    "    # way, so this hook is retained only for structural parity with the",
+    "    # original R package and performs no action.",
+    "    return None"
+  ]
+}

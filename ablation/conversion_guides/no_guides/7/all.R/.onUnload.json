@@ -1,0 +1,12 @@
+{
+  "imports": [],
+  "function_prototype": "def _on_unload(libpath: str) -> None:",
+  "function_body": [
+    "    # R's .onUnload package hook calls library.dynam.unload(\"KernSmooth\", libpath)",
+    "    # to unload the compiled shared library when the package is detached.",
+    "    # Python does not unload compiled extension modules (e.g. _KernSmooth) in",
+    "    # the same manner, so there is no direct equivalent action to perform here.",
+    "    # This stub is kept for interface/signature compatibility only.",
+    "    pass"
+  ]
+}
