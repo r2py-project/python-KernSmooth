@@ -1,0 +1,22 @@
+Unlimited License
+
+This software is distributed under an "Unlimited" license: it may be
+used, copied, modified, and redistributed, in source or binary form,
+with or without modification, for any purpose, with no restrictions
+other than those imposed by applicable law.
+
+r2py_kernsmooth is a Python port of the R package KernSmooth. By
+agreement with Dr Matt Wand (1998-06-22), the KernSmooth R port may be
+used and distributed freely; KernSmooth itself is released on CRAN
+under the same "Unlimited" terms. This Python port, and the additional
+code written for it, is released under identical terms. See NOTICE for
+attribution of the original and derivative work.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

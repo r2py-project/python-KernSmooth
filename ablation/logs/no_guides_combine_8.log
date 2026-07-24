@@ -1,0 +1,15 @@
+Loading CRC_default/1.1
+Loading CRC_default/1.1
+Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
+The module loads and runs correctly, including functions with multi-hop dependencies (`dpik` → `bkfe` → `linbin`).
+
+## Summary
+
+Combined all 16 JSON-defined functions from `ablation/conversion_guides/no_guides/8/all.R/*.json` into `8_kernsmooth/r2py_kernsmooth/__init__.py`:
+
+- **Functions added**: `bkde`, `bkde2D`, `bkfe`, `blkest`, `cpblock`, `dpih`, `dpik`, `dpill`, `linbin`, `linbin2D`, `locpoly`, `on_attach`, `_on_unload`, `rlbin`, `sdiag`, `sstdiag`
+- **Imports**: deduplicated and grouped stdlib (`math`, `sys`, `typing`, `warnings`) → third-party (`numpy`, `scipy.stats`) → previously there were local package imports, but I removed them (see below).
+- **Structural fix**: the JSON files' `imports` arrays assumed each function would live in its own submodule (e.g. `from .linbin import linbin`), but since the target `r2py_kernsmooth/` directory only contains `__init__.py` (no `linbin.py`, `bkfe.py`, etc.) and the task combines everything into one file, those relative imports would have raised `ModuleNotFoundError` at runtime (self-referential/circular). I stripped all `from .<name> import <name>` lines since every referenced function is now defined at module scope in the same file.
+- **Preserved**: the original `__all__` list (unchanged, already matched the 14 public functions) and the meson/pyproject build config, which already correctly registers `r2py_kernsmooth/__init__.py` as a source — no changes needed there.
+- Verified with `ast.parse`, then actually imported the module and ran `bkde`/`dpik` end-to-end to confirm cross-function calls resolve correctly.
+Loading CRC_default/1.1

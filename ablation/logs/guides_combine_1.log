@@ -1,0 +1,12 @@
+Loading CRC_default/1.1
+Loading CRC_default/1.1
+Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
+Combined all 16 converted functions from `guides/1/all.R/*.json` (bkde, bkde2D, bkfe, blkest, cpblock, dpih, dpik, dpill, linbin, linbin2D, locpoly, rlbin, sdiag, sstdiag, plus the `.onAttach`/`.onUnload` hooks) into `r2py_kernsmooth/__init__.py`. Key decisions:
+
+- **Imports**: deduplicated and sorted into stdlib (`math`, `sys`, `warnings`, `typing.Any`) → third-party (`numpy`, `scipy.stats`) → local (`from . import _KernSmooth`, verified against `meson.build` which builds the extension as `_KernSmooth`, matching the pre-existing stub exactly).
+- **Dropped** the per-function local imports like `from .linbin import linbin` — since every function now lives in the same module, those would be circular/broken; the functions just reference each other directly by name.
+- **Order**: functions placed in `__all__` order, with the two non-exported R lifecycle hooks (`on_attach`, `on_unload`) appended at the end.
+- Preserved the existing `__all__` list unchanged.
+
+Verified the result compiles cleanly with `python3 -m py_compile` and has no duplicate function names.
+Loading CRC_default/1.1

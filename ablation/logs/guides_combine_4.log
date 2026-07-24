@@ -1,0 +1,10 @@
+Loading CRC_default/1.1
+Loading CRC_default/1.1
+Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
+Combined all 16 JSON-defined functions (14 public + `_on_attach`/`_on_unload`) from `guides/4/all.R/` into `r2py_kernsmooth/__init__.py`:
+
+- **Imports deduped/sorted** into stdlib (`math`, `sys`, `typing.Any`, `warnings`) → third-party (`numpy`, `numpy.polynomial.polynomial`, `scipy.stats.beta/norm`) → local (`_KernSmooth`).
+- **Binding correction applied**: dropped the per-JSON intra-package imports (`from .linbin import linbin`, `from .bkfe import bkfe`, etc.) since the meson build only produces a single-module package (no `linbin.py`/`bkfe.py` submodules exist) — those functions now live in the same file, so importing them as separate modules would break. Kept the existing `from . import _KernSmooth` line, which matches the actual extension name built by `meson.build`/`src/_KernSmooth.pyf`.
+- **Function order** set to dependency order (`linbin`, `linbin2D`, `rlbin` → `bkde`/`bkde2D`/`bkfe`/`blkest`/`cpblock`/`dpih`/`dpik`/`locpoly`/`sdiag`/`sstdiag` → `dpill` → the two private hooks), and preserved the pre-existing `__all__` list unchanged.
+- Verified with `py_compile`, an AST scan for undefined top-level names, and a full runtime smoke test (with a stub `_KernSmooth` module) calling all 16 functions on synthetic data — everything ran cleanly.
+Loading CRC_default/1.1

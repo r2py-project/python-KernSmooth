@@ -1,0 +1,10 @@
+Loading CRC_default/1.1
+Loading CRC_default/1.1
+Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
+Combined all 14 R-derived functions (plus `on_attach`/`_on_unload` hooks) from the JSON conversion guides into `r2py_kernsmooth/__init__.py`:
+
+- **Imports deduplicated and sorted**: stdlib (`math`, `warnings`, `typing.Any`) → third-party (`numpy`, merged `scipy.stats` import combining `beta`/`norm`) → kept the pre-existing `from . import _KernSmooth`.
+- **Dropped 9 intra-package imports** (`from .linbin import linbin`, `from .bkfe import bkfe`, etc.) — those assumed a one-file-per-function layout, but since everything now lives in one `__init__.py`, functions call each other directly by name without importing themselves.
+- **Function order** matches the existing `__all__` list (bkde → sstdiag), with the two R package hooks appended at the end, left out of `__all__` since they aren't part of the public API.
+- Verified with `ast.parse` that the file is syntactically valid and contains all 16 function definitions.
+Loading CRC_default/1.1

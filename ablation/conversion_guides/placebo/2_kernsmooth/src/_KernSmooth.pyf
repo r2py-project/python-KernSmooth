@@ -1,0 +1,184 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module _KernSmooth ! in 
+    interface  ! in :_KernSmooth
+        subroutine blkest(x,y,n,q,qq,nval,xj,yj,coef,xmat,wk,qraux,sigsqe,th22e,th24e) ! in :_KernSmooth:src/blkest.f
+            double precision dimension(n) :: x
+            double precision dimension(n),depend(n) :: y
+            integer, optional,check(shape(x, 0) == n),depend(x) :: n=shape(x, 0)
+            integer :: q
+            integer, optional,check(shape(coef, 0) == qq),depend(coef) :: qq=shape(coef, 0)
+            integer :: nval
+            double precision dimension(n),depend(n) :: xj
+            double precision dimension(n),depend(n) :: yj
+            double precision dimension(qq) :: coef
+            double precision dimension(n,qq),depend(qq,n) :: xmat
+            double precision dimension(n),depend(n) :: wk
+            double precision dimension(qq),depend(qq) :: qraux
+            double precision, intent(out) :: sigsqe
+            double precision, intent(out) :: th22e
+            double precision, intent(out) :: th24e
+        end subroutine blkest
+        subroutine cp(x,y,n,qq,nmax,rss,xj,yj,coef,xmat,wk,qraux,cpvals) ! in :_KernSmooth:src/cp.f
+            double precision dimension(n) :: x
+            double precision dimension(n),depend(n) :: y
+            integer, optional,check(shape(x, 0) == n),depend(x) :: n=shape(x, 0)
+            integer, optional,check(shape(coef, 0) == qq),depend(coef) :: qq=shape(coef, 0)
+            integer, optional,check(shape(rss, 0) == nmax),depend(rss) :: nmax=shape(rss, 0)
+            double precision dimension(nmax) :: rss
+            double precision dimension(n),depend(n) :: xj
+            double precision dimension(n),depend(n) :: yj
+            double precision dimension(qq) :: coef
+            double precision dimension(n,qq),depend(qq,n) :: xmat
+            double precision dimension(n),depend(n) :: wk
+            double precision dimension(qq),depend(qq) :: qraux
+            double precision dimension(nmax),depend(nmax) :: cpvals
+        end subroutine cp
+        subroutine dgedi(a,lda,n,ipvt,det,work,job) ! in :_KernSmooth:src/dgedi.f
+            double precision dimension(lda,*) :: a
+            integer, optional,check(shape(a, 0) == lda),depend(a) :: lda=shape(a, 0)
+            integer :: n
+            integer dimension(*) :: ipvt
+            double precision dimension(2) :: det
+            double precision dimension(*) :: work
+            integer :: job
+        end subroutine dgedi
+        subroutine dgefa(a,lda,n,ipvt,info) ! in :_KernSmooth:src/dgefa.f
+            double precision dimension(lda,*) :: a
+            integer, optional,check(shape(a, 0) == lda),depend(a) :: lda=shape(a, 0)
+            integer :: n
+            integer dimension(*) :: ipvt
+            integer :: info
+        end subroutine dgefa
+        subroutine dgesl(a,lda,n,ipvt,b,job) ! in :_KernSmooth:src/dgesl.f
+            double precision dimension(lda,*) :: a
+            integer, optional,check(shape(a, 0) == lda),depend(a) :: lda=shape(a, 0)
+            integer :: n
+            integer dimension(*) :: ipvt
+            double precision dimension(*) :: b
+            integer :: job
+        end subroutine dgesl
+        subroutine dqrdc(x,ldx,n,p,qraux,jpvt,work,job) ! in :_KernSmooth:src/dqrdc.f
+            double precision dimension(ldx,1) :: x
+            integer, optional,check(shape(x, 0) == ldx),depend(x) :: ldx=shape(x, 0)
+            integer :: n
+            integer :: p
+            double precision dimension(1) :: qraux
+            integer dimension(1) :: jpvt
+            double precision dimension(1) :: work
+            integer :: job
+        end subroutine dqrdc
+        subroutine dqrsl(x,ldx,n,k,qraux,y,qy,qty,b,rsd,xb,job,info) ! in :_KernSmooth:src/dqrsl.f
+            double precision dimension(ldx,1) :: x
+            integer, optional,check(shape(x, 0) == ldx),depend(x) :: ldx=shape(x, 0)
+            integer :: n
+            integer :: k
+            double precision dimension(1) :: qraux
+            double precision dimension(1) :: y
+            double precision dimension(1) :: qy
+            double precision dimension(1) :: qty
+            double precision dimension(1) :: b
+            double precision dimension(1) :: rsd
+            double precision dimension(1) :: xb
+            integer :: job
+            integer :: info
+        end subroutine dqrsl
+        subroutine lbtwod(x,n,a1,a2,b1,b2,m1,m2,gcnts) ! in :_KernSmooth:src/linbin2D.f
+            double precision dimension(*) :: x
+            integer :: n
+            double precision :: a1
+            double precision :: a2
+            double precision :: b1
+            double precision :: b2
+            integer :: m1
+            integer :: m2
+            double precision dimension(*) :: gcnts
+        end subroutine lbtwod
+        subroutine linbin(x,n,a,b,m,trun,gcnts) ! in :_KernSmooth:src/linbin.f
+            double precision dimension(*) :: x
+            integer :: n
+            double precision :: a
+            double precision :: b
+            integer :: m
+            integer :: trun
+            double precision dimension(*) :: gcnts
+        end subroutine linbin
+        subroutine locpol(xcnts,ycnts,idrv,delta,hdisc,lvec,indic,midpts,m,iq,fkap,ipp,ippp,ss,tt,smat,tvec,ipvt,cvest) ! in :_KernSmooth:src/locpoly.f
+            double precision dimension(*) :: xcnts
+            double precision dimension(*) :: ycnts
+            integer :: idrv
+            double precision :: delta
+            double precision dimension(*) :: hdisc
+            integer dimension(*) :: lvec
+            integer dimension(*) :: indic
+            integer dimension(*) :: midpts
+            integer, optional,check(shape(ss, 0) == m),depend(ss) :: m=shape(ss, 0)
+            integer :: iq
+            double precision dimension(*) :: fkap
+            integer, optional,check(shape(tt, 1) == ipp),depend(tt) :: ipp=shape(tt, 1)
+            integer, optional,check(shape(ss, 1) == ippp),depend(ss) :: ippp=shape(ss, 1)
+            double precision dimension(m,ippp) :: ss
+            double precision dimension(m,ipp),depend(m) :: tt
+            double precision dimension(ipp,ipp),depend(ipp) :: smat
+            double precision dimension(ipp),depend(ipp) :: tvec
+            integer dimension(*) :: ipvt
+            double precision dimension(*) :: cvest
+        end subroutine locpol
+        subroutine rlbin(x,y,n,a,b,m,trun,xcnts,ycnts) ! in :_KernSmooth:src/rlbin.f
+            double precision dimension(*) :: x
+            double precision dimension(*) :: y
+            integer :: n
+            double precision :: a
+            double precision :: b
+            integer :: m
+            integer :: trun
+            double precision dimension(*) :: xcnts
+            double precision dimension(*) :: ycnts
+        end subroutine rlbin
+        subroutine sdiag(xcnts,delta,hdisc,lvec,indic,midpts,m,iq,fkap,ipp,ippp,ss,smat,work,det,ipvt,sdg) ! in :_KernSmooth:src/sdiag.f
+            double precision dimension(*) :: xcnts
+            double precision :: delta
+            double precision dimension(*) :: hdisc
+            integer dimension(*) :: lvec
+            integer dimension(*) :: indic
+            integer dimension(*) :: midpts
+            integer, optional,check(shape(ss, 0) == m),depend(ss) :: m=shape(ss, 0)
+            integer :: iq
+            double precision dimension(*) :: fkap
+            integer, optional,check(shape(smat, 0) == ipp),depend(smat) :: ipp=shape(smat, 0)
+            integer, optional,check(shape(ss, 1) == ippp),depend(ss) :: ippp=shape(ss, 1)
+            double precision dimension(m,ippp) :: ss
+            double precision dimension(ipp,ipp) :: smat
+            double precision dimension(*) :: work
+            double precision dimension(2) :: det
+            integer dimension(*) :: ipvt
+            double precision dimension(*) :: sdg
+        end subroutine sdiag
+        subroutine sstdg(xcnts,delta,hdisc,lvec,indic,midpts,m,iq,fkap,ipp,ippp,ss,uu,smat,umat,work,det,ipvt,sstd) ! in :_KernSmooth:src/sstdiag.f
+            double precision dimension(*) :: xcnts
+            double precision :: delta
+            double precision dimension(*) :: hdisc
+            integer dimension(*) :: lvec
+            integer dimension(*) :: indic
+            integer dimension(*) :: midpts
+            integer, optional,check(shape(ss, 0) == m),depend(ss) :: m=shape(ss, 0)
+            integer :: iq
+            double precision dimension(*) :: fkap
+            integer, optional,check(shape(smat, 0) == ipp),depend(smat) :: ipp=shape(smat, 0)
+            integer, optional,check(shape(ss, 1) == ippp),depend(ss) :: ippp=shape(ss, 1)
+            double precision dimension(m,ippp) :: ss
+            double precision dimension(m,ippp),depend(m,ippp) :: uu
+            double precision dimension(ipp,ipp) :: smat
+            double precision dimension(ipp,ipp),depend(ipp) :: umat
+            double precision dimension(*) :: work
+            double precision dimension(2) :: det
+            integer dimension(*) :: ipvt
+            double precision dimension(*) :: sstd
+        end subroutine sstdg
+    end interface 
+end python module _KernSmooth
+
+! This file was auto-generated with f2py (version:2.4.6).
+! See:
+! https://web.archive.org/web/20140822061353/http://cens.ioc.ee/projects/f2py2e

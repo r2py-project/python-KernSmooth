@@ -1,0 +1,12 @@
+Loading CRC_default/1.1
+Loading CRC_default/1.1
+Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
+Done. `r2py_kernsmooth/__init__.py` now contains all 16 converted functions combined from the JSON files in `2/all.R/`:
+
+- **Imports**: deduplicated and grouped — stdlib (`logging`, `math`, `warnings`, `typing.Any`), then third-party (`numpy`, `scipy.stats.beta/norm`), then the pre-existing local `from . import _KernSmooth` (kept as-is; none of the converted functions in this "no_guides" ablation actually call it, since every routine — `cpblock`, `locpoly`, `sdiag`, `sstdiag`, etc. — is a pure NumPy reimplementation rather than an f2py call).
+- **`__all__`**: left unchanged (already alphabetical, matching the source structure).
+- **Functions**: `_on_attach`, then the 14 public functions alphabetically, then `on_unload`, followed by a top-level `_on_attach()` call — mirroring the R package's load-time startup message, per the intent documented in `.onAttach.json`.
+- Verified with `py_compile`.
+
+One thing worth flagging: partway through, a scratch file I wrote to `/tmp` got silently clobbered with unrelated content (Fortran-binding calls that don't match any of your JSON files) between my write and read-back — `/tmp` here is world-writable (`drwxrwxrwt`) and something else raced it. I abandoned `/tmp` and did all scratch work inside the project directory instead, verifying by SHA-256 before copying into `__init__.py`, so the final file is confirmed correct. You may want to avoid relying on `/tmp` for anything sensitive on this host.
+Loading CRC_default/1.1

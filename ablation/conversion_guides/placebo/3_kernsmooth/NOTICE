@@ -1,0 +1,26 @@
+r2py_kernsmooth
+Copyright (c) 2025 Yufei Cai and Jun Li
+
+This package is a Python port of the R package KernSmooth (version
+2.23-26, CRAN), which provides functions for kernel smoothing and
+density estimation corresponding to:
+
+    Wand, M.P. and Jones, M.C. (1995) "Kernel Smoothing". Chapman and
+    Hall.
+
+KernSmooth's original S code is copyright Matt Wand. Several LINPACK
+Fortran routines (src/dgedi.f, dgefa.f, dgesl.f, dqrdc.f, dqrsl.f),
+attributed to Cleve Moler, are in the public domain in the USA. The
+R-language port and ongoing maintenance of KernSmooth are by Brian
+Ripley.
+
+r2py_kernsmooth reimplements KernSmooth's R-level logic in Python and
+re-wraps its Fortran computational routines for Python via f2py. It is
+distributed under the same "Unlimited" terms as upstream KernSmooth;
+see LICENSE for details.
+
+  Matt Wand       - original S code / algorithms (KernSmooth)
+  Cleve Moler     - LINPACK Fortran routines (public domain, USA)
+  Brian Ripley    - R port and maintenance (KernSmooth)
+  Yufei Cai       - Python port (r2py_kernsmooth)
+  Jun Li          - Python port (r2py_kernsmooth)
