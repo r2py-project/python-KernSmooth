@@ -7,7 +7,7 @@ name = "r2py_kernsmooth"
 version = "0.1.0"
 description = "Python port of the R package KernSmooth: binned kernel density estimation, local polynomial regression, and plug-in bandwidth selection."
 readme = "README.md"
-license = { text = "Unlimited" }
+license = "LicenseRef-Unlimited"
 license-files = ["LICENSE", "NOTICE"]
 authors = [
     { name = "Yufei Cai", email = "ycai9@nd.edu" },
@@ -19,7 +19,6 @@ classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
-    "License :: Freely Distributable",
     "Natural Language :: English",
     "Operating System :: OS Independent",
     "Programming Language :: Fortran",
