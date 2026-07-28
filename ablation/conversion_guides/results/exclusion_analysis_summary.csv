@@ -1,0 +1,7 @@
+scope,condition,n,included_replicates,excluded_replicates,mean_failed,std_failed,min_failed,max_failed,median_failed,pass_rate
+original_all_replicates,guides,10,1-10,none,56.8,49.08,17,126,28.5,0.8903
+original_all_replicates,no_guides,10,1-10,none,131.2,153.9262,18,518,85.5,0.7467
+original_all_replicates,placebo,10,1-10,none,46.3,35.994,19,135,31.0,0.9106
+excl_direct_fortran_binding_attempts,guides,7,1;2;3;4;6;7;10,5;8;9,27.4286,16.0713,17,62,19.0,0.947
+excl_direct_fortran_binding_attempts,no_guides,7,2;3;5;6;8;9;10,1;4;7,62.5714,58.9742,18,174,32.0,0.8792
+excl_direct_fortran_binding_attempts,placebo,9,1;2;3;4;5;6;8;9;10,7,36.4444,19.0992,19,69,31.0,0.9296
