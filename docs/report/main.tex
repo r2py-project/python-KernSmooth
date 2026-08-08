@@ -222,7 +222,7 @@ The original R package reference manual is archived at \texttt{docs/KernSmooth.p
 
 \subsection{Repository Structure}
 
-The working directory \texttt{python-KernSmooth/} is the working tree of the \texttt{python-KernSmooth} repository hosted at \texttt{github.com/caiyufei8/python-KernSmooth}. The \texttt{r2py\_kernsmooth/} subdirectory is additionally managed as a git subtree linked to a separate repository at \texttt{github.com/caiyufei8/r2py\_kernsmooth}, allowing the Python package to be versioned and published to PyPI independently of the broader project. The cluster scripts \texttt{git\_pull.sh} and \texttt{git\_push.sh} at the project root encapsulate the subtree synchronisation commands required to keep both remotes up to date from the HPC node.
+The working directory \texttt{python-KernSmooth/} is the working tree of the \texttt{python-KernSmooth} repository hosted at \texttt{github.com/r2py-project/python-KernSmooth}. The \texttt{r2py\_kernsmooth/} subdirectory is additionally managed as a git subtree linked to a separate repository at \texttt{github.com/r2py-project/r2py\_kernsmooth}, allowing the Python package to be versioned and published to PyPI independently of the broader project. The cluster scripts \texttt{git\_pull.sh} and \texttt{git\_push.sh} at the project root encapsulate the subtree synchronisation commands required to keep both remotes up to date from the HPC node.
 
 \begin{center}
 \begin{tabular}{p{0.42\textwidth}p{0.50\textwidth}}
@@ -232,7 +232,7 @@ Path & Contents \\
 \texttt{KernSmooth/} &
   Unmodified R package source (v2.23-26). \\
 \texttt{r2py\_kernsmooth/} &
-  Git subtree linked to \texttt{github.com/caiyufei8/r2py\_kernsmooth}; the installable Python package. Internal structure detailed in the table below. \\
+  Git subtree linked to \texttt{github.com/r2py-project/r2py\_kernsmooth}; the installable Python package. Internal structure detailed in the table below. \\
 \texttt{structural\_analysis/} &
   Dependency-graph visualisation artefacts (\texttt{dependency\_graph.\{py,html,pdf,png\}}), the function-level CSV (\texttt{dependency\_levels.csv}), and the JSON analysis outputs per R file. \\
 \texttt{language\_dependency\_analysis/} &

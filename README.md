@@ -18,7 +18,7 @@ at [`docs/paper/main.tex`](docs/paper/main.tex).
 | Path | Contents |
 | --- | --- |
 | `KernSmooth/` | Unmodified R package source (v. 2.23-26). |
-| `r2py_kernsmooth/` | The installable Python package; also mirrored as a standalone repository at [`github.com/caiyufei8/r2py_kernsmooth`](https://github.com/caiyufei8/r2py_kernsmooth) via `git subtree`. |
+| `r2py_kernsmooth/` | The installable Python package; also mirrored as a standalone repository at [`github.com/r2py-project/r2py_kernsmooth`](https://github.com/r2py-project/r2py_kernsmooth) via `git subtree`. |
 | `structural_analysis/` | Dependency-graph artefacts and per-function JSON analysis of the R source. |
 | `language_dependency_analysis/` | Per-file R-to-Python language-dependency tables and the generated conversion guides. |
 | `conversion_results/` | Per-function JSON translation artefacts produced by the conversion pipeline. |
