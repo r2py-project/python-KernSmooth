@@ -1,5 +1,0 @@
-Loading CRC_default/1.1
-Loading CRC_default/1.1
-Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
-All 16 functions from `KernSmooth/R/all.R` have been converted to Python and written to `ablation/conversion_guides/placebo/1/all.R/`, following dependency order (leaves → roots): `linbin`, `rlbin`, `blkest`, `cpblock`, `linbin2D`, `.onAttach`, `.onUnload`, `bkfe`, `locpoly`, `sdiag`, `sstdiag`, `bkde`, `bkde2D`, `dpih`, `dpik`, `dpill`. No conversion failures occurred; each function's Fortran external calls (`.Fortran(...)`) were reimplemented in pure NumPy, and each internal-dependency call site was wired to the previously converted function's actual signature.
-Loading CRC_default/1.1

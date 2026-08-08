@@ -1,7 +1,0 @@
-scope,comparison,n_a,n_b,mann_whitney_u,p_value_mann_whitney,welch_t,p_value_welch_t
-original_all_replicates,guides_vs_placebo,10,10,43.0,0.6189,0.546,0.5927
-original_all_replicates,placebo_vs_no_guides,10,10,34.0,0.2392,-1.698,0.1203
-original_all_replicates,guides_vs_no_guides,10,10,31.5,0.1728,-1.456,0.1737
-excl_direct_fortran_binding_attempts,guides_vs_placebo,7,9,16.0,0.1041,-1.025,0.3231
-excl_direct_fortran_binding_attempts,placebo_vs_no_guides,9,7,27.0,0.6692,-1.127,0.2969
-excl_direct_fortran_binding_attempts,guides_vs_no_guides,7,7,13.0,0.1585,-1.521,0.1727

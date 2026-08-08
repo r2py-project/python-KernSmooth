@@ -1,7 +1,0 @@
-Loading CRC_default/1.1
-Loading CRC_default/1.1
-Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
-All 16 functions from `KernSmooth/R/all.R` have been converted and written to `ablation/conversion_guides/placebo/7/all.R/`. Note `.onAttach.json` is a hidden file (dot-prefixed name matches the R function name).
-
-**Conversion order used (leaves → roots):** linbin, rlbin, bkfe, blkest, cpblock, linbin2D, locpoly, sdiag, sstdiag, .onAttach, .onUnload, bkde, bkde2D, dpih, dpik, dpill — all completed with no agent failures.
-Loading CRC_default/1.1

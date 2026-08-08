@@ -1,5 +1,0 @@
-Loading CRC_default/1.1
-Loading CRC_default/1.1
-Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
-All 16 functions from `KernSmooth/R/all.R` have been converted to Python and written to `/groups/jli9/Yufei/python-KernSmooth/ablation/conversion_guides/guides/1/all.R/`, in dependency order (leaves → roots): `linbin`, `rlbin`, `linbin2D`, `blkest`, `cpblock`, `bkfe`, `locpoly`, `sdiag`, `sstdiag`, `bkde`, `bkde2D`, `dpih`, `dpik`, `dpill`, `.onAttach`, `.onUnload`. All conversions succeeded with no agent errors; several were numerically validated (against R directly for `bkde2D`, and self-consistency checks for the others).
-Loading CRC_default/1.1

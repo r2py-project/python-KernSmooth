@@ -1,7 +1,0 @@
-Loading CRC_default/1.1
-Loading CRC_default/1.1
-Ignoring 2 permissions.allow entries from .claude/settings.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/groups/jli9/Yufei/python-KernSmooth"].hasTrustDialogAccepted: true in /users/ycai9/.claude.json.
-All 16 functions are present as top-level definitions, imports are deduplicated and correctly grouped (stdlib → third-party → local `_KernSmooth` binding matching meson.build's actual module name), and internal cross-function references (linbin, rlbin, bkfe, etc.) resolve directly within the same module without needing self-imports. The file parses cleanly with `ast.parse`.
-
-**Summary:** Combined all 16 JSON-converted functions from `ablation/conversion_guides/no_guides/4/all.R/` into `r2py_kernsmooth/__init__.py`, ordered by dependency (low-level bindings → composite functions), deduplicated imports, and stripped the internal `from .X import Y` self-references since everything now lives in one file. Kept the existing `__all__` list and the `from . import _KernSmooth` binding, which already matched the module name built by `meson.build`.
-Loading CRC_default/1.1

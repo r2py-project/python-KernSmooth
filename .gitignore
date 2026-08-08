@@ -5,3 +5,6 @@
 **/.pytest_cache
 **/.ssh
 ablation/claude_env.img
+ablation/
+docs/ablation_summaries/
+.vscode/
