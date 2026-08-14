@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+title: "r2py_kernsmooth: a Python port of the R package KernSmooth"
+message: >-
+  If you use this software, please cite all three of: the original R package
+  KernSmooth; the r2py conversion-method paper; and this port at the version
+  you ran. The numerical core of r2py_kernsmooth is KernSmooth's own Fortran
+  code, retained unmodified. See the Citation section of the README for the
+  full list.
+type: software
+authors:
+  - family-names: Cai
+    given-names: Yufei
+    affiliation: University of Notre Dame
+  - family-names: Li
+    given-names: Jun
+    affiliation: University of Notre Dame
+    orcid: "https://orcid.org/0000-0003-4353-5761"
+version: 0.1.1
+license-url: "https://github.com/r2py-project/r2py_kernsmooth/blob/main/LICENSE"
+repository-code: "https://github.com/r2py-project/r2py_kernsmooth"
+url: "https://pypi.org/project/r2py_kernsmooth/"
+references:
+  - type: software
+    title: "KernSmooth: Functions for Kernel Smoothing Supporting Wand & Jones (1995)"
+    version: 2.23-26
+    authors:
+      - family-names: Wand
+        given-names: Matt
+    year: 2025
+    url: "https://cran.r-project.org/package=KernSmooth"
+    notes: >-
+      Original R package; r2py_kernsmooth embeds its Fortran sources
+      unmodified and translates its R layer to Python. R port and maintenance
+      by Brian D. Ripley; LINPACK routines by Cleve Moler.
+  - type: book
+    title: "Kernel Smoothing"
+    authors:
+      - family-names: Wand
+        given-names: M. P.
+      - family-names: Jones
+        given-names: M. C.
+    year: 1995
+    publisher:
+      name: Chapman and Hall

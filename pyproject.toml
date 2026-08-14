@@ -4,11 +4,11 @@ requires = ["meson-python", "meson", "ninja", "numpy"]
 
 [project]
 name = "r2py_kernsmooth"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python port of the R package KernSmooth: binned kernel density estimation, local polynomial regression, and plug-in bandwidth selection."
 readme = "README.md"
 license = "LicenseRef-Unlimited"
-license-files = ["LICENSE", "NOTICE"]
+license-files = ["LICENSE", "NOTICE", "LICENCE.note"]
 authors = [
     { name = "Yufei Cai", email = "ycai9@nd.edu" },
     { name = "Jun Li", email = "jun.li@nd.edu" },
