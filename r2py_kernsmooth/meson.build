@@ -3,7 +3,7 @@ py_mod = import('python')
 py = py_mod.find_installation(pure: false)
 numpy_dep = dependency('numpy')
 fc = meson.get_compiler('fortran')
-blas_dep = dependency('blas', required: false)
+blas_dep = dependency('blas', required: false, method: 'pkg-config')
 if not blas_dep.found()
   blas_dep = fc.find_library('openblaso', required: false)
 endif
